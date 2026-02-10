@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="action_sale_planning_dashboard" model="ir.actions.client">
+      <field name="name">Kế hoạch cung ứng</field>
+      <field name="tag">sale_planning.dashboard</field>
+    </record>
+
+    <menuitem id="menu_sale_planning_root" name="Sale Planning" sequence="10"/>
+    <menuitem id="menu_sale_planning_dashboard"
+              name="Kế hoạch cung ứng / Mua hàng"
+              parent="menu_sale_planning_root"
+              action="action_sale_planning_dashboard"
+              sequence="10"/>
+  </data>
+</odoo>

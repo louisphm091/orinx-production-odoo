@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- =========================
+             CLIENT ACTIONS
+        ========================== -->
+
+        <record id="action_fashion_forecast_dashboard_demand" model="ir.actions.client">
+            <field name="name">Dự Báo Nhu Cầu</field>
+            <field name="tag">fashion_forecast.dashboard</field>
+        </record>
+
+        <record id="action_fashion_forecast_dashboard_sales" model="ir.actions.client">
+            <field name="name">Dự Báo Doanh Thu</field>
+            <field name="tag">demand_forecast.dashboard</field>
+        </record>
+
+        <!-- =========================
+             MENUS
+        ========================== -->
+
+        <menuitem id="menu_fashion_forecast_root"
+                  name="Forecast"
+                  sequence="10"/>
+
+        <menuitem id="menu_fashion_forecast_dashboard_demand"
+                  name="Dự Báo Nhu Cầu"
+                  parent="menu_fashion_forecast_root"
+                  action="action_fashion_forecast_dashboard_demand"
+                  sequence="10"/>
+
+        <menuitem id="menu_fashion_forecast_dashboard_sales"
+                  name="Dự Báo Doanh Thu"
+                  parent="menu_fashion_forecast_root"
+                  action="action_fashion_forecast_dashboard_sales"
+                  sequence="20"/>
+
+    </data>
+</odoo>

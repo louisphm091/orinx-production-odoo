@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="sale_planning.Dashboard" owl="1">
+    <div class="sp_wrap o_action p-3">
+
+      <!-- TOP BAR -->
+      <div class="sp_topbar d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <div class="sp_title">Kế hoạch cung ứng / Mua hàng</div>
+          <div class="sp_subtitle text-muted">
+            Lập và theo dõi kế hoạch mua hàng – cung ứng dựa trên nhu cầu và kế hoạch sản xuất ngành thời trang
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-light sp_pill" type="button">SKU / Nhóm SKU</button>
+          <button class="btn btn-primary sp_btn" t-on-click="load" type="button">
+            <i class="fa fa-refresh me-1"/> Làm mới
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER ROW -->
+      <div class="sp_filters d-flex flex-wrap gap-2 align-items-center mb-3">
+        <button class="btn btn-light sp_pill" type="button">Danh mục <i class="fa fa-angle-down ms-1"/></button>
+        <button class="btn btn-light sp_pill" type="button">SKU / Nhóm SKU <i class="fa fa-angle-down ms-1"/></button>
+        <button class="btn btn-light sp_pill" type="button">Tất cả <i class="fa fa-angle-down ms-1"/></button>
+        <button class="btn btn-light sp_pill" type="button">Kho <i class="fa fa-angle-down ms-1"/></button>
+        <button class="btn btn-light sp_pill" type="button">Thời gian <i class="fa fa-angle-down ms-1"/></button>
+
+        <div class="ms-auto">
+          <button class="btn btn-success sp_btn" type="button">
+            <i class="fa fa-plus me-1"/> Tạo kế hoạch cung ứng
+          </button>
+        </div>
+      </div>
+
+      <t t-if="state.loading">
+        <div class="alert alert-info">Đang tải dữ liệu...</div>
+      </t>
+      <t t-elif="state.error">
+        <div class="alert alert-danger"><t t-esc="state.error"/></div>
+      </t>
+      <t t-else="">
+
+        <!-- KPI CARDS -->
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-3">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="sp_card_title">Tổng nhu cầu cần cung ứng</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+              <div class="sp_kpi_value">
+                <t t-esc="formatNumber(state.kpis.total_supply_need)"/> <span class="sp_kpi_unit">sản phẩm</span>
+              </div>
+              <div class="sp_kpi_hint text-muted">
+                +<t t-esc="state.kpis.growth_percent"/>% so với kỳ trước
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="sp_card_title">Đã có kế hoạch mua</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+              <div class="sp_kpi_value">
+                <t t-esc="formatNumber(state.kpis.purchase_plan_qty)"/> <span class="sp_kpi_unit">sản phẩm</span>
+              </div>
+              <div class="sp_kpi_hint text-muted">74% nhu cầu</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <div class="card sp_card p-3 h-100 sp_warn">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="sp_card_title">Nguy cơ thiếu hàng</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+              <div class="sp_kpi_value">
+                <t t-esc="formatNumber(state.kpis.risk_sku_count)"/> <span class="sp_kpi_unit">SKU</span>
+              </div>
+              <div class="sp_kpi_hint text-muted">Dự kiến thiếu trong 14 ngày</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="sp_card_title">Đơn đang chờ giao</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+              <div class="sp_kpi_value">
+                <t t-esc="formatNumber(state.kpis.waiting_orders)"/> <span class="sp_kpi_unit">đơn</span>
+              </div>
+              <div class="sp_kpi_hint text-muted">Cập nhật hôm nay</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN ROW -->
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-lg-8">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold">Đề xuất đặt hàng</div>
+                <div class="text-muted small">Cập nhật: <t t-esc="state.kpis.last_update"/></div>
+              </div>
+              <div class="position-relative sp_chart_box">
+                <canvas t-ref="mainChart"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold">Dự báo tồn kho tương ứng</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+
+              <div class="position-relative sp_mini_chart_box">
+                <canvas t-ref="inventoryChart"/>
+              </div>
+
+              <t t-set="inv" t-value="state.inventory_forecast or {}"/>
+
+            <div class="mt-2">
+                <div class="fw-semibold">
+                    <t t-esc="inv.hint and inv.hint.sku_name or '-'"/>
+                </div>
+
+                <div class="text-muted small">
+                    <t t-esc="inv.hint and inv.hint.message or ''"/>
+                </div>
+            </div>
+
+              <div class="mt-2 pt-2 border-top text-muted small">
+                <i class="fa fa-check-circle text-success me-1"/>
+                <t t-esc="inv.growth_note || ''"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECOND ROW -->
+        <div class="row g-3">
+          <div class="col-12 col-lg-4">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold">Doanh thu dự báo theo danh mục</div>
+                <i class="fa fa-ellipsis-h text-muted"/>
+              </div>
+
+              <div class="d-flex gap-3">
+                <div class="flex-grow-1">
+                  <div class="position-relative sp_spark_box">
+                    <canvas t-ref="revByCategoryChart"/>
+                  </div>
+                </div>
+
+                <div style="min-width:160px;">
+                  <t t-set="rows" t-value="state.rev_by_category || []"/>
+                  <t t-if="!rows.length">
+                    <div class="text-muted small">Chưa có dữ liệu</div>
+                  </t>
+                  <t t-else="">
+                    <t t-foreach="rows" t-as="r" t-key="r.key">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="sp_dot" t-att-style="'background:'+ (r.color || '#10b981')"/>
+                          <span class="small fw-semibold"><t t-esc="r.name"/></span>
+                        </div>
+                        <div class="small fw-semibold"><t t-esc="r.value"/>tr</div>
+                      </div>
+                    </t>
+                  </t>
+                </div>
+              </div>
+
+              <div class="mt-2 pt-2 border-top d-flex align-items-center gap-2 text-muted small">
+                <span class="sp_iconbox"><i class="fa fa-search"/></span>
+                <span>Hệ thống sử dụng dữ liệu lịch sử để điều chỉnh dự báo doanh thu</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-8">
+            <div class="card sp_card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold">Đề xuất đặt hàng (SKU)</div>
+                <button class="btn btn-success sp_btn" type="button">
+                  <i class="fa fa-plus me-1"/> Tạo đề xuất đặt hàng
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <thead class="text-muted small">
+                    <tr>
+                      <th style="width:54px;">STT</th>
+                      <th>SKU</th>
+                      <th>Danh mục</th>
+                      <th class="text-end">Nhu cầu</th>
+                      <th class="text-end">Tồn hiện tại</th>
+                      <th class="text-end">Đề xuất mua</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <t t-if="!state.order_suggestions.length">
+                      <tr><td colspan="7" class="text-muted">Chưa có dữ liệu</td></tr>
+                    </t>
+                    <t t-else="">
+                      <t t-foreach="state.order_suggestions" t-as="r" t-key="r.stt">
+                        <tr>
+                          <td><t t-esc="r.stt"/></td>
+                          <td class="fw-semibold"><t t-esc="r.sku"/></td>
+                          <td class="text-muted"><t t-esc="r.category"/></td>
+                          <td class="text-end"><t t-esc="formatNumber(r.demand)"/></td>
+                          <td class="text-end"><t t-esc="formatNumber(r.onhand)"/></td>
+                          <td class="text-end"><t t-esc="formatNumber(r.plan_buy)"/></td>
+                          <td>
+                            <t t-if="r.status === 'Nguy cơ thiếu hàng'">
+                              <span class="badge bg-warning text-dark">
+                                <i class="fa fa-exclamation-triangle me-1"/> Nguy cơ thiếu hàng
+                              </span>
+                            </t>
+                            <t t-else="">
+                              <span class="badge bg-light text-dark">Ổn định</span>
+                            </t>
+                          </td>
+                        </tr>
+                      </t>
+                    </t>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </t>
+    </div>
+  </t>
+</templates>

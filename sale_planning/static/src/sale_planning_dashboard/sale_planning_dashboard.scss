@@ -1,0 +1,74 @@
+.sp_wrap {
+  height: calc(100vh - 110px); // action area
+  overflow: auto;
+  padding-bottom: 24px;
+}
+
+.sp_topbar .sp_title {
+  font-size: 18px;
+  font-weight: 700;
+}
+.sp_subtitle {
+  font-size: 12px;
+}
+
+.sp_pill {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.sp_btn {
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.sp_card {
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.sp_card_title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+.sp_kpi_value {
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+.sp_kpi_unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+.sp_kpi_hint {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.sp_warn {
+  background: linear-gradient(180deg, rgba(251,191,36,0.15), rgba(255,255,255,1));
+}
+
+.sp_chart_box { height: 260px; }
+.sp_mini_chart_box { height: 140px; }
+.sp_spark_box { height: 120px; }
+
+.sp_dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.sp_iconbox {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

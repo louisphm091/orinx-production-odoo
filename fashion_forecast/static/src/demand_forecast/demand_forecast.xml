@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="demand_forecast.Dashboard" owl="1">
+    <div class="demand_forecast.dashboard p-3 o_action">
+
+    <!-- HEADER -->
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <div class="ff_header_left">
+            <div class="ff_title_block">
+            <div class="ff_title">DỰ BÁO DOANH THU</div>
+            </div>
+        </div>
+    </div>
+    <div class="ff_header">
+        <div class="ff_header_left">
+            <div class="ff_title_block">
+                <h4>Ngành Thời Trang</h4>
+            </div>
+        </div>
+        <div class="ff_header_right">
+          <div class="ff_header_actions d-flex gap-2 align-items-center">
+            <button class="btn btn-primary" type="button">
+              Làm mới dự báo
+            </button>
+
+            <!-- nếu muốn gọi RPC thì đổi thành: t-on-click="load" -->
+            <button class="btn btn-primary" type="button">
+              Cài Đặt Nâng Cao
+            </button>
+          </div>
+        </div>
+      </div>
+        <!-- BODY -->
+      <div class="mt-3">
+        <t t-if="state.loading"><div class="alert alert-info">Đang tải dữ liệu...</div></t><t t-elif="state.error"><div class="alert alert-danger"><t t-esc="state.error"/></div></t><t t-else="">
+
+                    <!-- KPI cards -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-3">
+              <div class="card p-3 h-100">
+                <h3 class="mb-2">Doanh Thu Dự Báo</h3>
+                <div class="fs-4 fw-bold">
+                  <t t-esc="formatNumber(state.kpis.sku_forecast)"/>
+                </div>
+                <div class="small">
+                  <span class="text-success"><t t-esc="state.kpis.delta_percent"/></span>
+                  <span class="text-muted"> so với kỳ trước</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="card p-3 h-100">
+                <h3 class="mb-2">SKU Đóng Góp Cao Nhất</h3>
+                <div class="fs-6 fw-bold"><t t-esc="state.kpis.top_sku_name"/></div>
+                <div class="small text-muted">
+                  <t t-esc="state.kpis.top_sku_share"/> tổng nhu cầu
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="card p-3 h-100">
+                <h3 class="mb-2">Rủi Ro Thiếu Hàng</h3>
+                <div class="fs-4 fw-bold">
+                  <t t-esc="formatNumber(state.kpis.low_stock_sku_count)"/> SKU
+                </div>
+                <div class="small text-muted"><t t-esc="state.kpis.low_stock_hint"/></div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="card p-3 h-100">
+                <h3 class="mb-2">Đã Điều Chỉnh Thủ Công</h3>
+                <div class="fs-4 fw-bold">
+                  <t t-esc="state.kpis.manual_adjusted ? 'Có' : 'Không'"/>
+                </div>
+                <div class="small text-muted">
+                  Lần cập nhật: <t t-esc="state.kpis.last_update || '-'"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+             <!-- Chart + Adjustment -->
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-lg-8">
+                <div class="card p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Dự báo doanh thu theo thời gian</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="text-muted small">Tháng</span>
+                        <span class="badge bg-success">Tuần</span>
+                        <span class="text-muted small">Quý</span>
+                    </div>
+                    </div>
+
+                                <!-- chart -->
+                    <div class="position-relative" style="height: 280px;">
+                    <canvas t-ref="forecastChart"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                        <div class="card p-3 h-100 d-flex flex-column">
+                            <h5 class="mb-3">
+                                Điều chỉnh dự báo<br/>
+                                theo thực tế kinh doanh
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label">Hệ số điều chỉnh</label>
+                                <input
+                                    type="range"
+                                    class="form-range"
+                                    min="-50"
+                                    max="50"
+                                    step="1"
+                                    t-model="state.adjustment_percent"
+                                />
+                                <div class="text-end text-success fw-bold">
+                                    +<t t-esc="state.adjustment_percent || 0"/>%
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Lý do điều chỉnh</label>
+                                <textarea
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Nhập lý do điều chỉnh..."
+                                />
+                            </div>
+
+                            <div class="d-flex gap-2 mt-auto">
+                                <button class="btn btn-primary flex-fill">Lưu điều chỉnh</button>
+                                <button class="btn btn-outline-secondary flex-fill">Tái dự báo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- LEFT (2 tables) -->
+                <div class="row g-3">
+                    <!-- CARD 1: Doanh thu dự báo theo danh mục -->
+                    <div class="col-12 col-lg-4">
+                        <div class="card h-100 p-3">
+                        <!-- header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-semibold text-dark">Doanh thu dự báo theo danh mục</div>
+                            <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown" type="button"
+                                    style="width:32px;height:32px;">
+                                <i class="fa fa-ellipsis-h"/>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#">Xem chi tiết</a>
+                                <a class="dropdown-item" href="#">Xuất báo cáo</a>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- body -->
+                        <div class="d-flex gap-3">
+                            <!-- mini chart -->
+                            <div class="flex-grow-1">
+                                <div class="position-relative" style="height:110px;">
+                                    <canvas t-ref="revByCategoryChart" style="width:100%;height:110px;"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- footer note -->
+                        <div class="mt-2 pt-2 border-top d-flex align-items-center gap-2 text-muted small">
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
+                                style="width:26px;height:26px;">
+                            <i class="fa fa-search"/>
+                            </span>
+                            <span>Hệ thống sử dụng dữ liệu lịch sử để điều chỉnh dự báo doanh thu</span>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2: Dự báo theo SKU -->
+                    <div class="col-12 col-lg-4">
+                        <div class="card h-100 mb-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h5 class="mb-0">Dự báo theo SKU</h5>
+                      <span class="text-muted small">Top</span>
+                    </div>
+
+                    <div class="table-responsive">
+                      <table class="table table-sm align-middle mb-0">
+                        <thead class="text-muted">
+                          <tr>
+                            <th>SKU</th>
+                            <th class="text-end">Danh Mục</th>
+                            <th class="text-end">Nhu Cầu</th>
+                            <th class="text-end">Thực Tế</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <t t-if="!state.forecast_rows.length">
+                            <tr>
+                              <td colspan="4" class="text-muted">Chưa có dữ liệu</td>
+                            </tr>
+                          </t><t t-else="">
+                            <t t-foreach="state.forecast_rows" t-as="row" t-key="row.key">
+                              <tr>
+                                <td class="fw-semibold"><t t-esc="row.name"/></td>
+                                <td class="text-end"><t t-esc="row.category"/></td>
+                                <td class="text-end"><t t-esc="formatNumber(row.demand)"/></td>
+                                <td class="text-end">
+                                  <span class="badge bg-light text-dark">
+                                    <t t-esc="formatNumber(row.actual)"/>
+                                  </span>
+                                </td>
+                              </tr>
+                            </t>
+                          </t>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                    </div>
+
+                    <!-- CARD 3: Dự báo tồn kho tương ứng -->
+                    <div class="col-12 col-lg-4">
+                        <div class="card h-100 p-3">
+                        <!-- header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-semibold text-dark">Dự báo tồn kho tương ứng</div>
+                            <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown" type="button"
+                                    style="width:32px;height:32px;">
+                                <i class="fa fa-ellipsis-h"/>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#">Xem chi tiết</a>
+                                <a class="dropdown-item" href="#">Thiết lập ngưỡng</a>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- chart -->
+                        <div class="position-relative" style="height:120px;">
+                            <canvas t-ref="inventoryChart" style="width:100%;height:120px;"/>
+                        </div>
+
+                        <!-- info rows -->
+                        <div class="mt-2">
+                            <t t-set="inv" t-value="state.inventory_hint || {}"/>
+                            <div class="d-flex align-items-center gap-2">
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
+                                    style="width:28px;height:28px;">
+                                <i class="fa fa-cube text-success"/>
+                            </span>
+                            <div class="small">
+                                <span class="fw-semibold text-dark"><t t-esc="inv.sku_name || 'Quần jean nữ'"/></span>
+                                <span class="text-muted"> – </span>
+                                <span class="text-muted"><t t-esc="inv.message || 'Hết hàng sau 18 ngày nếu hiện tại'"/></span>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- footer note -->
+                        <div class="mt-2 pt-2 border-top d-flex align-items-center gap-2 text-muted small">
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
+                                style="width:26px;height:26px;">
+                            <i class="fa fa-line-chart"/>
+                            </span>
+                            <span>Tăng 18% tại nội trợ 16% SS hiện tại</span>
+                        </div>
+                        </div>
+                    </div>
+          </div>
+
+        </t>
+      </div>
+    </div>
+  </t>
+
+</templates>

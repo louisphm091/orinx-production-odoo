@@ -1,0 +1,211 @@
+/* fashion_forecast/static/src/scss/forecast_dashboard.scss */
+
+.o_ff_page {
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(245, 247, 255, .9), rgba(248, 250, 255, .6));
+  min-height: 100%;
+}
+
+.ff_header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .55);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .06);
+}
+
+/* fix trường hợp d-flex làm khoá scroll */
+.o_action {
+    overflow-y: auto !important;
+}
+
+.ff_header_left {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 420px;
+}
+
+.ff_logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #0f766e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  i {
+    font-size: 22px;
+  }
+}
+
+.ff_title_block .ff_title {
+  font-size: 26px;
+  letter-spacing: .5px;
+  color: #0f172a;
+  margin-top: 2px
+}
+
+.ff_subtitle {
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 13.5px;
+  line-height: 1.35;
+  max-width: 740px;
+}
+
+.ff_dots {
+  margin-left: 8px;
+  color: rgba(15, 118, 110, .55);
+  font-weight: 700;
+}
+
+.ff_header_right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.ff_filter_group,
+.ff_header_actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ff_pill {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .85);
+  border: 1px solid rgba(148, 163, 184, .35);
+  padding: 8px 12px;
+  font-weight: 600;
+  color: #0f172a;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, .05);
+}
+
+.ff_pill:hover {
+  background: #fff;
+}
+
+.ff_dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #22c55e;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.ff_primary_btn {
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-weight: 700;
+  border: 1px solid rgba(15, 118, 110, .35);
+  background: linear-gradient(180deg, #0f766e, #0b5f59);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(15, 118, 110, .25);
+}
+
+.ff_primary_btn:hover {
+  filter: brightness(1.03);
+}
+
+.ff_body {
+  margin-top: 16px;
+}
+
+.ff_usage_card {
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.ff_usage_top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ff_usage_title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.ff_usage_list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ff_usage_item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.ff_usage_icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: #0f766e; /* xanh như ảnh */
+  background: rgba(15, 118, 110, 0.10);
+}
+
+.ff_usage_right {
+  min-width: 120px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ff_usage_img {
+  width: 140px;
+  height: auto;
+  border-radius: 12px;
+  opacity: 0.95;
+}
+
+.ff_usage_img_placeholder {
+  width: 140px;
+  height: 100px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.ff_usage_bottom {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ff_usage_chip {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 700;
+  color: #334155;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+}
+
+.ff_usage_chip:hover {
+  background: #fff;
+}
