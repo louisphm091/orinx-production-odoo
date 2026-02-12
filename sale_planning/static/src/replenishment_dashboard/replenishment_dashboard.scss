@@ -1,0 +1,154 @@
+.sp_rep {
+  background: #f6f7fb;
+}
+
+.sp_rep_title {
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  font-size: 22px;
+}
+
+.sp_rep_sub {
+  margin-top: 6px;
+  max-width: 720px;
+}
+
+.sp_pill {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.sp_icon_btn {
+  background: #0b7285;
+  border: 1px solid #0b7285;
+  color: #fff;
+  border-radius: 10px;
+  width: 40px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp_card {
+  border-radius: 14px;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+.sp_kpi_label {
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+}
+
+.sp_kpi_value {
+  font-weight: 900;
+  font-size: 26px;
+}
+
+.sp_kpi_hint {
+  font-size: 12px;
+}
+
+.sp_card_image {
+  position: relative;
+  overflow: hidden;
+}
+
+.sp_img_hint {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 44px;
+  opacity: 0.35;
+}
+
+.sp_section_title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.sp_search {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sp_search input {
+  border: none;
+  outline: none;
+  width: 180px;
+}
+
+.sp_table thead th {
+  font-weight: 700;
+}
+.sp_thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp_row_active {
+  background: #eef2ff !important;
+}
+
+.sp_badge {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+}
+.sp_badge_proposed { background: #e5e7eb; color: #374151; }
+.sp_badge_approved { background: #ffedd5; color: #9a3412; }
+.sp_badge_ordered { background: #d1fae5; color: #065f46; }
+
+.sp_side {
+  position: sticky;
+  top: 12px;
+}
+
+.sp_side_title {
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.sp_side_img {
+  font-size: 54px;
+  opacity: 0.35;
+}
+
+.sp_block_title {
+  font-weight: 800;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.sp_kv {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sp_kv_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sp_tag_plus {
+  background: #0ea5a4;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 900;
+}

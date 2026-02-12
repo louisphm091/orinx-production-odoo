@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="sale_planning.AnalyticsDashboard" owl="1">
+    <div class="sp_analytics p-3 o_action">
+
+      <!-- Header -->
+      <div class="sp_topbar d-flex justify-content-between align-items-start gap-3">
+        <div>
+          <div class="sp_title">
+            <span class="sp_logo"><i class="fa fa-instagram"/></span>
+            PHÂN TÍCH &amp; BÁO CÁO
+          </div>
+          <div class="sp_subtitle">
+            Tổng hợp hiệu quả kinh doanh, hành vi người dùng và so sánh kế hoạch - thực tế theo ngành thời trang
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 align-items-center flex-wrap sp_filters">
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-th-large me-1"/> Thời trang nữ</button>
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-tag me-1"/> Sản phẩm / SKU</button>
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-clock-o me-1"/> Thời gian</button>
+          <div class="sp_actions d-flex gap-2">
+            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-calendar me-1"/> Tháng</button>
+            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-wifi me-1"/> Online</button>
+            <button class="btn btn-outline-secondary sp_pill" type="button"><i class="fa fa-download me-1"/> Xuất CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <t t-if="state.loading">
+          <div class="alert alert-info">Đang tải dữ liệu...</div>
+        </t>
+        <t t-elif="state.error">
+          <div class="alert alert-danger"><t t-esc="state.error"/></div>
+        </t>
+        <t t-else="">
+
+          <!-- KPI cards -->
+          <div class="row g-3 sp_cards">
+            <div class="col-12 col-lg-3">
+              <div class="card sp_card p-3">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="sp_card_title">Hành vi người dùng</div>
+                    <div class="sp_card_value">
+                      <t t-esc="fmtNumber(state.kpis.user_behavior.pv)"/> /
+                      <t t-esc="fmtNumber(state.kpis.user_behavior.uu)"/>
+                    </div>
+                    <div class="sp_card_meta">
+                      <span class="text-success"><t t-esc="state.kpis.user_behavior.delta_percent"/></span> so với kỳ trước
+                    </div>
+                  </div>
+                  <div class="sp_card_icon"><i class="fa fa-users"/></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+              <div class="card sp_card p-3">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="sp_card_title">Doanh thu</div>
+                    <div class="sp_card_value"><t t-esc="fmtMoneyVND(state.kpis.revenue.value)"/></div>
+                    <div class="sp_card_meta">Tăng trưởng <t t-esc="state.kpis.revenue.growth_percent"/>%</div>
+                  </div>
+                  <div class="sp_card_icon"><i class="fa fa-line-chart"/></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+              <div class="card sp_card p-3">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="sp_card_title">Lợi nhuận</div>
+                    <div class="sp_card_value"><t t-esc="fmtMoneyVND(state.kpis.profit.value)"/></div>
+                    <div class="sp_card_meta">Tăng trưởng <t t-esc="state.kpis.profit.growth_percent"/>%</div>
+                  </div>
+                  <div class="sp_card_icon"><i class="fa fa-database"/></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+              <div class="card sp_card p-3">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="sp_card_title"><t t-esc="state.kpis.kpi_over.delta_percent"/> so với kế hoạch</div>
+                    <div class="sp_card_value">Danh mục vượt KPI</div>
+                    <div class="sp_card_meta">—</div>
+                  </div>
+                  <div class="sp_card_icon"><i class="fa fa-bar-chart"/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle row -->
+          <div class="row g-3 mt-1">
+            <!-- Behavior line chart -->
+            <div class="col-12 col-lg-7">
+              <div class="card sp_panel p-3 h-100">
+                <div class="sp_panel_head d-flex justify-content-between align-items-center">
+                  <div class="sp_panel_title">Phân tích hành vi người dùng</div>
+                  <i class="fa fa-ellipsis-h text-muted"/>
+                </div>
+                <div class="sp_chart_wrap" style="height:260px;">
+                  <canvas t-ref="behaviorChart"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Revenue by category -->
+            <div class="col-12 col-lg-3">
+              <div class="card sp_panel p-3 h-100">
+                <div class="sp_panel_head d-flex justify-content-between align-items-center">
+                  <div class="sp_panel_title">Doanh thu theo danh mục</div>
+                  <i class="fa fa-ellipsis-h text-muted"/>
+                </div>
+
+                <div class="sp_big_number mt-1">
+                  <t t-esc="state.revenue_bar.headline"/>
+                </div>
+
+                <div class="sp_chart_wrap" style="height:140px;">
+                  <canvas t-ref="revenueBarChart"/>
+                </div>
+
+                <div class="mt-2">
+                  <t t-foreach="state.revenue_by_category" t-as="c" t-key="c.key">
+                    <div class="d-flex justify-content-between align-items-center sp_row">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="sp_dot" t-att-style="'background:'+ (c.color || 'rgba(16,185,129,0.9)')"/>
+                        <span class="sp_row_name"><t t-esc="c.name"/></span>
+                      </div>
+                      <span class="sp_row_val"><t t-esc="c.value"/> triệu</span>
+                    </div>
+                  </t>
+                </div>
+              </div>
+            </div>
+
+            <!-- Donut -->
+            <div class="col-12 col-lg-2">
+              <div class="card sp_panel p-3 h-100">
+                <div class="sp_panel_head d-flex justify-content-between align-items-center">
+                  <div class="sp_panel_title">Nguyên giá / Sale</div>
+                  <i class="fa fa-ellipsis-h text-muted"/>
+                </div>
+
+                <div class="mt-1">
+                  <div class="sp_big_percent">
+                    <t t-esc="state.pricing_mix.full_price"/>%
+                    <span class="text-muted">nguyên giá</span>
+                  </div>
+                  <div class="text-muted small">
+                    <t t-esc="state.pricing_mix.sale"/>% sale
+                  </div>
+                </div>
+
+                <div class="sp_chart_wrap mt-2" style="height:160px;">
+                  <canvas t-ref="donutChart"/>
+                </div>
+
+                <div class="text-muted small mt-2">
+                  <t t-esc="state.pricing_mix.note"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom row -->
+          <div class="row g-3 mt-1">
+            <div class="col-12 col-lg-6">
+              <div class="card sp_panel p-3">
+                <div class="sp_panel_head d-flex justify-content-between align-items-center">
+                  <div class="sp_panel_title">Kế hoạch / Thực tế</div>
+                  <i class="fa fa-ellipsis-h text-muted"/>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0 sp_table">
+                    <thead class="text-muted">
+                      <tr>
+                        <th>Sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th class="text-end">PV</th>
+                        <th class="text-end">UU</th>
+                        <th class="text-end">Doanh thu</th>
+                        <th class="text-end">Nguyên giá</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="state.plan_actual_rows" t-as="r" t-key="r.key">
+                        <tr>
+                          <td class="fw-semibold"><t t-esc="r.name"/></td>
+                          <td class="text-muted"><t t-esc="r.category"/></td>
+                          <td class="text-end"><t t-esc="fmtNumber(r.pv)"/></td>
+                          <td class="text-end"><t t-esc="fmtNumber(r.uu)"/></td>
+                          <td class="text-end"><t t-esc="r.revenue"/></td>
+                          <td class="text-end"><span class="sp_pill_badge"><t t-esc="r.full_price"/></span></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="card sp_panel p-3">
+                <div class="sp_panel_head d-flex justify-content-between align-items-center">
+                  <div class="sp_panel_title">Biểu đồ &amp; bảng số liệu</div>
+                  <div class="sp_search">
+                    <i class="fa fa-search text-muted"/>
+                    <input class="form-control form-control-sm" placeholder="Search"
+                           t-model="state.search"/>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0 sp_table">
+                    <thead class="text-muted">
+                      <tr>
+                        <th>Sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th class="text-end">PV</th>
+                        <th class="text-end">UU</th>
+                        <th class="text-end">Doanh thu</th>
+                        <th class="text-end">Sale</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="filteredDataRows()" t-as="r" t-key="r.key">
+                        <tr>
+                          <td class="fw-semibold"><t t-esc="r.name"/></td>
+                          <td class="text-muted"><t t-esc="r.category"/></td>
+                          <td class="text-end"><t t-esc="fmtNumber(r.pv)"/></td>
+                          <td class="text-end"><t t-esc="fmtNumber(r.uu)"/></td>
+                          <td class="text-end"><t t-esc="r.revenue"/></td>
+                          <td class="text-end">
+                            <span class="sp_sale_badge"><t t-esc="r.sale"/>%</span>
+                          </td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </t>
+      </div>
+
+    </div>
+  </t>
+
+</templates>

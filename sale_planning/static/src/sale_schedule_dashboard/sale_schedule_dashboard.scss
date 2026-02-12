@@ -1,0 +1,144 @@
+.ssd_wrap {
+  height: calc(100vh - 110px);
+  overflow: auto;
+  padding-bottom: 24px;
+}
+
+.ssd_logo {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: #e6f4ff;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  color: #1570ef;
+}
+.ssd_title { font-size: 18px; font-weight: 800; letter-spacing: .5px; }
+.ssd_avatar {
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  background: #dbeafe;
+  display: inline-block;
+}
+
+.ssd_card {
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.ssd_pill {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.ssd_btn { border-radius: 10px; padding: 8px 12px; }
+.ssd_iconbtn { border-radius: 12px; width: 40px; height: 40px; }
+
+.ssd_kpi_big { font-size: 20px; font-weight: 800; }
+.ssd_kpi_icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #111827;
+}
+.ssd_i_blue { background: #e0f2fe; color: #0284c7; }
+.ssd_i_green { background: #dcfce7; color: #16a34a; }
+.ssd_i_red { background: #fee2e2; color: #ef4444; }
+.ssd_i_yellow { background: #fef3c7; color: #f59e0b; }
+
+.ssd_grid_header {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 10px;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.ssd_grid_cols {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+}
+.ssd_col_head {
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ssd_grid_body { padding-top: 8px; }
+.ssd_row {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 10px;
+  padding: 10px 6px;
+  border-radius: 12px;
+}
+.ssd_row.is_active { background: rgba(2,132,199,0.06); }
+
+.ssd_row_left {
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  align-items: center;
+}
+.ssd_thumb {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: #e5e7eb;
+}
+.ssd_thumb_big {
+  width: 64px; height: 64px;
+  border-radius: 14px;
+  background: #e5e7eb;
+}
+
+.ssd_row_track {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-height: 44px;
+}
+.ssd_bar {
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: #0b1220;
+  font-weight: 700;
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ssd_bar.c_green { background: rgba(16,185,129,0.18); border: 1px solid rgba(16,185,129,0.35); }
+.ssd_bar.c_blue { background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.35); }
+.ssd_bar.c_yellow { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.35); }
+
+.ssd_progress {
+  height: 10px;
+  background: #eef2ff;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ssd_progress_bar {
+  height: 100%;
+  background: #10b981;
+  border-radius: 999px;
+}
+
+.ssd_alert {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+.ssd_alert_icon {
+  width: 34px; height: 34px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #ef4444;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+}

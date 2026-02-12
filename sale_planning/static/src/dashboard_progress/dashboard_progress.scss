@@ -1,0 +1,94 @@
+.sp_progress {
+  background: #f6f7fb;
+}
+
+.sp_brand {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-size: 20px;
+}
+
+.sp_pill {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+.sp_pill.sp_active {
+  background: #0b7285;
+  border-color: #0b7285;
+  color: #fff;
+}
+
+.sp_panel {
+  border-radius: 14px;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+.sp_panel_title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.sp_kpi {
+  border-radius: 14px;
+  border: 1px solid #eef0f4;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+  min-height: 86px;
+  background-size: cover;
+  background-position: center;
+}
+
+.sp_kpi_title {
+  font-weight: 700;
+}
+
+.sp_kpi_big {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.sp_kpi_yellow { background: #fff7ed; }
+.sp_kpi_red { background: #fff1f2; }
+.sp_kpi_green { background: #ecfdf5; }
+.sp_kpi_pink { background: #fdf2f8; }
+
+.sp_risk_list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sp_risk_item {
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+}
+
+.sp_risk_badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp_risk_high { background: #fee2e2; color: #b91c1c; }
+.sp_risk_med { background: #ffedd5; color: #9a3412; }
+
+.sp_sku_card {
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #eef0f4;
+  min-height: 160px;
+}
+
+.sp_note {
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #1e3a8a;
+}

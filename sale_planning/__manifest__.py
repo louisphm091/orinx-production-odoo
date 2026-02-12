@@ -24,12 +24,23 @@ Long description of module's purpose
     ],
     "assets": {
         "web.assets_backend": [
-            # Chart.js UMD (bạn đặt file ở path này)
             "sale_planning/static/src/sale_planning_dashboard/chart.umd.min.js",
-            # OWL dashboard
             "sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.xml",
             "sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.js",
             "sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.scss",
+            "sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.xml",
+            "sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js",
+            "sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.scss",
+            "sale_planning/static/src/dashboard_progress/dashboard_progress.xml",
+            "sale_planning/static/src/dashboard_progress/dashboard_progress.js",
+            "sale_planning/static/src/dashboard_progress/dashboard_progress.scss",
+            "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.xml",
+            "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.js",
+            "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.scss",
+            "sale_planning/static/src/analytics_dashboard/analytics_dashboard.xml",
+            "sale_planning/static/src/analytics_dashboard/analytics_dashboard.js",
+            "sale_planning/static/src/analytics_dashboard/analytics_dashboard.scss",
+
         ],
     },
     "application": True,

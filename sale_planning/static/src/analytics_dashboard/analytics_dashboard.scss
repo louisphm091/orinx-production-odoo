@@ -1,0 +1,102 @@
+.sp_analytics {
+  background: #f6f7fb;
+  min-height: calc(100vh - 16px);
+
+  .sp_topbar {
+    .sp_title {
+      font-weight: 800;
+      letter-spacing: .5px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sp_logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e9f7f3;
+      color: #0f766e;
+      border: 1px solid rgba(15, 118, 110, .18);
+    }
+    .sp_subtitle {
+      margin-top: 6px;
+      color: #6b7280;
+      max-width: 720px;
+    }
+    .sp_pill {
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+  }
+
+  .sp_card, .sp_panel {
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    background: #fff;
+  }
+
+  .sp_card_title { color: #475569; font-weight: 600; }
+  .sp_card_value { font-size: 22px; font-weight: 800; margin-top: 2px; }
+  .sp_card_meta { margin-top: 4px; color: #6b7280; }
+  .sp_card_icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display:flex; align-items:center; justify-content:center;
+    background: #f1f5f9; color: #0f766e;
+  }
+
+  .sp_panel_head { margin-bottom: 8px; }
+  .sp_panel_title { font-weight: 800; color: #0f172a; }
+
+  .sp_chart_wrap { width: 100%; }
+
+  .sp_big_number { font-size: 26px; font-weight: 900; color: #0f172a; }
+  .sp_big_percent { font-size: 18px; font-weight: 900; color: #0f172a; }
+
+  .sp_row {
+    padding: 6px 0;
+    border-top: 1px dashed rgba(0,0,0,.06);
+    &:first-child { border-top: 0; }
+  }
+  .sp_dot { width: 10px; height: 10px; border-radius: 999px; display:inline-block; }
+
+  .sp_table thead th { font-weight: 700; }
+  .sp_pill_badge {
+    display: inline-flex;
+    padding: 4px 8px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.16);
+    color: #92400e;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .sp_sale_badge {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 10px;
+    background: rgba(20, 184, 166, 0.16);
+    color: #0f766e;
+    font-weight: 800;
+    font-size: 12px;
+  }
+
+  .sp_search {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#f8fafc;
+    border:1px solid rgba(0,0,0,.06);
+    border-radius: 999px;
+    padding: 6px 10px;
+    input {
+      border: 0 !important;
+      background: transparent !important;
+      width: 180px;
+      box-shadow: none !important;
+    }
+  }
+}
