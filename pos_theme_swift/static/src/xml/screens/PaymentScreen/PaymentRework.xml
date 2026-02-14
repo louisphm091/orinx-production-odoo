@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+
+    <!--
+      1) Tạo panel bên phải (left-content) gồm:
+         - Khách cần trả (nhét PaymentScreenDue gốc vào đây)
+         - Target để nhét list món (PaymentScreenPaymentLines)
+    -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('left-content')][1]/*[1]" position="before">
+
+      <!-- Panel "Khách cần trả" -->
+      <div class="sapphire-due-right">
+        <div class="sdr-top">
+          <div class="sdr-label">Khách cần trả</div>
+
+          <!-- target để MOVE đúng 22đ gốc (PaymentScreenDue) vào đây -->
+          <div class="o_sapphire_due_target"/>
+        </div>
+
+        <!-- (optional) subtitle, không phụ thuộc order/get_orderlines để tránh crash -->
+        <div class="sdr-sub">
+          <span class="dot">•</span>
+          <span>Thanh toán</span>
+        </div>
+      </div>
+
+      <!-- target để MOVE component list món -->
+      <div class="o_sapphire_paymentlines_target"/>
+    </xpath>
+
+
+    <!-- 2) MOVE block "22đ" gốc: t-call PaymentScreenDue -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('left-content')][1]//div[hasclass('o_sapphire_due_target')][1]"
+           position="inside">
+      <xpath expr="//t[@t-call='point_of_sale.PaymentScreenDue']" position="move"/>
+    </xpath>
+
+
+    <!-- 3) MOVE list món gốc: component PaymentScreenPaymentLines -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('left-content')][1]//div[hasclass('o_sapphire_paymentlines_target')][1]"
+           position="inside">
+      <xpath expr="(//PaymentScreenPaymentLines)[1]" position="move"/>
+    </xpath>
+
+
+    <!-- 4) Ẩn chỗ hiển thị Due/Cash ở giữa màn hình (center-content) - KHÔNG replace để khỏi vỡ layout -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('center-content')][1]" position="attributes">
+      <attribute name="class" add=" o_sapphire_center_hidden " separator=" "/>
+    </xpath>
+
+  </t>
+</templates>

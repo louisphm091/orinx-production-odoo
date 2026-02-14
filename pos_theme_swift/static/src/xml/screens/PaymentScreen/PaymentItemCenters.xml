@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+
+    <!-- Render danh sách items trong center-content -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('center-content')][1]" position="inside">
+
+      <t t-set="order" t-value="(pos.get_order and pos.get_order()) or (pos.getOrder and pos.getOrder())"/>
+
+      <div class="sapphire-items-left" t-if="order">
+        <t t-set="lines"
+           t-value="(order.get_orderlines and order.get_orderlines()) or (order.getOrderlines and order.getOrderlines()) or []"/>
+
+        <div class="sil-header">
+          <div class="sil-title">Danh sách món</div>
+          <div class="sil-count"><t t-esc="lines.length"/> món</div>
+        </div>
+
+        <div class="sil-list">
+          <t t-if="!lines.length">
+            <div class="sil-empty">Chưa có sản phẩm</div>
+          </t>
+
+          <t t-foreach="lines" t-as="line" t-key="line.uuid or line.cid or line">
+
+            <!-- Odoo 19 fields -->
+            <t t-set="qty" t-value="line.qty or 0"/>
+            <t t-set="unit" t-value="line.price_unit or 0"/>
+            <t t-set="name" t-value="line.full_product_name or (line.getFullProductName and line.getFullProductName()) or ''"/>
+            <t t-set="line_total" t-value="qty * unit"/>
+
+            <div class="sil-row">
+              <div class="sil-qty"><t t-esc="qty"/></div>
+
+              <div class="sil-name" t-att-title="name">
+                <t t-esc="name"/>
+              </div>
+
+              <div class="sil-total">
+                <t t-esc="env.utils.formatCurrency(line_total)"/>
+              </div>
+            </div>
+
+          </t>
+        </div>
+      </div>
+
+    </xpath>
+
+  </t>
+</templates>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <!-- Ví dụ t-name; bạn phải match đúng trong core -->
+  <t t-inherit="point_of_sale.OrderTabs" t-inherit-mode="extension">
+
+    <!-- chỗ nào đang hiển thị order.name thì replace -->
+    <xpath expr="//t[@t-esc='order.name']" position="replace">
+      <t t-esc="'Hóa đơn ' + String(index + 1)"/>
+    </xpath>
+
+  </t>
+
+</templates>

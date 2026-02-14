@@ -1,0 +1,1314 @@
+/* =========================================================
+   POS THEME SAPPHIRE - CLEAN & STABLE (Odoo 19)
+   - ONE navbar rule (sticky per screen)
+   - NO fixed global navbar
+   ========================================================= */
+
+/* ---------- CSS tokens ---------- */
+.pos{
+  --sapphire-blue: #388eff;
+  --bg-soft: #f3f4f6;
+  --text-dark: #111827;
+  --muted: #6b7280;
+  --border-soft: rgba(0,0,0,0.08);
+  --border-soft-2: rgba(0,0,0,0.10);
+
+  --sapphire-navbar-h: 60px;   /* desktop navbar height */
+  --sapphire-navbar-h-m: 48px; /* mobile navbar height */
+}
+
+/* =========================================================
+   NAVBAR BASE (visual)
+   ========================================================= */
+.pos .sapphire-navbar{
+  height: var(--sapphire-navbar-h);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--sapphire-blue);
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.pos .sapphire-navbar .nav-left,
+.pos .sapphire-navbar .nav-right{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+/* remove any bottom underline / strip */
+.pos .sapphire-navbar .nav-tabs,
+.pos .sapphire-navbar .sapphire-order-tabs{
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+.pos .sapphire-navbar .nav-tabs{ margin-left: 8px; }
+.pos .sapphire-navbar .nav-tabs::before,
+.pos .sapphire-navbar .nav-tabs::after,
+.pos .sapphire-navbar .sapphire-order-tabs::before,
+.pos .sapphire-navbar .sapphire-order-tabs::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* search */
+.pos .sapphire-navbar #search-products .input-group,
+.pos .sapphire-navbar #search-products .input-container{
+  width: 380px !important;
+  max-width: 42vw !important;
+  height: 34px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12) !important;
+  margin: 0 !important;
+}
+.pos .sapphire-navbar #search-products .input-group-text,
+.pos .sapphire-navbar #search-products .input-icon{
+  border: none !important;
+  background: transparent !important;
+  padding-left: 12px !important;
+  padding-right: 6px !important;
+  color: #111 !important;
+}
+.pos .sapphire-navbar #search-products input.form-control,
+.pos .sapphire-navbar #search-products input{
+  height: 34px !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  color: #111 !important;
+  font-size: 14px !important;
+}
+.pos .sapphire-navbar #search-products input::placeholder{
+  color: var(--muted) !important;
+}
+
+/* navbar buttons */
+.pos .sapphire-navbar .nav-btn{
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  font-size: 13px;
+  line-height: 1;
+}
+.pos .sapphire-navbar .nav-btn:hover{ background: rgba(255,255,255,0.16); }
+.pos .sapphire-navbar .nav-btn .nav-icon{ font-size: 14px; }
+
+/* order tabs */
+.pos .sapphire-navbar .sapphire-order-tabs{
+  display: inline-flex;
+  gap: 8px;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab{
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: none !important;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab:hover{ background: rgba(255,255,255,0.25); }
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.active{
+  background: rgba(255,255,255,0.34);
+  font-weight: 600;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .tab-label{
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  font-size: 14px;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .tab-close{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.85;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .tab-close:hover{
+  opacity: 1;
+  background: rgba(0,0,0,0.18);
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add{
+  width: 32px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  font-size: 18px;
+  font-weight: 700;
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add:hover{ background: rgba(255,255,255,0.38); }
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add i{ color: #fff !important; }
+
+/* cashier */
+.pos .sapphire-navbar .nav-cashier{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  overflow: visible;
+}
+.pos .sapphire-navbar .nav-cashier .top-container{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pos .sapphire-navbar .nav-cashier .profile-image,
+.pos .sapphire-navbar .nav-cashier .avatar-letter{
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  border-radius: 7px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+.pos .sapphire-navbar .nav-cashier .name{
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  color: #fff !important;
+}
+.pos .sapphire-navbar .nav-cashier .mail{ display: none !important; }
+
+/* avatar letter fix */
+.pos .sapphire-navbar .nav-cashier .avatar-letter,
+.pos .sapphire-navbar .nav-cashier .o_avatar_letter,
+.pos .sapphire-navbar .nav-cashier .o_avatar_letter span{
+  background: rgba(255,255,255,0.18) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+.pos .sapphire-navbar .nav-cashier .btn,
+.pos .sapphire-navbar .nav-cashier .cashier-name,
+.pos .sapphire-navbar .nav-cashier .btn.cashier-name{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* mobile navbar sizing */
+@media (max-width: 768px){
+  .pos{ --sapphire-navbar-h: var(--sapphire-navbar-h-m); }
+  .pos .sapphire-navbar{
+    height: var(--sapphire-navbar-h);
+    padding: 0 8px;
+  }
+  .pos .sapphire-navbar #search-products .input-group,
+  .pos .sapphire-navbar #search-products .input-container{
+    width: 52vw !important;
+    max-width: 52vw !important;
+    height: 32px !important;
+  }
+  .pos .sapphire-navbar #search-products input{ height: 32px !important; }
+}
+
+/* =========================================================
+   IMPORTANT: NAVBAR POSITIONING (ONLY sticky per screen)
+   - This is the key to your “desktop blank but navbar missing” bug.
+   ========================================================= */
+
+.pos .product-screen.o_sapphire_with_navbar,
+.pos .payment-screen.o_sapphire_with_navbar{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* navbar must be direct child of screen */
+.pos .product-screen.o_sapphire_with_navbar > .sapphire-navbar,
+.pos .payment-screen.o_sapphire_with_navbar > .sapphire-navbar{
+  position: sticky;
+  top: 0;
+  z-index: 3500;
+  flex: 0 0 var(--sapphire-navbar-h);
+}
+
+/* content fills remaining area */
+.pos .product-screen.o_sapphire_with_navbar > :not(.sapphire-navbar),
+.pos .payment-screen.o_sapphire_with_navbar > :not(.sapphire-navbar){
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* =========================================================
+   CATEGORY PANEL: MENU LIST
+   ========================================================= */
+.pos .category-panel{
+  width: 240px;
+  min-width: 220px;
+  max-width: 260px;
+  background: #fff;
+  border-right: 1px solid var(--border-soft);
+  overflow: auto;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.pos .category-panel .category-list,
+.pos .category-panel .categories,
+.pos .category-panel .category-list-scroller{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: none !important;
+}
+
+.pos .category-panel .category-button,
+.pos .category-panel .category-simple-button{
+  width: 100% !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+
+  border-radius: 10px !important;
+  border: 1px solid var(--border-soft) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.pos .category-panel .category-button .category-img,
+.pos .category-panel .category-simple-button .category-img{
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background: rgba(56,142,255,0.10) !important;
+}
+.pos .category-panel .category-button .category-img img,
+.pos .category-panel .category-simple-button .category-img img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+}
+
+.pos .category-panel .category-name{
+  width: 100% !important;
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.pos .category-panel .category-button.highlight,
+.pos .category-panel .category-simple-button.highlight{
+  background: rgba(56,142,255,0.14) !important;
+  border-color: rgba(56,142,255,0.30) !important;
+  color: #0b5ed7 !important;
+}
+.pos .category-panel .category-button:hover,
+.pos .category-panel .category-simple-button:hover{
+  background: rgba(0,0,0,0.03) !important;
+}
+
+/* =========================================================
+   PRODUCTS: LIST VIEW (1 row per product)
+   ========================================================= */
+.pos .products-panel .product-list{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  grid-template-columns: none !important;
+}
+
+.pos .products-panel .product-card{
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+
+  box-shadow: none !important;
+  border: 1px solid var(--border-soft) !important;
+}
+
+.pos .products-panel .product-card .product-img{
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+.pos .products-panel .product-card .product-img img{
+  width: 40px !important;
+  height: 40px !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+  margin: 0 !important;
+}
+
+.pos .products-panel .product-card > *:not(.product-img){ min-width: 0 !important; }
+
+.pos .products-panel .product-card .product-info,
+.pos .products-panel .product-card .body,
+.pos .products-panel .product-card .content{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.pos .products-panel .product-card .title,
+.pos .products-panel .product-card .product-name{
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.pos .products-panel .product-card .price,
+.pos .products-panel .product-card .product-price{
+  margin-left: auto !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+/* =========================================================
+   CUSTOMER PANEL + HIDE OLD BUTTONS
+   ========================================================= */
+.pos .sapphire-customer-panel{
+  padding: 10px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.pos .sapphire-customer-panel .scp-search{
+  height: 42px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft-2);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pos .sapphire-customer-panel .scp-search-icon{ opacity: .55; }
+.pos .sapphire-customer-panel .scp-search-placeholder{
+  flex: 1 1 auto;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pos .sapphire-customer-panel .scp-add{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.pos .sapphire-customer-panel .scp-add:hover{ background: rgba(0,0,0,0.05); }
+
+.pos .sapphire-customer-panel .scp-tabs{
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+.pos .sapphire-customer-panel .scp-tab{
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft-2);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+.pos .sapphire-customer-panel .scp-more{
+  margin-left: auto;
+  width: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hide old partner/note buttons (leftpane/control-buttons) */
+.pos .actionpad .partner-button,
+.pos .actionpad .note-button,
+.pos .control-buttons .partner-button,
+.pos .control-buttons .note-button,
+.pos .leftpane button.set-partner,
+.pos .leftpane button.set-note,
+.pos .leftpane .pads button.set-partner,
+.pos .leftpane .pads button.set-note,
+.pos .leftpane .subpads button.set-partner,
+.pos .leftpane .subpads button.set-note,
+.pos .leftpane .control-buttons{
+  display: none !important;
+}
+
+/* =========================================================
+   BOTTOM BAR (if you use it)
+   ========================================================= */
+.pos .sapphire-bottom-bar{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  z-index: 999;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  align-items: center;
+  box-sizing: border-box;
+}
+.pos .sapphire-bottom-bar .sbb-btn{
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft-2);
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pos .sapphire-bottom-bar .sbb-more{
+  margin-left: auto;
+  width: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* prevent content hidden behind bottom bar */
+.pos .product-screen{ padding-bottom: 56px; }
+
+/* =========================================================
+   PAYMENT SCREEN (layout helpers)
+   ========================================================= */
+.pos .payment-screen{
+  min-height: 0 !important;
+}
+
+/* optional: make payment content split nicer (doesn't break default) */
+.pos .payment-screen .payment-screen-content,
+.pos .payment-screen .payment-content{
+  min-height: 0;
+}
+
+.pos .payment-screen.o_sapphire_with_navbar{
+  padding-top: 60px;
+  box-sizing: border-box;
+}
+
+.pos .payment-screen.o_sapphire_with_navbar .sapphire-navbar--payment{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  z-index: 10000;
+}
+
+/* Payment: navbar stick inside payment-screen */
+.pos .payment-screen.o_sapphire_payment_with_navbar{
+  padding-top: 60px; /* chừa chỗ navbar */
+  box-sizing: border-box;
+}
+
+.pos .payment-screen.o_sapphire_payment_with_navbar > .sapphire-navbar--payment{
+  position: sticky;
+  top: 0;
+  height: 60px;
+  margin-top: -60px; /* kéo navbar lên đúng vùng padding */
+  z-index: 10000;
+}
+/* =========================
+   PAYMENT SPLIT LAYOUT
+   ========================= */
+
+.pos .payment-screen.o_sapphire_payment_split .main-content{
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Cột trái: nơi chứa orderlines / summary */
+.pos .payment-screen.o_sapphire_payment_split .center-content{
+  order: 1 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  /* bỏ kiểu center to đùng */
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+}
+
+/* Cột phải: payment methods + numpad + buttons */
+.pos .payment-screen.o_sapphire_payment_split .left-content{
+  order: 2 !important;
+  flex: 0 0 420px !important;
+  width: 420px !important;
+  max-width: 40vw !important;
+  min-width: 360px !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+
+  background: #f9fafb !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  border-radius: 12px !important;
+  overflow: auto !important;
+  padding: 12px !important;
+}
+
+/* Nếu Odoo đang dùng right-content cho numpad/buttons thì gom nó chung sidebar luôn */
+.pos .payment-screen.o_sapphire_payment_split .right-content{
+  order: 3 !important;
+  flex: 0 0 0px !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  display: none !important;
+}
+
+/* =========================
+   ORDERLINES -> MENU LIST
+   (tùy DOM, selector rộng)
+   ========================= */
+
+/* Container list lines thường có class paymentlines-container */
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container{
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  border-radius: 12px !important;
+  padding: 10px !important;
+}
+
+/* mỗi dòng */
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .paymentline,
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .payment-line{
+  display: grid !important;
+  grid-template-columns: 56px 1fr 80px 110px 40px !important; /* qty/image | name | unit | total | menu */
+  align-items: center !important;
+  gap: 10px !important;
+
+  padding: 10px 12px !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  margin-bottom: 10px !important;
+}
+
+/* tên sản phẩm gọn */
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .product-name,
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .name{
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* số tiền căn phải */
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .total,
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .price{
+  text-align: right !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================================
+   ODOO 19 - PAYMENT SCREEN DESKTOP SPLIT
+   Left = Order items area (center-content)
+   Right = Methods + numpad/buttons (left-content + right-content)
+   ========================================================= */
+
+/* 1) Main content must be horizontal split */
+.pos .payment-screen .main-content{
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* 2) Center content becomes LEFT BIG area */
+.pos .payment-screen .center-content{
+  order: 1 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  /* stop the “big centered total” layout from forcing center */
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+}
+
+/* 3) Left content becomes RIGHT sidebar (methods) */
+.pos .payment-screen .left-content{
+  order: 2 !important;
+  flex: 0 0 420px !important;
+  width: 420px !important;
+  max-width: 40vw !important;
+  min-width: 360px !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+
+  overflow: auto !important;
+
+  background: #f9fafb !important;
+  border-left: 1px solid rgba(0,0,0,0.08) !important;
+  padding: 12px !important;
+}
+
+/* 4) If right-content exists, keep it under the right sidebar,
+      not as a third column (many Odoo builds render numpad/buttons here). */
+.pos .payment-screen .right-content{
+  order: 3 !important;
+  flex: 0 0 420px !important;
+  width: 420px !important;
+  max-width: 40vw !important;
+  min-width: 360px !important;
+
+  height: 100% !important;
+  min-height: 0 !important;
+
+  overflow: auto !important;
+
+  background: #f9fafb !important;
+  border-left: 1px solid rgba(0,0,0,0.08) !important;
+  padding: 12px !important;
+}
+
+/* 5) If both left-content and right-content render (2 side panels),
+      stack them vertically inside the same right column feel.
+      This makes “methods on top, numpad/buttons below”. */
+.pos .payment-screen .left-content,
+.pos .payment-screen .right-content{
+  border-radius: 12px !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+}
+
+.pos .payment-screen .main-content{
+  align-items: stretch !important;
+}
+
+/* Make the two panels behave like a single right column (top/bottom) */
+.pos .payment-screen .main-content{
+  /* allow wrapping to fake “stack” when 2 side panels exist */
+  flex-wrap: wrap !important;
+}
+.pos .payment-screen .center-content{
+  /* occupy left side full height */
+  flex: 1 1 calc(100% - 432px) !important;
+}
+.pos .payment-screen .left-content{
+  flex: 0 0 420px !important;
+}
+.pos .payment-screen .right-content{
+  flex: 0 0 420px !important;
+}
+
+/* 6) Make center area scrollable (where you will later render items list) */
+.pos .payment-screen .center-content{
+  overflow: auto !important;
+}
+
+/* Responsive */
+@media (max-width: 992px){
+  .pos .payment-screen .main-content{
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  .pos .payment-screen .left-content,
+  .pos .payment-screen .right-content{
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+.pos .o_sapphire_due_in_right{
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+}
+
+/* Thu nhỏ chữ số tiền (nếu vẫn to) */
+.pos .o_sapphire_due_in_right .payment-due .amount,
+.pos .o_sapphire_due_in_right .payment-due .value{
+  font-size: 32px !important;
+  line-height: 1.1 !important;
+}
+
+
+/* =========================
+   PAYMENT: hide old center due + old methods block
+   ========================= */
+
+/* Ẩn số tiền to ở center-content (cái 22đ giữa màn hình) */
+.pos .payment-screen .center-content .payment-due,
+.pos .payment-screen .center-content .payment-due-container,
+.pos .payment-screen .center-content .payment-status,
+.pos .payment-screen .center-content .payment-status-container {
+  display: none !important;
+}
+/* =========================
+   NEW: Items + Due panel (top of right panel)
+   ========================= */
+
+.pos .sapphire-pay-items-panel{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.pos .sapphire-pay-items-panel .spi-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pos .sapphire-pay-items-panel .spi-due-label{
+  font-size: 12px;
+  opacity: .7;
+}
+
+.pos .sapphire-pay-items-panel .spi-due-amount{
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.pos .sapphire-pay-items-panel .spi-meta{
+  font-size: 12px;
+  opacity: .7;
+  padding-top: 4px;
+}
+
+.pos .sapphire-pay-items-panel .spi-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;         /* panel scroll nếu nhiều items */
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.pos .sapphire-pay-items-panel .spi-row{
+  display: grid;
+  grid-template-columns: 36px 1fr 92px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+}
+
+.pos .sapphire-pay-items-panel .spi-qty{
+  text-align: center;
+  font-weight: 800;
+}
+
+.pos .sapphire-pay-items-panel .spi-name{
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.pos .sapphire-pay-items-panel .spi-total{
+  text-align: right;
+  font-weight: 800;
+}
+
+/* =========================
+   NEW: Collapsible Methods (near Customer)
+   ========================= */
+
+.pos .sapphire-methods-collapse-wrap{
+  margin: 6px 0 10px;
+}
+
+.pos .sapphire-methods-collapse{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pos .sapphire-methods-summary{
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  user-select: none;
+}
+
+.pos .sapphire-methods-summary::-webkit-details-marker{ display:none; }
+
+.pos .sapphire-methods-summary .sms-label{
+  font-weight: 800;
+}
+
+.pos .sapphire-methods-summary .sms-current{
+  font-size: 12px;
+  opacity: .75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
+  text-align: right;
+}
+
+.pos .sapphire-methods-body{
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding: 10px;
+}
+
+/* Make methods inside look like list */
+.pos .sapphire-methods-body .button,
+.pos .sapphire-methods-body button{
+  width: 100%;
+  justify-content: flex-start;
+}
+.pos .payment-screen .sapphire-methods-collapse-wrap{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.pos .payment-screen .sapphire-methods-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.pos .payment-screen .sapphire-methods-body{
+  margin-top: 10px;
+}
+
+ /* left-content là flex-column => dùng order để control vị trí */
+.pos .payment-screen .left-content{
+  display: flex;
+  flex-direction: column;
+}
+
+/* panel items + due lên trên cùng */
+.pos .payment-screen .left-content .sapphire-pay-items-panel{
+  order: -20;
+  margin-bottom: 8px;
+}
+
+/* collapse methods đứng dưới panel items */
+.pos .payment-screen .left-content .sapphire-methods-collapse-wrap{
+  order: -10;
+  margin-bottom: 8px;
+}
+
+/* style cơ bản */
+.pos .sapphire-methods-summary{
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.pos .sapphire-methods-body{
+  margin-top: 8px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+/* items list */
+.pos .sapphire-pay-items-panel{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.pos .sapphire-pay-items-panel .spi-row{
+  display: grid;
+  grid-template-columns: 44px 1fr 120px;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 0;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+}
+.pos .sapphire-pay-items-panel .spi-name{
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pos .sapphire-pay-items-panel .spi-total{
+  text-align: right;
+  font-weight: 700;
+}
+
+/* LEFT: items menu list */
+.pos .sapphire-items-left{
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pos .sapphire-items-left .sil-header{
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  background: #f9fafb;
+}
+
+.pos .sapphire-items-left .sil-title{
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pos .sapphire-items-left .sil-count{
+  font-size: 12px;
+  opacity: .7;
+}
+
+.pos .sapphire-items-left .sil-list{
+  padding: 8px;
+  overflow: auto;
+}
+
+.pos .sapphire-items-left .sil-empty{
+  padding: 10px;
+  font-size: 13px;
+  opacity: .7;
+}
+
+.pos .sapphire-items-left .sil-row{
+  display: grid;
+  grid-template-columns: 34px 1fr 110px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 8px;
+}
+
+.pos .sapphire-items-left .sil-qty{
+  font-weight: 800;
+  text-align: center;
+}
+
+.pos .sapphire-items-left .sil-name{
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos .sapphire-items-left .sil-total{
+  text-align: right;
+  font-weight: 800;
+}
+
+/* RIGHT: due panel above numpad */
+.pos .sapphire-due-right{
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+}
+
+.pos .sapphire-due-right .sdr-top{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pos .sapphire-due-right .sdr-label{
+  font-size: 12px;
+  opacity: .7;
+  font-weight: 600;
+}
+
+.pos .sapphire-due-right .sdr-amount{
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.pos .sapphire-due-right .sdr-sub{
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: .65;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos .sapphire-due-right .dot{
+  opacity: .5;
+}
+
+/* 1) Ẩn số 22đ */
+.payment-screen .center-content .payment-status,
+.payment-screen .center-content .payment-due,
+.payment-screen .center-content .payment-due-container {
+    display: none !important;
+}
+
+/* 2) Ẩn block Cash ở giữa */
+.payment-screen .center-content .paymentlines,
+.payment-screen .center-content .payment-lines,
+.payment-screen .center-content .paymentline {
+    display: none !important;
+}
+
+/* ===== Resize số tiền trong panel phải ===== */
+
+.pos .sapphire-due-right {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.pos .sapphire-due-right .sdr-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+/* Target block gốc PaymentScreenDue đã move vào */
+.pos .sapphire-due-right .o_sapphire_due_target {
+  font-size: 20px !important;   /* giảm từ 32-36px xuống */
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  color: #111827 !important;
+}
+
+/* Nếu Odoo bọc thêm div .payment-due */
+.pos .sapphire-due-right .payment-due,
+.pos .sapphire-due-right .payment-status {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+/* Mobile nhỏ hơn chút */
+@media (max-width: 768px){
+  .pos .sapphire-due-right .o_sapphire_due_target,
+  .pos .sapphire-due-right .payment-due,
+  .pos .sapphire-due-right .payment-status {
+    font-size: 18px !important;
+  }
+}
+
+/* Resize số tiền 22đ bên phải */
+.pos .sapphire-due-right .total {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+/* Resize ký hiệu tiền */
+.pos .sapphire-due-right .total span {
+  font-size: 60% !important;
+}
+
+.pos .sapphire-methods-collapse {
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.pos .sapphire-methods-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  user-select: none;
+}
+
+.pos .sapphire-methods-summary::-webkit-details-marker { display: none; }
+
+.pos .sapphire-methods-body {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Wrap */
+.sapphire-methods-collapse-wrap{
+  position: relative;
+}
+
+/* Dropdown body */
+.sapphire-methods-collapse{
+  position: relative;
+}
+
+.sapphire-methods-collapse > summary{
+  cursor: pointer;
+  list-style: none;
+}
+
+.sapphire-methods-collapse > summary::-webkit-details-marker{
+  display: none;
+}   
+
+/* phần menu xổ xuống */
+.sapphire-methods-collapse .sapphire-methods-body{
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 9999;
+
+  background: white;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+
+  max-height: 320px;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* đảm bảo không bị parent che */
+.left-content, .payment-screen, .main-content{
+  overflow: visible !important;
+}
+
+/* =============== FIX: Payment methods dropdown visible =============== */
+
+/* 1) chỉ ẩn methods gốc ở vị trí cũ (direct child) */
+.pos .payment-screen .left-content > .paymentmethods,
+.pos .payment-screen .left-content > .payment-methods,
+.pos .payment-screen .left-content > .payment-methods-container{
+  display: none !important;
+}
+
+/* 2) nhưng nếu methods nằm trong dropdown mới thì PHẢI HIỆN */
+.pos .payment-screen .sapphire-methods-body .paymentmethods,
+.pos .payment-screen .sapphire-methods-body .payment-methods,
+.pos .payment-screen .sapphire-methods-body .payment-methods-container{
+  display: block !important;
+  visibility: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 3) dropdown body: chọn 1 trong 2 option */
+
+/* Option A (ổn định): không overlay */
+.pos .sapphire-methods-collapse .sapphire-methods-body{
+  position: static !important;
+  max-height: 320px;
+  overflow: auto;
+}
+
+
+.pos .payment-screen .center-content .total.text-center.text-dark {
+  display: none !important;
+}

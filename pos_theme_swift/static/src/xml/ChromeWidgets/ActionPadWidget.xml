@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <t t-inherit="point_of_sale.ActionpadWidget" t-inherit-mode="extension">
+
+    <!-- Odoo 19: bám vào container chắc chắn có -->
+    <xpath expr="//div[contains(@class,'actionpad')]" position="attributes">
+      <attribute name="class" add=" o_sapphire_hide_partner_note " separator=" "/>
+    </xpath>
+
+  </t>
+
+</templates>
