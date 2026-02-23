@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+    <!-- 1) Chèn Sapphire pay panel lên đầu right column (left-content của PaymentScreen) -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('left-content')][1]/*[1]" position="before">
+
+      <t t-set="order" t-value="this.sppOrder()"/>
+      <t t-set="summary" t-value="order and this.getSapphireSummary(order)"/>
+      <t t-set="methods" t-value="this.sppMethods()"/>
+
+      <div class="sapp-paypanel" t-if="order and summary">
+
+        <!-- Customer row -->
+        <div class="spp-customer" t-on-click.stop.prevent="() => {}">
+          <i class="fa fa-search spp-ico"/>
+          <div class="spp-placeholder">
+            <t t-esc="(order.get_partner and order.get_partner() and order.get_partner().name) or 'Tìm khách hàng (F4)'"/>
+          </div>
+          <button class="spp-add" type="button" t-on-click.stop.prevent="() => {}">
+            <i class="fa fa-plus"/>
+          </button>
+        </div>
+
+        <!-- Summary -->
+        <div class="spp-summary">
+          <div class="spp-row">
+            <div class="lbl">Tổng tiền hàng</div>
+            <div class="mid"><t t-esc="summary.items_count"/></div>
+            <div class="val"><t t-esc="env.utils.formatCurrency(summary.total_items)"/></div>
+          </div>
+
+          <div class="spp-row">
+            <div class="lbl">Giảm giá</div>
+            <div class="mid"/>
+            <div class="val muted"><t t-esc="env.utils.formatCurrency(summary.discount_total)"/></div>
+          </div>
+
+          <div class="spp-row">
+            <div class="lbl">Thu khác</div>
+            <div class="mid"/>
+            <div class="val muted"><t t-esc="env.utils.formatCurrency(summary.other_charges)"/></div>
+          </div>
+
+          <!-- Khách cần trả = tổng - giảm + thu khác -->
+          <div class="spp-row spp-strong">
+            <div class="lbl">Khách cần trả</div>
+            <div class="mid"/>
+            <div class="val primary"><t t-esc="env.utils.formatCurrency(summary.need_to_pay)"/></div>
+          </div>
+
+          <div class="spp-row">
+            <div class="lbl">Khách thanh toán</div>
+            <div class="mid"/>
+            <div class="val"><t t-esc="env.utils.formatCurrency(summary.amount_paid)"/></div>
+          </div>
+        </div>
+
+        <!-- RADIO METHODS -->
+        <div class="spp-methods" t-if="methods and methods.length">
+          <t t-foreach="methods" t-as="method" t-key="method.id">
+            <label class="spp-radio" t-on-click.stop.prevent="(ev) => this.onSapphireSelectMethod(ev, method)">
+              <input
+                type="radio"
+                name="spp_method"
+                t-att-checked="this.isSapphireMethodSelected(order, method) ? true : undefined"
+                t-on-click.stop.prevent="(ev) => this.onSapphireSelectMethod(ev, method)"
+              />
+              <span class="radio-circle"/>
+              <span class="radio-label"><t t-esc="method.name"/></span>
+            </label>
+          </t>
+        </div>
+
+        <!-- QUICK -->
+        <div class="spp-quick">
+          <t t-set="qs" t-value="this.getSapphireQuickAmounts(summary.amount_due)"/>
+          <t t-foreach="qs" t-as="q" t-key="q">
+            <button class="spp-qbtn" type="button"
+                    t-on-click.stop.prevent="(ev) => this.onSapphireQuickPay(ev, q)">
+              <t t-esc="this.formatSapphireNumber(q)"/>
+            </button>
+          </t>
+        </div>
+
+        <!-- ✅ PAY BAR: IN + THANH TOÁN (giống KiotViet) -->
+        <div class="spp-paybar">
+          <button type="button"
+                  class="spp-inbtn"
+                  t-att-class="this.sppIsToInvoice(order) ? 'spp-inbtn is-on' : 'spp-inbtn'"
+                  t-on-click.stop.prevent="(ev) => this.onSapphireToggleInvoice(ev)">
+            IN
+          </button>
+
+          <button type="button"
+                  class="spp-paybtn"
+                  t-on-click.stop.prevent="(ev) => this.onSapphirePay(ev)">
+            THANH TOÁN
+          </button>
+        </div>
+
+      </div>
+    </xpath>
+  </t>
+
+  <!-- 2) Ẩn Payment methods block gốc của Odoo -->
+  <t t-inherit="point_of_sale.PaymentScreenMethods" t-inherit-mode="extension">
+    <xpath expr="//div[hasclass('paymentmethods-container')]" position="attributes">
+      <attribute name="class" add="d-none" separator=" "/>
+    </xpath>
+  </t>
+
+</templates>

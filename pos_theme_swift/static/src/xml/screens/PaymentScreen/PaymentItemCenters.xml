@@ -3,50 +3,100 @@
 
   <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
 
-    <!-- Render danh sách items trong center-content -->
-    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('center-content')][1]" position="inside">
+    <!-- Replace center-content by our table -->
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('center-content')][1]" position="replace">
+      <div class="center-content sapphire-items-table-wrap">
 
-      <t t-set="order" t-value="(pos.get_order and pos.get_order()) or (pos.getOrder and pos.getOrder())"/>
+        <t t-set="order" t-value="this.sppOrder()"/>
+        <t t-set="lines" t-value="order and this.sppOrderlines(order) or []"/>
 
-      <div class="sapphire-items-left" t-if="order">
-        <t t-set="lines"
-           t-value="(order.get_orderlines and order.get_orderlines()) or (order.getOrderlines and order.getOrderlines()) or []"/>
-
-        <div class="sil-header">
-          <div class="sil-title">Danh sách món</div>
-          <div class="sil-count"><t t-esc="lines.length"/> món</div>
+        <div class="sit-header">
+          <div class="sit-title">Danh sách món</div>
+          <div class="sit-count"><t t-esc="lines.length"/> món</div>
         </div>
 
-        <div class="sil-list">
-          <t t-if="!lines.length">
-            <div class="sil-empty">Chưa có sản phẩm</div>
-          </t>
+        <div class="sit-table-card">
+          <table class="sit-table" t-if="lines.length">
+            <thead>
+              <tr>
+                <th class="col-idx">#</th>
+                <th class="col-name">Sản phẩm</th>
+                <th class="col-unit">Đơn giá</th>
+                <th class="col-qty">SL</th>
+                <th class="col-total">Thành tiền</th>
+              </tr>
+            </thead>
 
-          <t t-foreach="lines" t-as="line" t-key="line.uuid or line.cid or line">
+            <tbody>
+              <t t-foreach="lines" t-as="line" t-key="this.sppLineKey(line, this.sppIndexOf(line))">
+                <tr class="sit-row">
+                  <!-- 1) STT + delete -->
+                  <td class="col-idx">
+                    <div class="idx-wrap">
+                      <span class="idx-num"><t t-esc="this.sppIndexOf(line) + 1"/></span>
+                      <button type="button"
+                              class="idx-del"
+                              title="Xoá"
+                              t-on-click.stop="() => this.sppRemoveLine(line)">
+                        <i class="fa fa-trash"/>
+                      </button>
+                    </div>
+                  </td>
 
-            <!-- Odoo 19 fields -->
-            <t t-set="qty" t-value="line.qty or 0"/>
-            <t t-set="unit" t-value="line.price_unit or 0"/>
-            <t t-set="name" t-value="line.full_product_name or (line.getFullProductName and line.getFullProductName()) or ''"/>
-            <t t-set="line_total" t-value="qty * unit"/>
+                  <!-- 2) Name -->
+                  <td class="col-name">
+                    <div class="name-wrap">
+                      <div class="name-text" t-att-title="this.sppLineName(line)">
+                        <t t-esc="this.sppLineName(line)"/>
+                      </div>
+                    </div>
+                  </td>
 
-            <div class="sil-row">
-              <div class="sil-qty"><t t-esc="qty"/></div>
+                  <!-- 3) Unit -->
+                  <td class="col-unit">
+                    <t t-esc="env.utils.formatCurrency(this.sppLineUnitPrice(line))"/>
+                  </td>
 
-              <div class="sil-name" t-att-title="name">
-                <t t-esc="name"/>
-              </div>
+                  <!-- 4) Qty control -->
+                    <td class="col-qty">
+                    <div class="qty-control">
+                        <button type="button"
+                                class="qty-btn"
+                                t-on-click.stop="() => this.sppDecQty(line)">
+                        -
+                        </button>
 
-              <div class="sil-total">
-                <t t-esc="env.utils.formatCurrency(line_total)"/>
-              </div>
-            </div>
+                        <span class="qty-num">
+                        <t t-esc="this.sppLineQty(line)"/>
+                        </span>
 
-          </t>
+                        <button type="button"
+                                class="qty-btn"
+                                t-on-click.stop="() => this.sppIncQty(line)">
+                        +
+                        </button>
+                    </div>
+                    </td>
+
+                  <!-- 5) Total -->
+                  <td class="col-total">
+                    <span class="total-money">
+                      <t t-esc="env.utils.formatCurrency(this.sppLineTotal(line))"/>
+                    </span>
+                  </td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+
+          <div class="sit-empty" t-else="">
+            Chưa có sản phẩm
+          </div>
         </div>
+
       </div>
-
     </xpath>
 
   </t>
+
 </templates>

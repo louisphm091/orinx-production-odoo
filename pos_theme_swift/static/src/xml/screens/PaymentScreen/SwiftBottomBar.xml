@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+  <!-- PaymentScreen: add bottom bar after main-content (ổn) -->
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+    <xpath expr="//div[hasclass('payment-screen')]//div[hasclass('main-content')][1]" position="after">
+      <t t-call="pos_theme_swift.SapphireBottomBar"/>
+    </xpath>
+  </t>
+
+  <!-- ProductScreen: KHÔNG dùng main-content nữa, inject thẳng vào root -->
+  <t t-inherit="point_of_sale.ProductScreen" t-inherit-mode="extension">
+    <xpath expr="//div[hasclass('product-screen')][1]" position="inside">
+      <t t-call="pos_theme_swift.SapphireBottomBar"/>
+    </xpath>
+  </t>
+
+  <!-- Reusable bottom bar -->
+  <t t-name="pos_theme_swift.SapphireBottomBar">
+    <div class="spp-bottom-bar" t-on-click.stop.prevent="() => {}">
+      <div class="spp-bb-left">
+        <button type="button"
+                class="spp-bb-chip"
+                t-att-class="this.isSppSaleMode('quick') ? 'spp-bb-chip is-active' : 'spp-bb-chip'"
+                t-on-click.stop.prevent="(ev) => this.onSppSetSaleMode(ev, 'quick')">
+          <i class="fa fa-bolt me-1"/>
+          Bán nhanh
+        </button>
+
+        <button type="button"
+                class="spp-bb-chip"
+                t-att-class="this.isSppSaleMode('normal') ? 'spp-bb-chip is-active' : 'spp-bb-chip'"
+                t-on-click.stop.prevent="(ev) => this.onSppSetSaleMode(ev, 'normal')">
+          <i class="fa fa-clock-o me-1"/>
+          Bán thường
+        </button>
+      </div>
+
+      <div class="spp-bb-right">
+        <button type="button"
+                class="spp-bb-customer"
+                t-on-click.stop.prevent="(ev) => this.onSppOpenCustomer(ev)">
+          <i class="fa fa-map-marker me-1"/>
+          <span class="spp-bb-customer-name">
+            <t t-esc="this.sppCustomerLabel()"/>
+          </span>
+          <i class="fa fa-caret-down ms-1"/>
+        </button>
+      </div>
+    </div>
+  </t>
+
+</templates>

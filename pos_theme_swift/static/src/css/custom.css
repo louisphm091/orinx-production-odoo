@@ -5,22 +5,22 @@
    ========================================================= */
 
 /* ---------- CSS tokens ---------- */
-.pos{
+.pos {
   --sapphire-blue: #388eff;
   --bg-soft: #f3f4f6;
   --text-dark: #111827;
   --muted: #6b7280;
-  --border-soft: rgba(0,0,0,0.08);
-  --border-soft-2: rgba(0,0,0,0.10);
+  --border-soft: rgba(0, 0, 0, 0.08);
+  --border-soft-2: rgba(0, 0, 0, 0.1);
 
-  --sapphire-navbar-h: 60px;   /* desktop navbar height */
+  --sapphire-navbar-h: 60px; /* desktop navbar height */
   --sapphire-navbar-h-m: 48px; /* mobile navbar height */
 }
 
 /* =========================================================
    NAVBAR BASE (visual)
    ========================================================= */
-.pos .sapphire-navbar{
+.pos .sapphire-navbar {
   height: var(--sapphire-navbar-h);
   padding: 0 14px;
   display: flex;
@@ -32,7 +32,7 @@
 }
 
 .pos .sapphire-navbar .nav-left,
-.pos .sapphire-navbar .nav-right{
+.pos .sapphire-navbar .nav-right {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -41,36 +41,38 @@
 
 /* remove any bottom underline / strip */
 .pos .sapphire-navbar .nav-tabs,
-.pos .sapphire-navbar .sapphire-order-tabs{
+.pos .sapphire-navbar .sapphire-order-tabs {
   display: flex;
   align-items: center;
   height: 100%;
   border-bottom: none !important;
   box-shadow: none !important;
 }
-.pos .sapphire-navbar .nav-tabs{ margin-left: 8px; }
+.pos .sapphire-navbar .nav-tabs {
+  margin-left: 8px;
+}
 .pos .sapphire-navbar .nav-tabs::before,
 .pos .sapphire-navbar .nav-tabs::after,
 .pos .sapphire-navbar .sapphire-order-tabs::before,
-.pos .sapphire-navbar .sapphire-order-tabs::after{
+.pos .sapphire-navbar .sapphire-order-tabs::after {
   content: none !important;
   display: none !important;
 }
 
 /* search */
 .pos .sapphire-navbar #search-products .input-group,
-.pos .sapphire-navbar #search-products .input-container{
+.pos .sapphire-navbar #search-products .input-container {
   width: 380px !important;
   max-width: 42vw !important;
   height: 34px !important;
   border-radius: 999px !important;
   overflow: hidden !important;
   background: #fff !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12) !important;
   margin: 0 !important;
 }
 .pos .sapphire-navbar #search-products .input-group-text,
-.pos .sapphire-navbar #search-products .input-icon{
+.pos .sapphire-navbar #search-products .input-icon {
   border: none !important;
   background: transparent !important;
   padding-left: 12px !important;
@@ -78,7 +80,7 @@
   color: #111 !important;
 }
 .pos .sapphire-navbar #search-products input.form-control,
-.pos .sapphire-navbar #search-products input{
+.pos .sapphire-navbar #search-products input {
   height: 34px !important;
   border: none !important;
   box-shadow: none !important;
@@ -89,17 +91,17 @@
   color: #111 !important;
   font-size: 14px !important;
 }
-.pos .sapphire-navbar #search-products input::placeholder{
+.pos .sapphire-navbar #search-products input::placeholder {
   color: var(--muted) !important;
 }
 
 /* navbar buttons */
-.pos .sapphire-navbar .nav-btn{
+.pos .sapphire-navbar .nav-btn {
   height: 30px;
   padding: 0 10px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.28);
-  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -110,20 +112,24 @@
   font-size: 13px;
   line-height: 1;
 }
-.pos .sapphire-navbar .nav-btn:hover{ background: rgba(255,255,255,0.16); }
-.pos .sapphire-navbar .nav-btn .nav-icon{ font-size: 14px; }
+.pos .sapphire-navbar .nav-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.pos .sapphire-navbar .nav-btn .nav-icon {
+  font-size: 14px;
+}
 
 /* order tabs */
-.pos .sapphire-navbar .sapphire-order-tabs{
+.pos .sapphire-navbar .sapphire-order-tabs {
   display: inline-flex;
   gap: 8px;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab{
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab {
   height: 32px;
   padding: 0 12px;
   border-radius: 16px;
   border: none !important;
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -133,18 +139,20 @@
   box-shadow: none !important;
   outline: none !important;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab:hover{ background: rgba(255,255,255,0.25); }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab.active{
-  background: rgba(255,255,255,0.34);
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.active {
+  background: rgba(255, 255, 255, 0.34);
   font-weight: 600;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .tab-label{
+.pos .sapphire-navbar .sapphire-order-tabs .tab-label {
   display: inline-flex;
   align-items: center;
   line-height: 1;
   font-size: 14px;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .tab-close{
+.pos .sapphire-navbar .sapphire-order-tabs .tab-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -155,37 +163,41 @@
   line-height: 1;
   opacity: 0.85;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .tab-close:hover{
+.pos .sapphire-navbar .sapphire-order-tabs .tab-close:hover {
   opacity: 1;
-  background: rgba(0,0,0,0.18);
+  background: rgba(0, 0, 0, 0.18);
 }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add{
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add {
   width: 32px;
   padding: 0;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   font-size: 18px;
   font-weight: 700;
 }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add:hover{ background: rgba(255,255,255,0.38); }
-.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add i{ color: #fff !important; }
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add:hover {
+  background: rgba(255, 255, 255, 0.38);
+}
+.pos .sapphire-navbar .sapphire-order-tabs .order-tab.add i {
+  color: #fff !important;
+}
 
 /* cashier */
-.pos .sapphire-navbar .nav-cashier{
+.pos .sapphire-navbar .nav-cashier {
   display: flex;
   align-items: center;
   gap: 8px;
   height: 100%;
   overflow: visible;
 }
-.pos .sapphire-navbar .nav-cashier .top-container{
+.pos .sapphire-navbar .nav-cashier .top-container {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 .pos .sapphire-navbar .nav-cashier .profile-image,
-.pos .sapphire-navbar .nav-cashier .avatar-letter{
+.pos .sapphire-navbar .nav-cashier .avatar-letter {
   width: 30px !important;
   height: 30px !important;
   min-width: 30px !important;
@@ -195,7 +207,7 @@
   justify-content: center !important;
   line-height: 1 !important;
 }
-.pos .sapphire-navbar .nav-cashier .name{
+.pos .sapphire-navbar .nav-cashier .name {
   font-size: 13px !important;
   font-weight: 500 !important;
   line-height: 1 !important;
@@ -203,39 +215,45 @@
   white-space: nowrap !important;
   color: #fff !important;
 }
-.pos .sapphire-navbar .nav-cashier .mail{ display: none !important; }
+.pos .sapphire-navbar .nav-cashier .mail {
+  display: none !important;
+}
 
 /* avatar letter fix */
 .pos .sapphire-navbar .nav-cashier .avatar-letter,
 .pos .sapphire-navbar .nav-cashier .o_avatar_letter,
-.pos .sapphire-navbar .nav-cashier .o_avatar_letter span{
-  background: rgba(255,255,255,0.18) !important;
+.pos .sapphire-navbar .nav-cashier .o_avatar_letter span {
+  background: rgba(255, 255, 255, 0.18) !important;
   color: #fff !important;
   font-weight: 700 !important;
   opacity: 1 !important;
 }
 .pos .sapphire-navbar .nav-cashier .btn,
 .pos .sapphire-navbar .nav-cashier .cashier-name,
-.pos .sapphire-navbar .nav-cashier .btn.cashier-name{
+.pos .sapphire-navbar .nav-cashier .btn.cashier-name {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
 /* mobile navbar sizing */
-@media (max-width: 768px){
-  .pos{ --sapphire-navbar-h: var(--sapphire-navbar-h-m); }
-  .pos .sapphire-navbar{
+@media (max-width: 768px) {
+  .pos {
+    --sapphire-navbar-h: var(--sapphire-navbar-h-m);
+  }
+  .pos .sapphire-navbar {
     height: var(--sapphire-navbar-h);
     padding: 0 8px;
   }
   .pos .sapphire-navbar #search-products .input-group,
-  .pos .sapphire-navbar #search-products .input-container{
+  .pos .sapphire-navbar #search-products .input-container {
     width: 52vw !important;
     max-width: 52vw !important;
     height: 32px !important;
   }
-  .pos .sapphire-navbar #search-products input{ height: 32px !important; }
+  .pos .sapphire-navbar #search-products input {
+    height: 32px !important;
+  }
 }
 
 /* =========================================================
@@ -244,7 +262,7 @@
    ========================================================= */
 
 .pos .product-screen.o_sapphire_with_navbar,
-.pos .payment-screen.o_sapphire_with_navbar{
+.pos .payment-screen.o_sapphire_with_navbar {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -252,7 +270,7 @@
 
 /* navbar must be direct child of screen */
 .pos .product-screen.o_sapphire_with_navbar > .sapphire-navbar,
-.pos .payment-screen.o_sapphire_with_navbar > .sapphire-navbar{
+.pos .payment-screen.o_sapphire_with_navbar > .sapphire-navbar {
   position: sticky;
   top: 0;
   z-index: 3500;
@@ -261,7 +279,7 @@
 
 /* content fills remaining area */
 .pos .product-screen.o_sapphire_with_navbar > :not(.sapphire-navbar),
-.pos .payment-screen.o_sapphire_with_navbar > :not(.sapphire-navbar){
+.pos .payment-screen.o_sapphire_with_navbar > :not(.sapphire-navbar) {
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -269,7 +287,7 @@
 /* =========================================================
    CATEGORY PANEL: MENU LIST
    ========================================================= */
-.pos .category-panel{
+.pos .category-panel {
   width: 240px;
   min-width: 220px;
   max-width: 260px;
@@ -283,7 +301,7 @@
 
 .pos .category-panel .category-list,
 .pos .category-panel .categories,
-.pos .category-panel .category-list-scroller{
+.pos .category-panel .category-list-scroller {
   display: flex !important;
   flex-direction: column !important;
   gap: 6px !important;
@@ -293,7 +311,7 @@
 }
 
 .pos .category-panel .category-button,
-.pos .category-panel .category-simple-button{
+.pos .category-panel .category-simple-button {
   width: 100% !important;
   height: 44px !important;
   margin: 0 !important;
@@ -312,7 +330,7 @@
 }
 
 .pos .category-panel .category-button .category-img,
-.pos .category-panel .category-simple-button .category-img{
+.pos .category-panel .category-simple-button .category-img {
   width: 28px !important;
   height: 28px !important;
   min-width: 28px !important;
@@ -321,17 +339,17 @@
   justify-content: center !important;
   border-radius: 8px !important;
   overflow: hidden !important;
-  background: rgba(56,142,255,0.10) !important;
+  background: rgba(56, 142, 255, 0.1) !important;
 }
 .pos .category-panel .category-button .category-img img,
-.pos .category-panel .category-simple-button .category-img img{
+.pos .category-panel .category-simple-button .category-img img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   border-radius: 8px !important;
 }
 
-.pos .category-panel .category-name{
+.pos .category-panel .category-name {
   width: 100% !important;
   display: block !important;
   font-size: 14px !important;
@@ -343,27 +361,27 @@
 }
 
 .pos .category-panel .category-button.highlight,
-.pos .category-panel .category-simple-button.highlight{
-  background: rgba(56,142,255,0.14) !important;
-  border-color: rgba(56,142,255,0.30) !important;
+.pos .category-panel .category-simple-button.highlight {
+  background: rgba(56, 142, 255, 0.14) !important;
+  border-color: rgba(56, 142, 255, 0.3) !important;
   color: #0b5ed7 !important;
 }
 .pos .category-panel .category-button:hover,
-.pos .category-panel .category-simple-button:hover{
-  background: rgba(0,0,0,0.03) !important;
+.pos .category-panel .category-simple-button:hover {
+  background: rgba(0, 0, 0, 0.03) !important;
 }
 
 /* =========================================================
    PRODUCTS: LIST VIEW (1 row per product)
    ========================================================= */
-.pos .products-panel .product-list{
+.pos .products-panel .product-list {
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
   grid-template-columns: none !important;
 }
 
-.pos .products-panel .product-card{
+.pos .products-panel .product-card {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -381,14 +399,14 @@
   border: 1px solid var(--border-soft) !important;
 }
 
-.pos .products-panel .product-card .product-img{
+.pos .products-panel .product-card .product-img {
   width: 40px !important;
   height: 40px !important;
   min-width: 40px !important;
   margin: 0 !important;
   flex: 0 0 auto !important;
 }
-.pos .products-panel .product-card .product-img img{
+.pos .products-panel .product-card .product-img img {
   width: 40px !important;
   height: 40px !important;
   object-fit: cover !important;
@@ -396,11 +414,13 @@
   margin: 0 !important;
 }
 
-.pos .products-panel .product-card > *:not(.product-img){ min-width: 0 !important; }
+.pos .products-panel .product-card > *:not(.product-img) {
+  min-width: 0 !important;
+}
 
 .pos .products-panel .product-card .product-info,
 .pos .products-panel .product-card .body,
-.pos .products-panel .product-card .content{
+.pos .products-panel .product-card .content {
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
@@ -409,7 +429,7 @@
 }
 
 .pos .products-panel .product-card .title,
-.pos .products-panel .product-card .product-name{
+.pos .products-panel .product-card .product-name {
   font-size: 14px !important;
   font-weight: 600 !important;
   line-height: 1.2 !important;
@@ -419,7 +439,7 @@
 }
 
 .pos .products-panel .product-card .price,
-.pos .products-panel .product-card .product-price{
+.pos .products-panel .product-card .product-price {
   margin-left: auto !important;
   font-size: 14px !important;
   font-weight: 700 !important;
@@ -429,14 +449,14 @@
 /* =========================================================
    CUSTOMER PANEL + HIDE OLD BUTTONS
    ========================================================= */
-.pos .sapphire-customer-panel{
+.pos .sapphire-customer-panel {
   padding: 10px;
   background: var(--bg-soft);
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.pos .sapphire-customer-panel .scp-search{
+.pos .sapphire-customer-panel .scp-search {
   height: 42px;
   background: #fff;
   border-radius: 10px;
@@ -446,8 +466,10 @@
   align-items: center;
   gap: 10px;
 }
-.pos .sapphire-customer-panel .scp-search-icon{ opacity: .55; }
-.pos .sapphire-customer-panel .scp-search-placeholder{
+.pos .sapphire-customer-panel .scp-search-icon {
+  opacity: 0.55;
+}
+.pos .sapphire-customer-panel .scp-search-placeholder {
   flex: 1 1 auto;
   color: var(--muted);
   font-weight: 500;
@@ -455,7 +477,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.pos .sapphire-customer-panel .scp-add{
+.pos .sapphire-customer-panel .scp-add {
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -463,14 +485,16 @@
   background: transparent;
   cursor: pointer;
 }
-.pos .sapphire-customer-panel .scp-add:hover{ background: rgba(0,0,0,0.05); }
+.pos .sapphire-customer-panel .scp-add:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-.pos .sapphire-customer-panel .scp-tabs{
+.pos .sapphire-customer-panel .scp-tabs {
   margin-top: 10px;
   display: flex;
   gap: 8px;
 }
-.pos .sapphire-customer-panel .scp-tab{
+.pos .sapphire-customer-panel .scp-tab {
   height: 36px;
   padding: 0 12px;
   border-radius: 10px;
@@ -479,7 +503,7 @@
   cursor: pointer;
   font-weight: 600;
 }
-.pos .sapphire-customer-panel .scp-more{
+.pos .sapphire-customer-panel .scp-more {
   margin-left: auto;
   width: 40px;
   padding: 0;
@@ -499,14 +523,14 @@
 .pos .leftpane .pads button.set-note,
 .pos .leftpane .subpads button.set-partner,
 .pos .leftpane .subpads button.set-note,
-.pos .leftpane .control-buttons{
+.pos .leftpane .control-buttons {
   display: none !important;
 }
 
 /* =========================================================
    BOTTOM BAR (if you use it)
    ========================================================= */
-.pos .sapphire-bottom-bar{
+.pos .sapphire-bottom-bar {
   position: fixed;
   left: 0;
   right: 0;
@@ -521,7 +545,7 @@
   align-items: center;
   box-sizing: border-box;
 }
-.pos .sapphire-bottom-bar .sbb-btn{
+.pos .sapphire-bottom-bar .sbb-btn {
   height: 40px;
   padding: 0 16px;
   border-radius: 10px;
@@ -530,7 +554,7 @@
   font-weight: 700;
   cursor: pointer;
 }
-.pos .sapphire-bottom-bar .sbb-more{
+.pos .sapphire-bottom-bar .sbb-more {
   margin-left: auto;
   width: 44px;
   padding: 0;
@@ -540,40 +564,46 @@
 }
 
 /* prevent content hidden behind bottom bar */
-.pos .product-screen{ padding-bottom: 56px; }
+.pos .product-screen {
+  padding-bottom: 56px;
+}
 
 /* =========================================================
    PAYMENT SCREEN (layout helpers)
    ========================================================= */
-.pos .payment-screen{
+.pos .payment-screen {
   min-height: 0 !important;
 }
 
 /* optional: make payment content split nicer (doesn't break default) */
 .pos .payment-screen .payment-screen-content,
-.pos .payment-screen .payment-content{
+.pos .payment-screen .payment-content {
   min-height: 0;
 }
 
-.pos .payment-screen.o_sapphire_with_navbar{
+.pos .payment-screen.o_sapphire_with_navbar {
   padding-top: 60px;
   box-sizing: border-box;
 }
 
-.pos .payment-screen.o_sapphire_with_navbar .sapphire-navbar--payment{
+.pos .payment-screen.o_sapphire_with_navbar .sapphire-navbar--payment {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 60px;
   z-index: 10000;
 }
 
 /* Payment: navbar stick inside payment-screen */
-.pos .payment-screen.o_sapphire_payment_with_navbar{
+.pos .payment-screen.o_sapphire_payment_with_navbar {
   padding-top: 60px; /* chừa chỗ navbar */
   box-sizing: border-box;
 }
 
-.pos .payment-screen.o_sapphire_payment_with_navbar > .sapphire-navbar--payment{
+.pos
+  .payment-screen.o_sapphire_payment_with_navbar
+  > .sapphire-navbar--payment {
   position: sticky;
   top: 0;
   height: 60px;
@@ -584,7 +614,7 @@
    PAYMENT SPLIT LAYOUT
    ========================= */
 
-.pos .payment-screen.o_sapphire_payment_split .main-content{
+.pos .payment-screen.o_sapphire_payment_split .main-content {
   display: flex !important;
   flex-direction: row !important;
   gap: 12px !important;
@@ -593,7 +623,7 @@
 }
 
 /* Cột trái: nơi chứa orderlines / summary */
-.pos .payment-screen.o_sapphire_payment_split .center-content{
+.pos .payment-screen.o_sapphire_payment_split .center-content {
   order: 1 !important;
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -606,7 +636,7 @@
 }
 
 /* Cột phải: payment methods + numpad + buttons */
-.pos .payment-screen.o_sapphire_payment_split .left-content{
+.pos .payment-screen.o_sapphire_payment_split .left-content {
   order: 2 !important;
   flex: 0 0 420px !important;
   width: 420px !important;
@@ -617,14 +647,14 @@
   min-height: 0 !important;
 
   background: #f9fafb !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 12px !important;
   overflow: auto !important;
   padding: 12px !important;
 }
 
 /* Nếu Odoo đang dùng right-content cho numpad/buttons thì gom nó chung sidebar luôn */
-.pos .payment-screen.o_sapphire_payment_split .right-content{
+.pos .payment-screen.o_sapphire_payment_split .right-content {
   order: 3 !important;
   flex: 0 0 0px !important;
   width: 0 !important;
@@ -640,35 +670,44 @@
    ========================= */
 
 /* Container list lines thường có class paymentlines-container */
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container{
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container {
   height: 100% !important;
   min-height: 0 !important;
   overflow: auto !important;
 
   background: #fff !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 12px !important;
   padding: 10px !important;
 }
 
 /* mỗi dòng */
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .paymentline,
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .payment-line{
+.pos
+  .payment-screen.o_sapphire_payment_split
+  .paymentlines-container
+  .paymentline,
+.pos
+  .payment-screen.o_sapphire_payment_split
+  .paymentlines-container
+  .payment-line {
   display: grid !important;
   grid-template-columns: 56px 1fr 80px 110px 40px !important; /* qty/image | name | unit | total | menu */
   align-items: center !important;
   gap: 10px !important;
 
   padding: 10px 12px !important;
-  border: 1px solid rgba(0,0,0,0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
   border-radius: 12px !important;
   background: #fff !important;
   margin-bottom: 10px !important;
 }
 
 /* tên sản phẩm gọn */
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .product-name,
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .name{
+.pos
+  .payment-screen.o_sapphire_payment_split
+  .paymentlines-container
+  .product-name,
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .name {
   font-weight: 600 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -677,7 +716,7 @@
 
 /* số tiền căn phải */
 .pos .payment-screen.o_sapphire_payment_split .paymentlines-container .total,
-.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .price{
+.pos .payment-screen.o_sapphire_payment_split .paymentlines-container .price {
   text-align: right !important;
   font-weight: 700 !important;
 }
@@ -689,7 +728,7 @@
    ========================================================= */
 
 /* 1) Main content must be horizontal split */
-.pos .payment-screen .main-content{
+.pos .payment-screen .main-content {
   display: flex !important;
   flex-direction: row !important;
   gap: 12px !important;
@@ -700,7 +739,7 @@
 }
 
 /* 2) Center content becomes LEFT BIG area */
-.pos .payment-screen .center-content{
+.pos .payment-screen .center-content {
   order: 1 !important;
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -713,7 +752,7 @@
 }
 
 /* 3) Left content becomes RIGHT sidebar (methods) */
-.pos .payment-screen .left-content{
+.pos .payment-screen .left-content {
   order: 2 !important;
   flex: 0 0 420px !important;
   width: 420px !important;
@@ -726,13 +765,13 @@
   overflow: auto !important;
 
   background: #f9fafb !important;
-  border-left: 1px solid rgba(0,0,0,0.08) !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
   padding: 12px !important;
 }
 
 /* 4) If right-content exists, keep it under the right sidebar,
       not as a third column (many Odoo builds render numpad/buttons here). */
-.pos .payment-screen .right-content{
+.pos .payment-screen .right-content {
   order: 3 !important;
   flex: 0 0 420px !important;
   width: 420px !important;
@@ -745,7 +784,7 @@
   overflow: auto !important;
 
   background: #f9fafb !important;
-  border-left: 1px solid rgba(0,0,0,0.08) !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
   padding: 12px !important;
 }
 
@@ -753,65 +792,58 @@
       stack them vertically inside the same right column feel.
       This makes “methods on top, numpad/buttons below”. */
 .pos .payment-screen .left-content,
-.pos .payment-screen .right-content{
+.pos .payment-screen .right-content {
   border-radius: 12px !important;
-  border: 1px solid rgba(0,0,0,0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
-
-.pos .payment-screen .main-content{
-  align-items: stretch !important;
-}
-
-/* Make the two panels behave like a single right column (top/bottom) */
-.pos .payment-screen .main-content{
+.pos .payment-screen .main-content {
   /* allow wrapping to fake “stack” when 2 side panels exist */
   flex-wrap: wrap !important;
 }
-.pos .payment-screen .center-content{
+.pos .payment-screen .center-content {
   /* occupy left side full height */
   flex: 1 1 calc(100% - 432px) !important;
 }
-.pos .payment-screen .left-content{
+.pos .payment-screen .left-content {
   flex: 0 0 420px !important;
 }
-.pos .payment-screen .right-content{
+.pos .payment-screen .right-content {
   flex: 0 0 420px !important;
 }
 
 /* 6) Make center area scrollable (where you will later render items list) */
-.pos .payment-screen .center-content{
+.pos .payment-screen .center-content {
   overflow: auto !important;
 }
 
 /* Responsive */
-@media (max-width: 992px){
-  .pos .payment-screen .main-content{
+@media (max-width: 992px) {
+  .pos .payment-screen .main-content {
     flex-direction: column !important;
     flex-wrap: nowrap !important;
   }
   .pos .payment-screen .left-content,
-  .pos .payment-screen .right-content{
+  .pos .payment-screen .right-content {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
   }
 }
 
-.pos .o_sapphire_due_in_right{
+.pos .o_sapphire_due_in_right {
   margin-bottom: 12px;
   padding: 12px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
 }
 
 /* Thu nhỏ chữ số tiền (nếu vẫn to) */
 .pos .o_sapphire_due_in_right .payment-due .amount,
-.pos .o_sapphire_due_in_right .payment-due .value{
+.pos .o_sapphire_due_in_right .payment-due .value {
   font-size: 32px !important;
   line-height: 1.1 !important;
 }
-
 
 /* =========================
    PAYMENT: hide old center due + old methods block
@@ -828,15 +860,15 @@
    NEW: Items + Due panel (top of right panel)
    ========================= */
 
-.pos .sapphire-pay-items-panel{
+.pos .sapphire-pay-items-panel {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 10px;
 }
 
-.pos .sapphire-pay-items-panel .spi-head{
+.pos .sapphire-pay-items-panel .spi-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -844,48 +876,48 @@
   margin-bottom: 10px;
 }
 
-.pos .sapphire-pay-items-panel .spi-due-label{
+.pos .sapphire-pay-items-panel .spi-due-label {
   font-size: 12px;
-  opacity: .7;
+  opacity: 0.7;
 }
 
-.pos .sapphire-pay-items-panel .spi-due-amount{
+.pos .sapphire-pay-items-panel .spi-due-amount {
   font-size: 26px;
   font-weight: 800;
   line-height: 1.1;
 }
 
-.pos .sapphire-pay-items-panel .spi-meta{
+.pos .sapphire-pay-items-panel .spi-meta {
   font-size: 12px;
-  opacity: .7;
+  opacity: 0.7;
   padding-top: 4px;
 }
 
-.pos .sapphire-pay-items-panel .spi-list{
+.pos .sapphire-pay-items-panel .spi-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 240px;         /* panel scroll nếu nhiều items */
+  max-height: 240px; /* panel scroll nếu nhiều items */
   overflow: auto;
   padding-right: 4px;
 }
 
-.pos .sapphire-pay-items-panel .spi-row{
+.pos .sapphire-pay-items-panel .spi-row {
   display: grid;
   grid-template-columns: 36px 1fr 92px;
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 10px;
 }
 
-.pos .sapphire-pay-items-panel .spi-qty{
+.pos .sapphire-pay-items-panel .spi-qty {
   text-align: center;
   font-weight: 800;
 }
 
-.pos .sapphire-pay-items-panel .spi-name{
+.pos .sapphire-pay-items-panel .spi-name {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -893,7 +925,7 @@
   font-weight: 600;
 }
 
-.pos .sapphire-pay-items-panel .spi-total{
+.pos .sapphire-pay-items-panel .spi-total {
   text-align: right;
   font-weight: 800;
 }
@@ -902,18 +934,18 @@
    NEW: Collapsible Methods (near Customer)
    ========================= */
 
-.pos .sapphire-methods-collapse-wrap{
+.pos .sapphire-methods-collapse-wrap {
   margin: 6px 0 10px;
 }
 
-.pos .sapphire-methods-collapse{
+.pos .sapphire-methods-collapse {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   overflow: hidden;
 }
 
-.pos .sapphire-methods-summary{
+.pos .sapphire-methods-summary {
   list-style: none;
   cursor: pointer;
   padding: 10px 12px;
@@ -924,15 +956,17 @@
   user-select: none;
 }
 
-.pos .sapphire-methods-summary::-webkit-details-marker{ display:none; }
+.pos .sapphire-methods-summary::-webkit-details-marker {
+  display: none;
+}
 
-.pos .sapphire-methods-summary .sms-label{
+.pos .sapphire-methods-summary .sms-label {
   font-weight: 800;
 }
 
-.pos .sapphire-methods-summary .sms-current{
+.pos .sapphire-methods-summary .sms-current {
   font-size: 12px;
-  opacity: .75;
+  opacity: 0.75;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -940,57 +974,57 @@
   text-align: right;
 }
 
-.pos .sapphire-methods-body{
-  border-top: 1px solid rgba(0,0,0,0.06);
+.pos .sapphire-methods-body {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
   padding: 10px;
 }
 
 /* Make methods inside look like list */
 .pos .sapphire-methods-body .button,
-.pos .sapphire-methods-body button{
+.pos .sapphire-methods-body button {
   width: 100%;
   justify-content: flex-start;
 }
-.pos .payment-screen .sapphire-methods-collapse-wrap{
+.pos .payment-screen .sapphire-methods-collapse-wrap {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   padding: 10px;
 }
 
-.pos .payment-screen .sapphire-methods-summary{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  cursor:pointer;
-  font-weight:600;
+.pos .payment-screen .sapphire-methods-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
-.pos .payment-screen .sapphire-methods-body{
+.pos .payment-screen .sapphire-methods-body {
   margin-top: 10px;
 }
 
- /* left-content là flex-column => dùng order để control vị trí */
-.pos .payment-screen .left-content{
+/* left-content là flex-column => dùng order để control vị trí */
+.pos .payment-screen .left-content {
   display: flex;
   flex-direction: column;
 }
 
 /* panel items + due lên trên cùng */
-.pos .payment-screen .left-content .sapphire-pay-items-panel{
+.pos .payment-screen .left-content .sapphire-pay-items-panel {
   order: -20;
   margin-bottom: 8px;
 }
 
 /* collapse methods đứng dưới panel items */
-.pos .payment-screen .left-content .sapphire-methods-collapse-wrap{
+.pos .payment-screen .left-content .sapphire-methods-collapse-wrap {
   order: -10;
   margin-bottom: 8px;
 }
 
 /* style cơ bản */
-.pos .sapphire-methods-summary{
+.pos .sapphire-methods-summary {
   height: 40px;
   display: flex;
   align-items: center;
@@ -999,165 +1033,167 @@
   padding: 0 12px;
   border-radius: 10px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   cursor: pointer;
   font-weight: 700;
 }
 
-.pos .sapphire-methods-body{
+.pos .sapphire-methods-body {
   margin-top: 8px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   padding: 10px;
 }
 
 /* items list */
-.pos .sapphire-pay-items-panel{
+.pos .sapphire-pay-items-panel {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   padding: 10px 12px;
 }
-.pos .sapphire-pay-items-panel .spi-row{
+.pos .sapphire-pay-items-panel .spi-row {
   display: grid;
   grid-template-columns: 44px 1fr 120px;
   gap: 10px;
   align-items: center;
   padding: 6px 0;
-  border-top: 1px dashed rgba(0,0,0,0.08);
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
-.pos .sapphire-pay-items-panel .spi-name{
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.pos .sapphire-pay-items-panel .spi-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.pos .sapphire-pay-items-panel .spi-total{
+.pos .sapphire-pay-items-panel .spi-total {
   text-align: right;
   font-weight: 700;
 }
 
 /* LEFT: items menu list */
-.pos .sapphire-items-left{
+.pos .sapphire-items-left {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
   background: #fff;
-  border: 1px solid rgba(0,0,0,.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   overflow: hidden;
 }
 
-.pos .sapphire-items-left .sil-header{
+.pos .sapphire-items-left .sil-header {
   padding: 10px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background: #f9fafb;
 }
 
-.pos .sapphire-items-left .sil-title{
+.pos .sapphire-items-left .sil-title {
   font-weight: 700;
   font-size: 14px;
 }
 
-.pos .sapphire-items-left .sil-count{
+.pos .sapphire-items-left .sil-count {
   font-size: 12px;
-  opacity: .7;
+  opacity: 0.7;
 }
 
-.pos .sapphire-items-left .sil-list{
+.pos .sapphire-items-left .sil-list {
   padding: 8px;
   overflow: auto;
 }
 
-.pos .sapphire-items-left .sil-empty{
+.pos .sapphire-items-left .sil-empty {
   padding: 10px;
   font-size: 13px;
-  opacity: .7;
+  opacity: 0.7;
 }
 
-.pos .sapphire-items-left .sil-row{
+.pos .sapphire-items-left .sil-row {
   display: grid;
   grid-template-columns: 34px 1fr 110px;
   gap: 10px;
   align-items: center;
   padding: 10px 10px;
-  border: 1px solid rgba(0,0,0,.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 10px;
   background: #fff;
   margin-bottom: 8px;
 }
 
-.pos .sapphire-items-left .sil-qty{
+.pos .sapphire-items-left .sil-qty {
   font-weight: 800;
   text-align: center;
 }
 
-.pos .sapphire-items-left .sil-name{
+.pos .sapphire-items-left .sil-name {
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.pos .sapphire-items-left .sil-total{
+.pos .sapphire-items-left .sil-total {
   text-align: right;
   font-weight: 800;
 }
 
 /* RIGHT: due panel above numpad */
-.pos .sapphire-due-right{
+.pos .sapphire-due-right {
   margin-bottom: 10px;
   padding: 10px 12px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
 }
 
-.pos .sapphire-due-right .sdr-top{
+.pos .sapphire-due-right .sdr-top {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
 }
 
-.pos .sapphire-due-right .sdr-label{
+.pos .sapphire-due-right .sdr-label {
   font-size: 12px;
-  opacity: .7;
+  opacity: 0.7;
   font-weight: 600;
 }
 
-.pos .sapphire-due-right .sdr-amount{
+.pos .sapphire-due-right .sdr-amount {
   font-size: 18px;
   font-weight: 900;
 }
 
-.pos .sapphire-due-right .sdr-sub{
+.pos .sapphire-due-right .sdr-sub {
   margin-top: 4px;
   font-size: 12px;
-  opacity: .65;
+  opacity: 0.65;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.pos .sapphire-due-right .dot{
-  opacity: .5;
+.pos .sapphire-due-right .dot {
+  opacity: 0.5;
 }
 
 /* 1) Ẩn số 22đ */
 .payment-screen .center-content .payment-status,
 .payment-screen .center-content .payment-due,
 .payment-screen .center-content .payment-due-container {
-    display: none !important;
+  display: none !important;
 }
 
 /* 2) Ẩn block Cash ở giữa */
 .payment-screen .center-content .paymentlines,
 .payment-screen .center-content .payment-lines,
 .payment-screen .center-content .paymentline {
-    display: none !important;
+  display: none !important;
 }
 
 /* ===== Resize số tiền trong panel phải ===== */
@@ -1166,7 +1202,7 @@
   padding: 12px 14px;
   border-radius: 12px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .pos .sapphire-due-right .sdr-label {
@@ -1178,7 +1214,7 @@
 
 /* Target block gốc PaymentScreenDue đã move vào */
 .pos .sapphire-due-right .o_sapphire_due_target {
-  font-size: 20px !important;   /* giảm từ 32-36px xuống */
+  font-size: 20px !important; /* giảm từ 32-36px xuống */
   font-weight: 600 !important;
   line-height: 1.2 !important;
   color: #111827 !important;
@@ -1192,7 +1228,7 @@
 }
 
 /* Mobile nhỏ hơn chút */
-@media (max-width: 768px){
+@media (max-width: 768px) {
   .pos .sapphire-due-right .o_sapphire_due_target,
   .pos .sapphire-due-right .payment-due,
   .pos .sapphire-due-right .payment-status {
@@ -1213,7 +1249,7 @@
 }
 
 .pos .sapphire-methods-collapse {
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   background: #fff;
   overflow: hidden;
@@ -1230,34 +1266,36 @@
   user-select: none;
 }
 
-.pos .sapphire-methods-summary::-webkit-details-marker { display: none; }
+.pos .sapphire-methods-summary::-webkit-details-marker {
+  display: none;
+}
 
 .pos .sapphire-methods-body {
   padding: 10px 12px;
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Wrap */
-.sapphire-methods-collapse-wrap{
+.sapphire-methods-collapse-wrap {
   position: relative;
 }
 
 /* Dropdown body */
-.sapphire-methods-collapse{
+.sapphire-methods-collapse {
   position: relative;
 }
 
-.sapphire-methods-collapse > summary{
+.sapphire-methods-collapse > summary {
   cursor: pointer;
   list-style: none;
 }
 
-.sapphire-methods-collapse > summary::-webkit-details-marker{
+.sapphire-methods-collapse > summary::-webkit-details-marker {
   display: none;
-}   
+}
 
 /* phần menu xổ xuống */
-.sapphire-methods-collapse .sapphire-methods-body{
+.sapphire-methods-collapse .sapphire-methods-body {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -1265,9 +1303,9 @@
   z-index: 9999;
 
   background: white;
-  border: 1px solid rgba(0,0,0,.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 
   max-height: 320px;
   overflow: auto;
@@ -1275,7 +1313,9 @@
 }
 
 /* đảm bảo không bị parent che */
-.left-content, .payment-screen, .main-content{
+.left-content,
+.payment-screen,
+.main-content {
   overflow: visible !important;
 }
 
@@ -1284,14 +1324,14 @@
 /* 1) chỉ ẩn methods gốc ở vị trí cũ (direct child) */
 .pos .payment-screen .left-content > .paymentmethods,
 .pos .payment-screen .left-content > .payment-methods,
-.pos .payment-screen .left-content > .payment-methods-container{
+.pos .payment-screen .left-content > .payment-methods-container {
   display: none !important;
 }
 
 /* 2) nhưng nếu methods nằm trong dropdown mới thì PHẢI HIỆN */
 .pos .payment-screen .sapphire-methods-body .paymentmethods,
 .pos .payment-screen .sapphire-methods-body .payment-methods,
-.pos .payment-screen .sapphire-methods-body .payment-methods-container{
+.pos .payment-screen .sapphire-methods-body .payment-methods-container {
   display: block !important;
   visibility: visible !important;
   height: auto !important;
@@ -1302,13 +1342,832 @@
 /* 3) dropdown body: chọn 1 trong 2 option */
 
 /* Option A (ổn định): không overlay */
-.pos .sapphire-methods-collapse .sapphire-methods-body{
+.pos .sapphire-methods-collapse .sapphire-methods-body {
   position: static !important;
   max-height: 320px;
   overflow: auto;
 }
 
-
 .pos .payment-screen .center-content .total.text-center.text-dark {
   display: none !important;
+}
+
+/* =========================
+   Hide numpad on desktop
+   ========================= */
+@media (min-width: 992px) {
+  .pos .payment-screen .numpad,
+  .pos .payment-screen .payment-numpad,
+  .pos .payment-screen .numpad-container {
+    display: none !important;
+  }
+}
+
+/* =========================
+   SAPPHIRE PAY PANEL (E FRESH MART-like)
+   ========================= */
+
+.pos .sapp-paypanel {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+/* Customer search row */
+.pos .sapp-paypanel .spp-customer {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f3f4f6;
+  border-radius: 14px;
+  padding: 0 12px;
+  margin-bottom: 14px;
+}
+.pos .sapp-paypanel .spp-ico {
+  opacity: 0.55;
+}
+.pos .sapp-paypanel .spp-placeholder {
+  flex: 1 1 auto;
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pos .sapp-paypanel .spp-add {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+.pos .sapp-paypanel .spp-add:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Summary table */
+.pos .sapp-paypanel .spp-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* IMPORTANT: make it 2 columns (label | value) to avoid "0  0đ" */
+.pos .sapp-paypanel .spp-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* If you still render .mid, hide it (fix double zero column) */
+.pos .sapp-paypanel .spp-row .mid {
+  display: none !important;
+}
+
+.pos .sapp-paypanel .spp-row .lbl {
+  font-weight: 700;
+  color: #111827;
+}
+.pos .sapp-paypanel .spp-row .val {
+  text-align: right;
+  font-weight: 800;
+  color: #111827;
+  min-width: 84px;
+}
+.pos .sapp-paypanel .spp-row .val.muted {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+/* Hide default Odoo payment methods blocks (different builds/classes) */
+.pos .payment-screen .left-content .paymentmethods,
+.pos .payment-screen .left-content .payment-methods,
+.pos .payment-screen .left-content .payment-methods-container,
+.pos .payment-screen .left-content .paymentmethods-container,
+.pos .payment-screen .left-content .paymentmethods-list,
+.pos .payment-screen .left-content .payment-lines,
+.pos .payment-screen .left-content .paymentlines,
+.pos .payment-screen .left-content .paymentlines-container {
+  display: none !important;
+}
+
+/* Hide Odoo default payment methods panel (avoid xpath not-found crash) */
+.pos .payment-screen .left-content .paymentmethods,
+.pos .payment-screen .left-content .payment-methods,
+.pos .payment-screen .left-content .payment-methods-container {
+  display: none !important;
+}
+
+/* --- Radio look like E-FRESH MART --- */
+.pos .spp-methods {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+.pos .spp-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+}
+
+.pos .spp-radio input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pos .spp-radio .radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  display: inline-block;
+  position: relative;
+}
+
+.pos .spp-radio input:checked + .radio-circle {
+  border-color: #2563eb;
+}
+
+.pos .spp-radio input:checked + .radio-circle::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.pos .spp-radio .radio-label {
+  white-space: nowrap;
+}
+
+/* =========================
+   SAPPHIRE PAY PANEL - RADIO + QUICK (E FRESH MART vibe)
+   ========================= */
+
+.pos .sapp-paypanel {
+  overflow: hidden; /* nhìn gọn */
+}
+
+/* --- RADIO METHODS ROW --- */
+.pos .sapp-paypanel .spp-methods {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* label wrapper */
+.pos .sapp-paypanel .spp-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+/* hide native radio */
+.pos .sapp-paypanel .spp-radio input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* custom circle */
+.pos .sapp-paypanel .spp-radio .radio-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  display: inline-block;
+  position: relative;
+}
+
+/* inner dot when checked */
+.pos .sapp-paypanel .spp-radio input:checked + .radio-circle {
+  border-color: #2563eb;
+}
+.pos .sapp-paypanel .spp-radio input:checked + .radio-circle::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2563eb;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* label */
+.pos .sapp-paypanel .spp-radio .radio-label {
+  font-size: 18px;
+}
+
+/* more button (⋮) */
+.pos .sapp-paypanel .spp-more {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* --- QUICK AMOUNTS --- */
+.pos .sapp-paypanel .spp-quick {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* pill buttons */
+.pos .sapp-paypanel .spp-qbtn {
+  min-width: 120px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  color: #111827;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* hover/active */
+.pos .sapp-paypanel .spp-qbtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.pos .sapp-paypanel .spp-qbtn:active {
+  transform: translateY(1px);
+}
+
+/* make first quick amount look like "suggested" (optional) */
+.pos .sapp-paypanel .spp-qbtn.is-primary {
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+.pos .sapp-paypanel .spp-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* circle nhỏ hơn */
+.pos .sapp-paypanel .spp-radio .radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+/* inner dot */
+.pos .sapp-paypanel .spp-radio input:checked + .radio-circle::after {
+  width: 8px;
+  height: 8px;
+}
+
+/* TEXT — giảm size */
+.pos .sapp-paypanel .spp-radio .radio-label {
+  font-size: 15px; /* trước là 18px */
+  font-weight: 600; /* trước là 700–800 */
+  color: #111827;
+}
+/* Ẩn khối payment methods + payment lines cũ trên PaymentScreen */
+.pos .payment-screen .paymentmethods-container,
+.pos .payment-screen .payment-methods,
+.pos .payment-screen .paymentlines-container,
+.pos .payment-screen .paymentlines {
+  display: none !important;
+}
+
+.pos .sapp-paypanel {
+  position: relative;
+}
+.pos .spp-methods {
+  position: relative;
+  z-index: 2;
+}
+.pos .spp-quick {
+  position: relative;
+  z-index: 3;
+} /* quan trọng */
+.pos .spp-qbtn {
+  pointer-events: auto;
+}
+
+/* CRITICAL FIX */
+.pos .left-content {
+  position: relative;
+}
+
+.pos .sapp-paypanel {
+  position: relative;
+  z-index: 20;
+}
+
+.pos .spp-quick {
+  position: relative;
+  z-index: 30;
+}
+
+/* THIS IS THE REAL FIX */
+.pos .left-content > .flex-grow-1 {
+  flex-grow: 0 !important;
+}
+
+.pos .sapp-paypanel,
+.pos .sapp-paypanel * {
+  pointer-events: auto;
+}
+
+.pos .left-content > .flex-grow-1 {
+  pointer-events: auto;
+}
+
+.pos .spp-paybar {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pos .spp-inbtn {
+  width: 74px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #eef2f7;
+  font-weight: 800;
+}
+
+.pos .spp-inbtn.is-on {
+  background: #6b7280;
+  color: #fff;
+}
+
+.pos .spp-paybtn {
+  flex: 1 1 auto;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #2f80ed;
+  color: #fff;
+  font-weight: 800;
+}
+
+.pos .payment-screen .left-content .validation-button,
+.pos .payment-screen .left-content .back-button,
+.pos .payment-screen .left-content .partner-button,
+.pos .payment-screen .left-content .js_invoice {
+  display: none !important;
+}
+
+.pos .payment-screen .left-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* quan trọng để scroll không vỡ */
+}
+
+.pos .payment-screen .left-content .sapp-paypanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto; /* chiếm phần còn lại */
+  min-height: 0;
+}
+
+.pos .sapp-paypanel .spp-paybar {
+  margin-top: auto; /* key */
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pos .sapp-paypanel .spp-summary,
+.pos .sapp-paypanel .spp-methods,
+.pos .sapp-paypanel .spp-quick {
+  flex: 0 0 auto;
+}
+.pos .payment-screen .left-content {
+  padding-bottom: 12px; /* tuỳ bạn */
+}
+
+.pos .spp-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 56px;
+  padding: 8px 12px;
+  z-index: 9999;
+
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.pos .spp-bb-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pos .spp-bb-chip {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #f3f4f6;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pos .spp-bb-chip.is-active {
+  background: #e8f0ff;
+  border-color: rgba(56, 142, 255, 0.35);
+}
+
+.pos .spp-bb-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.pos .spp-bb-customer {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 420px;
+}
+
+.pos .spp-bb-customer-name {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos .spp-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20000;
+}
+
+.pos .product-screen,
+.pos .payment-screen {
+  padding-bottom: 64px !important;
+}
+.pos .payment-screen .center-content .payment-summary {
+  display: none !important;
+}
+.pos .payment-screen .payment-summary {
+  display: none !important;
+}
+
+.pos .payment-screen .payment-summary.d-flex.flex-grow-1 {
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.pos .sapp-paypanel .spp-quick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pos .sapp-paypanel .spp-quick .spp-qbtn {
+  height: 27px;
+  padding: 0 5px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 27px;
+  min-height: 27px;
+}
+
+.pos .sapp-paypanel .spp-quick .spp-qbtn {
+  box-shadow: none;
+  border-width: 1px;
+}
+
+.pos .o-debug-widget-btn,
+.o-debug-widget-btn {
+  display: none !important;
+}
+
+/* Wrapper thường là input group / container, nên xử lý cả input + icon */
+.pos .scp-search-input {
+  height: 36px; /* giống ảnh KiotViet */
+  border-radius: 8px;
+  background: #fff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 12px 0 38px; /* chừa chỗ icon kính lúp bên trái */
+  font-size: 14px;
+  line-height: 36px;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Placeholder */
+.pos .scp-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* Focus */
+.pos .scp-search-input:focus {
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: none !important;
+}
+
+/* Trường hợp phổ biến: icon được position absolute trong wrapper */
+.pos .sapphire-navbar .searchbox,
+.pos .sapphire-navbar .search-bar,
+.pos .sapphire-navbar #search-products,
+.pos .sapphire-navbar .scp-search {
+  position: relative;
+}
+
+/* Icon kính lúp canh giữa trong ô */
+.pos .sapphire-navbar .scp-search .fa-search,
+.pos .sapphire-navbar .searchbox .fa-search,
+.pos .sapphire-navbar .search-bar .fa-search {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Nếu wrapper đang bị bóp chiều cao làm input “lụt”, ép align-center */
+.pos .sapphire-navbar .scp-search,
+.pos .sapphire-navbar .searchbox,
+.pos .sapphire-navbar .search-bar {
+  display: flex;
+  align-items: center;
+}
+
+/* Nếu có button/icon bên phải bị lệch, reset */
+.pos .sapphire-navbar .scp-search button,
+.pos .sapphire-navbar .searchbox button,
+.pos .sapphire-navbar .search-bar button {
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Payment navbar search - match ProductScreen look */
+.pos .sapphire-navbar .navbar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px; /* chỉnh theo ý */
+  width: 420px; /* hoặc auto */
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 0 12px 0 36px; /* chừa chỗ icon */
+}
+
+.pos .sapphire-navbar .scp-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+  color: black;
+}
+
+.pos .sapphire-navbar .scp-search-input {
+  width: 100%;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  height: 100%;
+  font-size: 14px;
+}
+
+.pos .sapphire-navbar .scp-search-input::placeholder {
+  opacity: 0.7;
+}
+
+/* wrap */
+.pos .sapphire-items-table-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* header */
+.pos .sit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.pos .sit-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+.pos .sit-count {
+  color: #6b7280;
+}
+
+/* card */
+.pos .sit-table-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* table */
+.pos .sit-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pos .sit-table thead th {
+  text-align: left;
+  font-weight: 700;
+  color: #6b7280;
+  font-size: 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fafafa;
+}
+.pos .sit-table tbody td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+}
+.pos .sit-row:last-child td {
+  border-bottom: none;
+}
+
+/* columns */
+.pos .sit-table .col-idx {
+  width: 110px;
+}
+.pos .sit-table .col-unit {
+  width: 160px;
+}
+.pos .sit-table .col-qty {
+  width: 200px;
+}
+.pos .sit-table .col-total {
+  width: 200px;
+  text-align: right;
+}
+
+/* idx + delete */
+.pos .idx-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pos .idx-num {
+  font-size: 16px;
+  font-weight: 800;
+  min-width: 24px;
+}
+.pos .idx-del {
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* name */
+.pos .name-text {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* qty control */
+.pos .qty-ctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.pos .qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: #fff;
+}
+.pos .qty-num {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* money */
+.pos .total-money {
+  font-size: 14px;
+  font-weight: 800;
+}
+.pos .sit-empty {
+  padding: 18px;
+  color: #6b7280;
+}
+
+/* ===============================
+   FIX CỘT SL LỆCH HÀNG
+   =============================== */
+
+/* Header SL */
+.pos .sit-table thead th.col-qty{
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Cell SL */
+.pos .sit-table tbody td.col-qty{
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Wrapper của nút SL */
+.pos .qty-control{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+}
+
+/* Nút - / + */
+.pos .qty-btn{
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Số lượng */
+.pos .qty-num{
+  min-width: 24px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1;
 }
