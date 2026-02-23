@@ -9,6 +9,7 @@
     'author': 'Orinx',
     'company': 'Orinx',
     'website': 'https://www.erp.orinx.com.vn',
+    'website': 'https://www.erp.orinx.com.vn',
     'depends': ['point_of_sale'],
     'data': [
         'views/SwiftReportMenu.xml',
