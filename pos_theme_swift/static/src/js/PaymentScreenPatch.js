@@ -15,9 +15,6 @@ patch(PaymentScreen, {
 });
 
 patch(PaymentScreen.prototype, {
-  // =========================================================
-  // 0) Order / Lines safe getters
-  // =========================================================
   sppOrder() {
     return this.pos?.getOrder?.() || this.pos?.get_order?.() || null;
   },
@@ -32,7 +29,6 @@ patch(PaymentScreen.prototype, {
   },
 
   sppLineKey(line, i) {
-    // tránh duplicate key "/" hoặc object toString
     return (
       line?.uuid ||
       line?.uid ||
@@ -49,9 +45,6 @@ patch(PaymentScreen.prototype, {
     return idx >= 0 ? idx : 0;
   },
 
-  // =========================================================
-  // 1) Line fields helpers
-  // =========================================================
   sppLineQty(line) {
     const q =
       (line?.get_quantity && line.get_quantity()) ??
@@ -73,7 +66,6 @@ patch(PaymentScreen.prototype, {
   },
 
   sppLineTotal(line) {
-    // ưu tiên subtotal/tax theo chuẩn
     const v =
       (line?.get_display_price && line.get_display_price()) ??
       (line?.get_price_with_tax && line.get_price_with_tax()) ??
@@ -100,9 +92,6 @@ patch(PaymentScreen.prototype, {
     return line?.product?.barcode || line?.product?.default_code || "";
   },
 
-  // =========================================================
-  // 2) Actions: select / qty / remove / more
-  // =========================================================
   onSppSelectLine(ev, line) {
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
@@ -193,10 +182,6 @@ patch(PaymentScreen.prototype, {
     ev?.stopImmediatePropagation?.();
     console.log("[Sapphire] more line:", line);
   },
-
-  // =========================================================
-  // 3) Navbar: Tabs + Search (giữ pos.searchProductWord)
-  // =========================================================
   getOrderTabs() {
     const orders = this.pos.getOpenOrders().filter((o) => !o.table_id);
     return orders.map((order, idx) => ({
@@ -212,16 +197,13 @@ patch(PaymentScreen.prototype, {
   },
 
   onSapphireSearchKeydown(ev) {
-    // Enter => back ProductScreen để search
     if (ev?.key === "Enter") {
       ev.preventDefault();
       ev.stopPropagation();
       ev.stopImmediatePropagation?.();
-      // Stay on PaymentScreen
       return;
     }
 
-    // F3 => focus search
     if (ev?.key === "F3") {
       ev.preventDefault();
       ev.stopPropagation();
@@ -250,12 +232,9 @@ patch(PaymentScreen.prototype, {
       product_id: product,
       product_tmpl_id: product.product_tmpl_id,
     });
-    // Clear search after adding
     this.pos.searchProductWord = "";
     this.render?.();
   },
-
-  // alias để tương thích XML cũ
   sppLineUnit(line) {
     return this.sppLineUnitPrice(line);
   },
@@ -287,7 +266,6 @@ patch(PaymentScreen.prototype, {
 
     const current = this.sppLineQty(line);
 
-    // 🔥 Nếu còn 1 thì xoá luôn
     if (current <= 1) {
         this.sppRemoveLine(line);
         return;
@@ -311,7 +289,6 @@ patch(PaymentScreen.prototype, {
     const order = this.sppOrder();
     if (!order || !line) return;
 
-    // Odoo classic
     if (order.remove_orderline) {
       order.remove_orderline(line);
     } else if (line.delete) {
@@ -323,10 +300,6 @@ patch(PaymentScreen.prototype, {
     order.trigger?.("change", order);
     this.render?.();
   },
-
-  // =========================================================
-  // 4) Optional: mapping list món (nếu bạn đang dùng chỗ khác)
-  // =========================================================
   getPaymentLines() {
     const order = this.sppOrder();
     const lines = this.sppOrderlines(order);
@@ -342,9 +315,7 @@ patch(PaymentScreen.prototype, {
       const unitPrice =
         this.env.utils?.formatCurrency?.(this.sppLineUnitPrice(line)) || "";
 
-      const imageUrl = product?.image_128
-        ? `data:image/png;base64,${product.image_128}`
-        : null;
+      const imageUrl = `/web/image?model=product.product&id=${product.id}&field=image_128&unique=${product.write_date}`;
 
       return {
         id: line.uid || line.id || `${product?.id}-${Math.random()}`,

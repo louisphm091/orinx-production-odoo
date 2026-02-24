@@ -98,7 +98,7 @@ const BottomBarMixin = {
       nativeBtn.click();
       return;
     }
-    
+
     if (typeof this.onClickPartner === "function") {
       console.log("[SapphireBottomBar] using this.onClickPartner()");
       await this.onClickPartner();

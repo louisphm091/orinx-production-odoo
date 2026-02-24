@@ -4,10 +4,6 @@ import { patch } from "@web/core/utils/patch";
 import { useService } from "@web/core/utils/hooks";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 
-/**
- * 1) Chặn mọi click / hotkey / flow nào gọi ProductScreen
- * => redirect qua PaymentScreen
- */
 patch(ProductScreen.prototype, {
   setup() {
     super.setup(...arguments);
