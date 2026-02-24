@@ -217,7 +217,7 @@ patch(PaymentScreen.prototype, {
       ev.preventDefault();
       ev.stopPropagation();
       ev.stopImmediatePropagation?.();
-      this.pos.showScreen("ProductScreen");
+      // Stay on PaymentScreen
       return;
     }
 
@@ -228,6 +228,31 @@ patch(PaymentScreen.prototype, {
       ev.stopImmediatePropagation?.();
       ev.target?.focus?.();
     }
+  },
+
+  getFilteredProducts() {
+    const word = (this.pos.searchProductWord || "").trim().toLowerCase();
+    if (!word) return [];
+
+    const products = this.pos.models["product.product"].filter((p) => {
+      return (
+        (p.display_name && p.display_name.toLowerCase().includes(word)) ||
+        (p.barcode && String(p.barcode).includes(word)) ||
+        (p.default_code && String(p.default_code).toLowerCase().includes(word))
+      );
+    });
+    return products.slice(0, 10); // Limit to 10 results
+  },
+
+  async onSapphireAddProduct(product) {
+    if (!product) return;
+    await this.pos.addLineToCurrentOrder({
+      product_id: product,
+      product_tmpl_id: product.product_tmpl_id,
+    });
+    // Clear search after adding
+    this.pos.searchProductWord = "";
+    this.render?.();
   },
 
   // alias để tương thích XML cũ

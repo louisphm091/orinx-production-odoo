@@ -13,6 +13,28 @@
                    placeholder="Tìm hàng hóa (F3)"
                    t-on-input="onSapphireSearchInput"
                    t-on-keydown="onSapphireSearchKeydown"/>
+
+            <div t-if="pos.searchProductWord" class="scp-search-results">
+              <t t-set="products" t-value="this.getFilteredProducts()"/>
+              <t t-if="products.length">
+                <div class="results-list">
+                  <t t-foreach="products" t-as="product" t-key="product.id">
+                    <div class="result-item" t-on-click="() => this.onSapphireAddProduct(product)">
+                      <div class="item-img" t-if="product.image_128">
+                        <img t-att-src="'data:image/png;base64,' + product.image_128"/>
+                      </div>
+                      <div class="item-info">
+                        <div class="item-name"><t t-esc="product.display_name"/></div>
+                        <div class="item-price"><t t-esc="env.utils.formatCurrency(product.lst_price)"/></div>
+                      </div>
+                    </div>
+                  </t>
+                </div>
+              </t>
+              <t t-else="">
+                <div class="results-empty">Không tìm thấy sản phẩm</div>
+              </t>
+            </div>
           </div>
 
           <div class="nav-tabs">

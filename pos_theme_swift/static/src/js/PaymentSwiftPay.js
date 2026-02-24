@@ -50,7 +50,7 @@ patch(PaymentScreen.prototype, {
       ev.preventDefault();
       ev.stopPropagation();
       ev.stopImmediatePropagation?.();
-      this.pos.showScreen("ProductScreen");
+      // Stay on PaymentScreen
       return;
     }
     if (ev.key === "F3") {

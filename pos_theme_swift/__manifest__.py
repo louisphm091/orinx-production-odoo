@@ -23,7 +23,8 @@
             'pos_theme_swift/static/src/css/SwiftReport.css',
         ],
         'point_of_sale._assets_pos': [
-            'pos_theme_swift/static/src/js/ProductScreen.js',
+            'pos_theme_swift/static/src/js/PosAppPatch.js',
+            'pos_theme_swift/static/src/js/RemoveProductScreen.js',
             'pos_theme_swift/static/src/js/PaymentScreenPatch.js',
             'pos_theme_swift/static/src/js/SwiftTabsPatch.js',
             'pos_theme_swift/static/src/js/PaymentSwiftPay.js',
