@@ -7,9 +7,7 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 patch(ProductScreen.prototype, {
   setup() {
     super.setup(...arguments);
-    // vừa mount ProductScreen là đá sang PaymentScreen luôn
     const pos = this.pos || this.env?.services?.pos;
-    // một số build dùng navigate, một số build dùng showScreen
     if (pos?.navigate) {
       pos.navigate("PaymentScreen");
     } else if (pos?.showScreen) {

@@ -18,24 +18,6 @@
   <!-- Reusable bottom bar -->
   <t t-name="pos_theme_swift.SapphireBottomBar">
     <div class="spp-bottom-bar" t-on-click.stop.prevent="() => {}">
-      <div class="spp-bb-left">
-        <button type="button"
-                class="spp-bb-chip"
-                t-att-class="this.isSppSaleMode('quick') ? 'spp-bb-chip is-active' : 'spp-bb-chip'"
-                t-on-click.stop.prevent="(ev) => this.onSppSetSaleMode(ev, 'quick')">
-          <i class="fa fa-bolt me-1"/>
-          Bán nhanh
-        </button>
-
-        <button type="button"
-                class="spp-bb-chip"
-                t-att-class="this.isSppSaleMode('normal') ? 'spp-bb-chip is-active' : 'spp-bb-chip'"
-                t-on-click.stop.prevent="(ev) => this.onSppSetSaleMode(ev, 'normal')">
-          <i class="fa fa-clock-o me-1"/>
-          Bán thường
-        </button>
-      </div>
-
       <div class="spp-bb-right">
         <button type="button"
                 class="spp-bb-customer"

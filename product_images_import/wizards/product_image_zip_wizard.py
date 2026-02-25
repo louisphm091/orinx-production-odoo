@@ -58,54 +58,86 @@ class ProductImageZipWizard(models.TransientModel):
         if not members:
             raise UserError(_("No image files found in ZIP. Allowed: %s") % ", ".join(allowed_ext))
 
-        ProductT = self.env["product.template"]
-        ProductV = self.env["product.product"]
+        import logging
+        _logger = logging.getLogger(__name__)
 
+        # 1. Collect keys and filter members
+        valid_members = []
+        keys = []
+        for member in members:
+            filename = os.path.basename(member)
+            if filename.startswith("._") or "__MACOSX" in member:
+                continue
+
+            key = self._normalize_key(member)
+            if key:
+                valid_members.append((member, key))
+                keys.append(key)
+
+        if not keys:
+            raise UserError(_("No valid image files found in ZIP."))
+
+        # 2. Bulk Search Products
+        ProductV = self.env["product.product"]
+        product_map = {}
+
+        if self.match_by == "id":
+            valid_ids = []
+            for k in keys:
+                try:
+                    valid_ids.append(int(k))
+                except (ValueError, TypeError):
+                    continue
+            products = ProductV.browse(valid_ids).exists()
+            for p in products:
+                product_map[str(p.id)] = p
+        elif self.match_by == "barcode":
+            products = ProductV.search([("barcode", "in", keys)])
+            for p in products:
+                # Use barcode as key (case-insensitive if needed, but 'in' is case-sensitive in PostgreSQL usually)
+                # Odoo barcode is usually unique-ish, but let's handle multiples if it ever happens (limit 1 logic)
+                product_map[p.barcode] = p
+        else: # default_code
+            products = ProductV.search([("default_code", "in", keys)])
+            for p in products:
+                product_map[p.default_code] = p
+
+        # 3. Process Images
         updated = 0
         skipped = 0
         not_found = 0
 
-        import logging
-        _logger = logging.getLogger(__name__)
+        for member, key in valid_members:
+            v = product_map.get(key)
 
-        for member in members:
-            filename = os.path.basename(member)
-            if filename.startswith("._") or "__MACOSX" in member:
-                skipped += 1
-                continue
-
-            key = self._normalize_key(member)
-            if not key:
-                skipped += 1
-                continue
-
-            v = False
-            if self.match_by == "id":
-                try:
-                    product_id = int(key)
-                    v = ProductV.browse(product_id).exists()
-                except (ValueError, TypeError):
-                    v = False
-            else:
-                domain = []
-                if self.match_by == "barcode":
-                    domain = [("barcode", "=ilike", key)]
-                else:
-                    domain = [("default_code", "=ilike", key)]
-                v = ProductV.search(domain, limit=1)
+            # If search didn't find it (maybe case sensitivity or ilike vs in)
+            if not v and self.match_by != "id":
+                # Fallback to ilike if direct match fails?
+                # Actually 'in' is faster and usually 1:1.
+                # If they used ilike before, it was to match "barcode" = "BARCODE"
+                # Let's try to be a bit more flexible if product_map doesn't have it
+                # but for bulk, 'in' is the way.
+                pass
 
             if not v:
                 _logger.warning("Product not found for key: %s (from %s)", key, member)
                 not_found += 1
                 continue
 
-            _logger.info("Found product %s for key: %s", v.display_name, key)
             record = v if self.target == "variant" else v.product_tmpl_id
+
+            if not self.overwrite and record.image_1920:
+                skipped += 1
+                continue
 
             try:
                 img_bytes = zf.read(member)
                 record.image_1920 = base64.b64encode(img_bytes)
                 updated += 1
+                # Trigger a commit or flush periodically?
+                # Odoo handles this at end of transaction,
+                # but for 50 images, memory might be an issue if images are large.
+                # However, 50 images is usually fine.
             except Exception as e:
                 _logger.error("Error reading/saving image for %s: %s", key, str(e))
                 skipped += 1

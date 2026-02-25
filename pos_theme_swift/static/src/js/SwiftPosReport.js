@@ -33,7 +33,6 @@ export class SwiftPosSalesDashboard extends Component {
 
     onMounted(async () => {
       await this.load();
-      // đánh dấu để onPatched render chart sau khi DOM đã paint
       this._chartNeedsRender = true;
     });
 
@@ -47,7 +46,6 @@ export class SwiftPosSalesDashboard extends Component {
     onWillUnmount(() => this.destroyChart());
   }
 
-  // ---------------- Format helpers ----------------
   formatVND(v) {
     const n = Number(v || 0);
     return `${n.toLocaleString("vi-VN")} đ`;
@@ -60,7 +58,6 @@ export class SwiftPosSalesDashboard extends Component {
     return `${n}`;
   }
 
-  // ---------------- Menu actions ----------------
   onRefresh() {
     this.load().then(() => {
       this._chartNeedsRender = true;
@@ -90,14 +87,13 @@ export class SwiftPosSalesDashboard extends Component {
 
   setTab(tab) {
     this.state.tab = tab;
-    this.onRefresh(); // Refresh data for the new tab/chart view
+    this.onRefresh();
   }
 
   onTopModeChanged() { this.onRefresh(); }
   onTopRangeChanged() { this.onRefresh(); }
 
   openOrders() {
-    // mở list pos.order (backend)
     return this.action.doAction({
       type: "ir.actions.act_window",
       name: "POS Orders",
@@ -127,7 +123,6 @@ export class SwiftPosSalesDashboard extends Component {
     }
   }
 
-  // ---------------- Chart.js ----------------
   destroyChart() {
     if (this._chart) {
       this._chart.destroy();
@@ -146,9 +141,6 @@ export class SwiftPosSalesDashboard extends Component {
         console.warn("[SwiftReport] Chart.js not found on window");
         return;
       }
-
-      // nếu canvas đang display none hoặc height = 0 -> Chart sẽ “không thấy”
-      // CSS bên dưới sẽ fix height của container.
 
       this.destroyChart();
 
@@ -177,8 +169,6 @@ export class SwiftPosSalesDashboard extends Component {
         },
       });
 
-      // debug
-      // console.log("[SwiftReport] chart rendered");
     } catch (e) {
       console.error("[SwiftReport] renderChart failed:", e);
     }

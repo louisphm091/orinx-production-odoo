@@ -4,9 +4,6 @@ import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { CashierName } from "@point_of_sale/app/components/navbar/cashier_name/cashier_name";
 
-/**
- * Register CashierName for PaymentScreen template
- */
 patch(PaymentScreen, {
   components: {
     ...(PaymentScreen.components || {}),

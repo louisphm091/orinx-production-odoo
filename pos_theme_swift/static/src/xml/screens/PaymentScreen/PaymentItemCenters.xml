@@ -9,12 +9,6 @@
 
         <t t-set="order" t-value="this.sppOrder()"/>
         <t t-set="lines" t-value="order and this.sppOrderlines(order) or []"/>
-
-        <div class="sit-header">
-          <div class="sit-title">Danh sách món</div>
-          <div class="sit-count"><t t-esc="lines.length"/> món</div>
-        </div>
-
         <div class="sit-table-card">
           <table class="sit-table" t-if="lines.length">
             <thead>
