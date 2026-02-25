@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="pos_theme_swift.SwiftPosSalesDashboard">
+    <div class="o_swift_pos_report">
+      <!-- Header -->
+      <div class="swift-pageHead">
+        <h2 class="swift-pageTitle">Kết quả bán hàng hôm nay</h2>
+
+        <div class="swift-headActions">
+          <button type="button" class="btn btn-light swift-btn" t-on-click="onRefresh">
+            <i class="fa fa-refresh me-1"/> Làm mới
+          </button>
+
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle swift-btn" type="button" data-bs-toggle="dropdown">
+              <t t-esc="state.filterLabel"/>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" t-on-click="setFilterToday">Hôm nay</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterYesterday">Hôm qua</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisWeek">Tuần này</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisMonth">Tháng này</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <t t-if="state.loading">
+        <div class="alert alert-info m-0">Đang tải dữ liệu...</div>
+      </t>
+
+      <t t-if="!state.loading">
+        <!-- KPI Row -->
+        <div class="swift-kpiRow">
+          <div class="swift-kpiCard">
+            <div class="swift-kpiTop">
+              <div class="swift-kpiIcon is-blue"><i class="fa fa-usd"/></div>
+              <div class="swift-kpiTitle">Doanh thu</div>
+            </div>
+            <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.revenue)"/></div>
+            <div class="swift-kpiSub"><t t-esc="state.kpi.orders"/> hóa đơn</div>
+          </div>
+
+          <div class="swift-kpiCard">
+            <div class="swift-kpiTop">
+              <div class="swift-kpiIcon is-orange"><i class="fa fa-undo"/></div>
+              <div class="swift-kpiTitle">Trả hàng</div>
+            </div>
+            <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.refund)"/></div>
+            <div class="swift-kpiSub"> </div>
+          </div>
+
+          <div class="swift-kpiCard">
+            <div class="swift-kpiTop">
+              <div class="swift-kpiIcon is-red"><i class="fa fa-arrow-down"/></div>
+              <div class="swift-kpiTitle">Doanh thu thuần</div>
+            </div>
+            <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.net)"/></div>
+            <div class="swift-kpiSub">So với hôm qua</div>
+          </div>
+
+          <div class="swift-kpiCard">
+            <div class="swift-kpiTop">
+              <div class="swift-kpiIcon is-gray"><i class="fa fa-file-text-o"/></div>
+              <div class="swift-kpiTitle">Hóa đơn</div>
+            </div>
+            <div class="swift-kpiValue"><t t-esc="state.kpi.orders"/></div>
+            <a href="#" class="swift-link" t-on-click.prevent="openOrders">Xem danh sách</a>
+          </div>
+        </div>
+
+        <!-- Main Row -->
+        <div class="swift-mainRow">
+          <!-- Net revenue chart card -->
+          <div class="swift-card swift-card--net">
+            <div class="swift-cardHead">
+              <div>
+                <div class="swift-cardTitle">Doanh thu thuần</div>
+                <div class="swift-cardBig"><t t-esc="formatVND(state.kpi.net)"/></div>
+              </div>
+
+              <div class="swift-tabs">
+                <button type="button" t-att-class="state.tab==='day' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabDay">Theo ngày</button>
+                <button type="button" t-att-class="state.tab==='hour' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabHour">Theo giờ</button>
+                <button type="button" t-att-class="state.tab==='weekday' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabWeekday">Theo thứ</button>
+              </div>
+            </div>
+
+            <div class="swift-cardBody">
+              <div class="swift-chartWrap">
+                <canvas t-ref="netRevenueChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent activity -->
+          <div class="swift-card swift-card--activity">
+            <div class="swift-cardHead">
+              <div class="swift-cardTitle">Hoạt động gần đây</div>
+            </div>
+            <div class="swift-cardBody swift-activityList">
+              <t t-foreach="state.recent_orders" t-as="o" t-key="o.id">
+                <div class="swift-activityItem">
+                  <div class="swift-activityLeft">
+                    <div class="swift-activityName"><t t-esc="o.partner"/></div>
+                    <div class="swift-activitySub">vừa bán đơn hàng</div>
+                  </div>
+                  <div class="swift-activityRight">
+                    <div class="swift-activityAmt"><t t-esc="formatVND(o.amount_total)"/></div>
+                    <div class="swift-activityTime"><t t-esc="o.time_ago"/></div>
+                  </div>
+                </div>
+              </t>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="swift-bottomRow">
+          <!-- Top products -->
+          <div class="swift-card swift-card--topprod">
+            <div class="swift-cardHead">
+              <div class="swift-cardTitle">Top 10 hàng bán chạy</div>
+              <div class="swift-selects">
+                <select class="form-select form-select-sm" t-model="state.topProductsMode" t-on-change="onTopModeChanged">
+                  <option value="revenue">Theo doanh thu</option>
+                  <option value="qty">Theo số lượng</option>
+                </select>
+                <select class="form-select form-select-sm" t-model="state.topProductsRange" t-on-change="onTopRangeChanged">
+                  <option value="this_month">Tháng này</option>
+                  <option value="this_week">Tuần này</option>
+                  <option value="today">Hôm nay</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="swift-cardBody">
+              <t t-foreach="state.top_products" t-as="p" t-key="p.name">
+                <div class="swift-topRow">
+                  <div class="swift-topName"><t t-esc="p.name"/></div>
+                  <div class="swift-topBar">
+                    <div class="swift-topBarFill" t-att-style="'width:' + p.pct + '%'"></div>
+                  </div>
+                  <div class="swift-topVal"><t t-esc="formatCompact(p.value)"/></div>
+                </div>
+              </t>
+            </div>
+          </div>
+
+          <!-- Placeholder customers -->
+          <div class="swift-card swift-card--customers">
+            <div class="swift-cardHead">
+              <div class="swift-cardTitle">Top 10 khách mua nhiều nhất</div>
+              <span class="swift-pill">Hôm qua</span>
+            </div>
+            <div class="swift-cardBody">
+              <div class="text-muted">Bạn có thể bổ sung bảng / chart khách hàng ở đây.</div>
+            </div>
+          </div>
+        </div>
+
+      </t>
+    </div>
+  </t>
+
+</templates>
