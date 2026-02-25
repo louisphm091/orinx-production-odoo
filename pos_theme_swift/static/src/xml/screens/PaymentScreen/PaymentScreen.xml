@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1" t-translation="off">
+
+    <xpath expr="//div[contains(@class,'payment-screen')]/div[contains(@class,'main-content')][1]" position="before">
+      <div class="sapphire-navbar sapphire-navbar--payment">
+        <div class="nav-left">
+          <div class="navbar-search" id="search-products">
+            <i class="fa fa-search scp-search-icon"/>
+            <input class="scp-search-input"
+                   type="search"
+                   t-att-value="pos.searchProductWord || ''"
+                   placeholder="Tìm hàng hóa (F3)"
+                   t-on-input="onSapphireSearchInput"
+                   t-on-keydown="onSapphireSearchKeydown"/>
+
+            <div t-if="pos.searchProductWord" class="scp-search-results">
+              <t t-set="products" t-value="this.getFilteredProducts()"/>
+              <t t-if="products.length">
+                <div class="results-list">
+                  <t t-foreach="products" t-as="product" t-key="product.id">
+                    <div class="result-item" t-on-click="() => this.onSapphireAddProduct(product)">
+                      <div class="item-img">
+                        <img t-att-src="'/web/image?model=product.product&amp;id=' + product.id + '&amp;field=image_128&amp;unique=' + product.write_date" loading="lazy"/>
+                      </div>
+                      <div class="item-info">
+                        <div class="item-name"><t t-esc="product.display_name"/></div>
+                        <div class="item-price"><t t-esc="env.utils.formatCurrency(product.lst_price)"/></div>
+                      </div>
+                    </div>
+                  </t>
+                </div>
+              </t>
+              <t t-else="">
+                <div class="results-empty">Không tìm thấy sản phẩm</div>
+              </t>
+            </div>
+          </div>
+
+          <div class="nav-tabs">
+            <div class="sapphire-order-tabs d-flex flex-row align-items-center gap-2">
+              <t t-set="tabs" t-value="getOrderTabs()"/>
+              <t t-foreach="tabs" t-as="tab" t-key="tab.key">
+                <button class="order-tab"
+                        t-att-class="{'active': tab.order === pos.getOrder()}"
+                        t-on-click="() => this.pos.setOrder(tab.order)">
+                  <span class="tab-label"><t t-esc="tab.label"/></span>
+                  <span class="tab-close" t-on-click.stop="() => this.pos.removeOrder(tab.order)">×</span>
+                </button>
+              </t>
+            </div>
+          </div>
+        </div>
+        <div class="nav-right">
+          <button class="nav-btn"
+                  t-on-click="() => pos.closePos()"
+                  title="Backend">
+            <i class="fa fa-pause nav-icon" />
+            <span class="nav-label">Backend</span>
+          </button>
+
+          <button class="nav-btn danger"
+                  t-on-click="closeSession"
+                  title="Logout">
+            <i class="fa fa-sign-out nav-icon" />
+            <span class="nav-label">Logout</span>
+          </button>
+
+          <div class="nav-cashier">
+            <CashierName/>
+          </div>
+        </div>
+      </div>
+    </xpath>
+
+    <xpath expr="//div[contains(@class,'payment-screen')]" position="attributes">
+      <attribute name="class" add=" o_sapphire_payment_with_navbar " separator=" "/>
+    </xpath>
+
+  </t>
+</templates>
