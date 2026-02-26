@@ -30,26 +30,27 @@ class PosDashboardSwift(models.AbstractModel):
     def _get_chart_data(self, start, end):
         # Aggregate revenue by POS Config (Chi nhánh)
         domain = [('date_order', '>=', start), ('date_order', '<=', end), ('state', 'in', ['paid', 'done', 'invoiced'])]
-        orders = self.env['pos.order'].read_group(domain, ['config_id', 'amount_total'], ['config_id'])
+        # _read_group returns a list of tuples: (config_id_record, amount_total_sum)
+        groups = self.env['pos.order']._read_group(
+            domain,
+            groupby=['config_id'],
+            aggregates=['amount_total:sum'],
+        )
 
-        labels = []
         datasets = []
 
-        if not orders:
+        if not groups:
             return {'labels': ['-'], 'datasets': []}
 
-        # For simplicity in this version, we use a single label (the period) or hours
-        # The user's screenshot showed "09" as label and legend with branch names.
-
-        for o in orders:
-            config_name = o['config_id'][1] if o['config_id'] else _('Unknown')
+        for config_rec, amount_total_sum in groups:
+            config_name = config_rec.name if config_rec else _('Unknown')
             datasets.append({
                 'label': config_name,
-                'data': [o['amount_total']]
+                'data': [amount_total_sum or 0.0]
             })
 
         return {
-            'labels': [fields.Date.to_string(start)], # Simple label for now
+            'labels': [fields.Date.to_string(start)],  # Simple label for now
             'datasets': datasets
         }
 
@@ -124,17 +125,26 @@ class PosDashboardSwift(models.AbstractModel):
 
     def _get_top_products(self, start, end):
         domain = [('order_id.date_order', '>=', start), ('order_id.date_order', '<=', end), ('order_id.state', 'in', ['paid', 'done', 'invoiced'])]
-        lines = self.env['pos.order.line'].read_group(domain, ['product_id', 'price_subtotal_incl'], ['product_id'], limit=10, orderby='price_subtotal_incl desc')
+        # _read_group returns list of tuples: (product_id_record, price_subtotal_incl_sum)
+        groups = self.env['pos.order.line']._read_group(
+            domain,
+            groupby=['product_id'],
+            aggregates=['price_subtotal_incl:sum'],
+            order='price_subtotal_incl:sum desc',
+            limit=10,
+        )
 
         res = []
-        if not lines:
+        if not groups:
             return res
 
-        max_val = max(l['price_subtotal_incl'] for l in lines) if lines else 1
-        for l in lines:
+        values = [amt or 0.0 for _, amt in groups]
+        max_val = max(values) if values else 1
+        for product_rec, amount in groups:
+            amount = amount or 0.0
             res.append({
-                'name': l['product_id'][1],
-                'value': l['price_subtotal_incl'],
-                'pct': int((l['price_subtotal_incl'] / max_val) * 100) if max_val > 0 else 0
+                'name': product_rec.name if product_rec else _('Unknown'),
+                'value': amount,
+                'pct': int((amount / max_val) * 100) if max_val > 0 else 0
             })
         return res

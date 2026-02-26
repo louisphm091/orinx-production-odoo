@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-  <!-- ✅ ID MỚI để tránh xung đột -->
   <record id="action_swift_pos_report_client" model="ir.actions.client">
-    <field name="name">Doanh Thu</field>
+    <field name="name">Báo Cáo</field>
     <field name="tag">pos_theme_swift.swift_pos_sales_dashboard</field>
+  </record>
+
+  <record id="point_of_sale.menu_point_rep" model="ir.ui.menu">
+    <field name="active" eval="False"/>
   </record>
 
   <menuitem
     id="menu_swift_pos_report"
-    name="Doanh Thu"
+    name="Báo Cáo"
     parent="point_of_sale.menu_point_root"
     action="pos_theme_swift.action_swift_pos_report_client"
     sequence="110"
