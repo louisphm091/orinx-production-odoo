@@ -790,4 +790,7 @@ patch(PaymentScreen.prototype, {
 
   sppLineUnit(line) { return this.sppLineUnitPrice(line); },
   sppLineUnitPriceValue(line) { return this.sppLineUnitPrice(line); },
+  async closeSession() {
+    await this.pos.closePos();
+  },
 });
