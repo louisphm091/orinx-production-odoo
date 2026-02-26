@@ -1,4 +1,5 @@
 import { useRef, onMounted, onPatched } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
@@ -74,8 +75,9 @@ patch(PaymentScreen.prototype, {
     const order = this.sppOrder();
     const summary = this.getSapphireSummary(order);
     const val = summary?.amount_paid || 0;
-    if (input.value !== String(val)) {
-      input.value = val;
+    const formatted = this.formatSapphireNumber(val, true);
+    if (input.value !== formatted) {
+      input.value = formatted;
     }
   },
 
@@ -382,13 +384,34 @@ patch(PaymentScreen.prototype, {
     ev.stopImmediatePropagation?.();
 
     const input = ev.target;
-    // Display exactly what user types, but scrub non-digits
-    const raw = input.value.replace(/\D/g, "");
-    const next = parseInt(raw, 10) || 0;
+    if (!input) return;
+
+    const start = input.selectionStart;
+    const oldLength = input.value.length;
+
+    // Scrub everything but digits
+    const digits = input.value.replace(/\D/g, "");
+    const next = parseInt(digits, 10) || 0;
+
+    // Format new value with symbol
+    const formatted = this.formatSapphireNumber(next, true);
 
     // Direct value assignment to avoid Owl interference
-    if (input.value !== raw) {
-        input.value = raw;
+    if (input.value !== formatted) {
+      input.value = formatted;
+
+      // Adjust cursor position to feel natural
+      const newLength = formatted.length;
+      let newPos = start + (newLength - oldLength);
+      // Keep cursor before the currency symbol " đ"
+      if (newPos > newLength - 2) newPos = newLength - 2;
+      if (newPos < 0) newPos = 0;
+
+      try {
+        input.setSelectionRange(newPos, newPos);
+      } catch (e) {
+        // Silently ignore selection errors on some browsers/states
+      }
     }
 
     const order = this.sppOrder();
@@ -505,29 +528,29 @@ patch(PaymentScreen.prototype, {
     return [50000, 100000, 200000, 500000];
   },
 
-  formatSapphireNumber(v) {
+  formatSapphireNumber(v, showSymbol = false) {
     try {
-      return new Intl.NumberFormat("vi-VN").format(Number(v) || 0);
+      const formatted = new Intl.NumberFormat("vi-VN").format(Number(v) || 0);
+      return showSymbol ? `${formatted} đ` : formatted;
     } catch {
-      return String(Number(v) || 0);
+      const num = String(Number(v) || 0);
+      return showSymbol ? `${num} đ` : num;
     }
   },
 
   getSppMethodName(method) {
     if (!method) return "";
-    const name = method.name || "";
-    if (name === "Customer Account" || name.en_US === "Customer Account") {
-      return "Transfer";
+    if (method.type === "pay_later") {
+      return _t("Transfer");
     }
-    return name;
+    return method.name || "";
   },
 
   isSapphireTransferSelected(order) {
     if (!order) return false;
     const line = this.sppSelectedPaymentline(order);
     const pm = this.sppPaymentlineMethod(line);
-    const name = pm?.name || "";
-    return name === "Customer Account" || name.en_US === "Customer Account";
+    return pm?.type === "pay_later";
   },
 
   sppIsToInvoice(order) {

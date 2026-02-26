@@ -1,0 +1,67 @@
+#. module: pos_theme_swift
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-26 13:28+0000\n"
+"PO-Revision-Date: 2026-02-26 13:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/PaymentSwiftPay.js:0
+msgid "Transfer"
+msgstr "Chuyển khoản"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Items Total"
+msgstr "Tổng tiền hàng"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Discount"
+msgstr "Giảm giá"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Other Charges"
+msgstr "Thu khác"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Amount Due"
+msgstr "Khách cần trả"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Paid"
+msgstr "Đã thanh toán"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Change"
+msgstr "Tiền thừa"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Account Name"
+msgstr "Tên tài khoản"
+
+#. module: pos_theme_swift
+#. odoo-xml
+#: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
+msgid "Account Number"
+msgstr "Số tài khoản"

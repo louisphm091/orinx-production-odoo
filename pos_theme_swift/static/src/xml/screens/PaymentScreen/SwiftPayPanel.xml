@@ -37,7 +37,7 @@
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Khách thanh toán</div>
+            <div class="lbl">Đã thanh toán</div>
             <div class="mid"/>
             <input type="text"
                    class="val spp-input"
@@ -51,7 +51,7 @@
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Tiền hoàn lại</div>
+            <div class="lbl">Tiền thừa</div>
             <div class="mid"/>
             <div class="val"><t t-esc="env.utils.formatCurrency(summary.amount_paid - summary.need_to_pay)"/></div>
           </div>
@@ -79,9 +79,9 @@
             <img t-attf-src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=ORINX_TRANSFER_{{summary.amount_paid}}" class="spp-qr-img"/>
           </div>
           <div class="spp-qr-right">
-            <div class="spp-qr-label">Account Name</div>
+            <div class="spp-qr-label">Tên tài khoản</div>
             <div class="spp-qr-val">ORINX TECH CO.</div>
-            <div class="spp-qr-label">Account Number</div>
+            <div class="spp-qr-label">Số tài khoản</div>
             <div class="spp-qr-val">99999999</div>
           </div>
         </div>
