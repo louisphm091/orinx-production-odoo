@@ -735,7 +735,8 @@ patch(PaymentScreen.prototype, {
     const orders = (this.pos?.getOpenOrders?.() || []).filter((o) => o && !o.table_id);
     return orders.map((order, idx) => ({
       order,
-      key: order.cid || order.uid || order.name || idx,
+      // uuid/cid are always unique even for unsaved orders; never use name alone (new orders have name '/')
+      key: order.uuid || order.cid || order.uid || `order-${idx}`,
       label: `Hóa đơn ${idx + 1}`,
     }));
   },
@@ -791,6 +792,56 @@ patch(PaymentScreen.prototype, {
   sppLineUnit(line) { return this.sppLineUnitPrice(line); },
   sppLineUnitPriceValue(line) { return this.sppLineUnitPrice(line); },
   async closeSession() {
-    await this.pos.closePos();
+    // Show a confirmation dialog before closing the session
+    const confirmed = window.confirm("Bạn có chắc chắn muốn đóng phiên bán hàng không?");
+    if (!confirmed) return;
+
+    try {
+      const orm = this.env?.services?.orm;
+      const sessionId = this.pos?.session?.id || this.pos?.session_id?.[0];
+
+      if (orm && sessionId) {
+        // Call the backend to properly set session state to 'closing_control'
+        await orm.call("pos.session", "action_pos_session_closing_control", [[sessionId]], {});
+      }
+    } catch (e) {
+      console.warn("[Sapphire] Could not call action_pos_session_closing_control:", e);
+    }
+
+    // Navigate back to backend regardless of RPC result
+    window.location.href = "/odoo/point-of-sale";
+  },
+  async onSapphireAddOrder() {
+    const pos = this.pos;
+    if (typeof pos.add_new_order === "function") {
+      pos.add_new_order();
+    } else if (typeof pos.createNewOrder === "function") {
+      await pos.createNewOrder();
+    } else if (typeof pos.addNewOrder === "function") {
+      await pos.addNewOrder();
+    } else {
+      // Odoo 17 fallback: create order via model
+      const OrderModel = pos.models?.["pos.order"];
+      if (OrderModel && typeof OrderModel.create === "function") {
+        const newOrder = await OrderModel.create({});
+        pos.selectedOrderUuid = newOrder?.uuid;
+      } else {
+        console.warn("[Sapphire] Cannot create a new order: no suitable method found on pos.");
+      }
+    }
+  },
+  sppLineUom(line) {
+    try {
+      // Odoo 17: uom_id is a record object with a name property
+      const uom = line?.product_uom_id || line?.uom_id;
+      if (!uom) return "";
+      // If it's a Many2one record object
+      if (typeof uom === "object" && !Array.isArray(uom)) return uom.name || "";
+      // If it's a [id, name] tuple (older Odoo style)
+      if (Array.isArray(uom)) return uom[1] || "";
+      return "";
+    } catch (e) {
+      return "";
+    }
   },
 });

@@ -48,6 +48,10 @@
                   <span class="tab-close" t-on-click.stop="() => this.pos.removeOrder(tab.order)">×</span>
                 </button>
               </t>
+              <button class="order-tab add-order-btn"
+                      t-on-click="onSapphireAddOrder">
+                <i class="fa fa-plus"/>
+              </button>
             </div>
           </div>
         </div>

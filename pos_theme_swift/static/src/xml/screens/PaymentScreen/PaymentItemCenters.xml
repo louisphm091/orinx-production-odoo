@@ -16,6 +16,7 @@
                 <th class="col-idx">#</th>
                 <th class="col-name">Sản phẩm</th>
                 <th class="col-unit">Đơn giá</th>
+                <th class="col-uom">Đơn Vị</th>
                 <th class="col-qty">SL</th>
                 <th class="col-total">Thành tiền</th>
               </tr>
@@ -49,6 +50,9 @@
                   <!-- 3) Unit -->
                   <td class="col-unit">
                     <t t-esc="env.utils.formatCurrency(this.sppLineUnitPrice(line))"/>
+                  </td>
+                  <td class="col-uom">
+                    <t t-esc="this.sppLineUom(line)"/>
                   </td>
 
                   <!-- 4) Qty control -->
