@@ -9,18 +9,6 @@
       <t t-set="methods" t-value="this.sppMethods()"/>
 
       <div class="sapp-paypanel" t-if="order and summary">
-
-        <!-- Customer row -->
-        <div class="spp-customer" t-on-click.stop.prevent="() => {}">
-          <i class="fa fa-search spp-ico"/>
-          <div class="spp-placeholder">
-            <t t-esc="(order.get_partner and order.get_partner() and order.get_partner().name) or 'Tìm khách hàng (F4)'"/>
-          </div>
-          <button class="spp-add" type="button" t-on-click.stop.prevent="() => {}">
-            <i class="fa fa-plus"/>
-          </button>
-        </div>
-
         <!-- Summary -->
         <div class="spp-summary">
           <div class="spp-row">
@@ -51,7 +39,21 @@
           <div class="spp-row">
             <div class="lbl">Khách thanh toán</div>
             <div class="mid"/>
-            <div class="val"><t t-esc="env.utils.formatCurrency(summary.amount_paid)"/></div>
+            <input type="text"
+                   class="val spp-input"
+                   t-ref="sapphireInput"
+                   t-on-input="onSapphireAmountPaidInput"
+                   t-on-keydown="onSapphireStopPropagation"
+                   t-on-keyup="onSapphireStopPropagation"
+                   t-on-keypress="onSapphireStopPropagation"
+                   t-on-focus="onSapphireAmountPaidFocus"
+                   t-on-blur="onSapphireAmountPaidBlur"/>
+          </div>
+
+          <div class="spp-row">
+            <div class="lbl">Tiền hoàn lại</div>
+            <div class="mid"/>
+            <div class="val"><t t-esc="env.utils.formatCurrency(summary.amount_paid - summary.need_to_pay)"/></div>
           </div>
         </div>
 
@@ -66,9 +68,22 @@
                 t-on-click.stop.prevent="(ev) => this.onSapphireSelectMethod(ev, method)"
               />
               <span class="radio-circle"/>
-              <span class="radio-label"><t t-esc="method.name"/></span>
+              <span class="radio-label"><t t-esc="this.getSppMethodName(method)"/></span>
             </label>
           </t>
+        </div>
+
+        <!-- QR Code for Transfer -->
+        <div class="spp-qr-container" t-if="this.isSapphireTransferSelected(order)">
+          <div class="spp-qr-left">
+            <img t-attf-src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=ORINX_TRANSFER_{{summary.amount_paid}}" class="spp-qr-img"/>
+          </div>
+          <div class="spp-qr-right">
+            <div class="spp-qr-label">Account Name</div>
+            <div class="spp-qr-val">ORINX TECH CO.</div>
+            <div class="spp-qr-label">Account Number</div>
+            <div class="spp-qr-val">99999999</div>
+          </div>
         </div>
 
         <!-- QUICK -->
@@ -82,12 +97,10 @@
           </t>
         </div>
 
-        <!-- ✅ PAY BAR: IN + THANH TOÁN (giống KiotViet) -->
         <div class="spp-paybar">
           <button type="button"
                   class="spp-inbtn"
-                  t-att-class="this.sppIsToInvoice(order) ? 'spp-inbtn is-on' : 'spp-inbtn'"
-                  t-on-click.stop.prevent="(ev) => this.onSapphireToggleInvoice(ev)">
+                  t-on-click.stop.prevent="(ev) => this.onSapphirePrint(ev)">
             IN
           </button>
 

@@ -1,8 +1,16 @@
-/** @odoo-module **/
-
+import { useRef, onMounted, onPatched } from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
+
+import { CashierName } from "@point_of_sale/app/components/navbar/cashier_name/cashier_name";
+
+patch(PaymentScreen, {
+  components: {
+    ...(PaymentScreen.components || {}),
+    CashierName,
+  },
+});
 
 patch(PosOrder.prototype, {
   get isCustomerRequired() {
@@ -24,19 +32,50 @@ patch(PosOrder.prototype, {
 patch(PaymentScreen.prototype, {
   setup() {
     super.setup();
+    // Force reset Odoo's internal buffer to prevent interference on refresh
     try {
-      const order = this.pos.getOrder();
-      if (order && order.payment_ids) {
-        const badLines = order.payment_ids.filter(
-          (p) => !p.payment_method_id || !p.payment_method_id.id,
+        if (this.numberBuffer) {
+            this.numberBuffer.reset();
+        }
+    } catch(e) {
+        console.warn("[Sapphire] Failed to reset numberBuffer:", e);
+    }
+
+    this.sapphireInput = useRef("sapphireInput");
+    onMounted(() => this._syncSapphireInput());
+    onPatched(() => this._syncSapphireInput());
+
+    try {
+      // Robust order detection on refresh
+      const order = this.sppOrder();
+      if (order && (order.payment_ids || order.payment_line_ids)) {
+        const pls = this.sppPaymentlines(order);
+        // Only clean if we are absolutely sure the structure is wrong
+        const badLines = pls.filter(
+          (p) => p && !this.sppPaymentlineMethod(p)
         );
         for (const bad of badLines) {
-          console.warn("Removing corrupted payment line:", bad);
-          bad.delete && bad.delete();
+          console.warn("[Sapphire] Removing invalid payment line:", bad);
+          if (typeof bad.delete === "function") bad.delete();
+          else if (order.remove_paymentline) order.remove_paymentline(bad);
         }
       }
     } catch (e) {
-      console.error("Error cleaning up payment lines:", e);
+      console.error("[Sapphire] Error during order state restoration:", e);
+    }
+  },
+
+  _syncSapphireInput() {
+    const input = this.sapphireInput.el;
+    if (!input) return;
+    // Do not sync if user is focusing or if we flagged as editing
+    if (this.isSapphireEditing || document.activeElement === input) return;
+
+    const order = this.sppOrder();
+    const summary = this.getSapphireSummary(order);
+    const val = summary?.amount_paid || 0;
+    if (input.value !== String(val)) {
+      input.value = val;
     }
   },
 
@@ -68,13 +107,22 @@ patch(PaymentScreen.prototype, {
   },
   sppOrder() {
     const pos = this.pos;
-    if (typeof pos?.getOrder === "function") return pos.getOrder();
-    if (typeof pos?.get_order === "function") return pos.get_order();
+    if (!pos) return null;
 
-    const OrderModel = pos?.models?.["pos.order"];
-    const uuid = pos?.selectedOrderUuid;
+    // Check various ways Odoo stores the current order
+    const order = pos.getOrder?.() || pos.get_order?.() || pos.selectedOrder || null;
+    if (order) return order;
+
+    const OrderModel = pos.models?.["pos.order"];
+    const uuid = pos.selectedOrderUuid || pos.selected_order_uuid;
     if (OrderModel?.get && uuid) return OrderModel.get(uuid) || null;
-    if (OrderModel?.getAll) return OrderModel.getAll()?.[0] || null;
+
+    // On refresh, sometimes we need to wait or check getAll
+    if (OrderModel?.getAll) {
+        const all = OrderModel.getAll();
+        if (all.length > 0) return all[0];
+    }
+
     return null;
   },
   sppPaymentlines(order) {
@@ -284,10 +332,10 @@ patch(PaymentScreen.prototype, {
 
     // ---- amount_paid: vẫn tính từ payment lines như bạn đang làm ----
     const pls = this.sppPaymentlines(order);
-    const amount_paid = pls.reduce(
-      (s, pl) => s + (Number(pl.amount ?? pl.payment_amount ?? 0) || 0),
-      0,
-    );
+    const amount_paid = pls.reduce((s, pl) => {
+      const a = Number(pl.amount ?? pl.payment_amount ?? 0) || 0;
+      return s + a;
+    }, 0);
     const discount_total = lines.reduce((s, l) => {
       const qty = Number(l.qty) || 0;
       const unit = Number(l.price_unit ?? l.priceUnit) || 0;
@@ -295,14 +343,11 @@ patch(PaymentScreen.prototype, {
       return s + unit * qty * (disc / 100);
     }, 0);
 
-    const other_charges = 0; // sau này nếu có logic thu khác thì thay ở đây
+    const other_charges = 0;
 
-    const need_to_pay = Math.max(
-      total_items - discount_total + other_charges,
-      0,
-    );
-
-    // amount_paid vẫn như bạn đang tính
+    // total_items derived from subtotalIncl is already net (discount subtracted)
+    // So need_to_pay should be total_items + other_charges.
+    const need_to_pay = Math.max(total_items + other_charges, 0);
     const amount_due = Math.max(need_to_pay - amount_paid, 0);
 
     return {
@@ -310,10 +355,81 @@ patch(PaymentScreen.prototype, {
       total_items,
       discount_total,
       other_charges,
-      need_to_pay, // <<< ADD
+      need_to_pay,
       amount_due,
       amount_paid,
     };
+  },
+
+  onSapphireStopPropagation(ev) {
+    ev.stopPropagation();
+    ev.stopImmediatePropagation?.();
+    // Do not preventDefault here so the input still works
+  },
+
+  onSapphireAmountPaidFocus(ev) {
+    this.isSapphireEditing = true;
+    ev.target.select();
+  },
+
+  onSapphireAmountPaidBlur(ev) {
+    this.isSapphireEditing = false;
+    this.render?.();
+  },
+
+  async onSapphireAmountPaidInput(ev) {
+    ev.stopPropagation();
+    ev.stopImmediatePropagation?.();
+
+    const input = ev.target;
+    // Display exactly what user types, but scrub non-digits
+    const raw = input.value.replace(/\D/g, "");
+    const next = parseInt(raw, 10) || 0;
+
+    // Direct value assignment to avoid Owl interference
+    if (input.value !== raw) {
+        input.value = raw;
+    }
+
+    const order = this.sppOrder();
+    if (!order) return;
+
+    const pls = this.sppPaymentlines(order);
+    let line =
+      this.sppSelectedPaymentline(order) || (pls.length ? pls[0] : null);
+
+    if (!line) {
+      const methods = this.sppMethods();
+      if (!methods.length) return;
+      await this.onSapphireSelectMethod(null, methods[0]);
+      const pls2 = this.sppPaymentlines(order);
+      line =
+        this.sppSelectedPaymentline(order) || (pls2.length ? pls2[0] : null);
+      if (!line) return;
+    }
+
+    order.select_paymentline?.(line);
+
+    if (!line || typeof line !== "object") {
+        console.error("[Sapphire] No valid payment line to update.");
+        return;
+    }
+
+    console.log("[Sapphire] Updating line amount:", {
+        method: this.sppPaymentlineMethod(line)?.name,
+        prev: line.amount,
+        next: next
+    });
+
+    // Update amount in the store
+    if (typeof line.update === "function") line.update({ amount: next });
+    else if (typeof line.set_amount === "function") line.set_amount(next);
+    else if (typeof line.setAmount === "function") line.setAmount(next);
+    else line.amount = next;
+
+    // Trigger changes to update the summary rows reactively
+    line.trigger?.("change", line);
+    order.trigger?.("change", order);
   },
 
   async onSapphireQuickPay(ev, amount) {
@@ -325,6 +441,26 @@ patch(PaymentScreen.prototype, {
 
     const order = this.sppOrder();
     if (!order) return;
+
+    // Read current value from input if available, else from order
+    let cur = 0;
+    const input = this.sapphireInput.el;
+    if (input) {
+        cur = parseInt(input.value.replace(/\D/g, ""), 10) || 0;
+    } else {
+        const summary = this.getSapphireSummary(order);
+        cur = summary?.amount_paid || 0;
+    }
+
+    const add = Number(amount) || 0;
+    const next = cur + add;
+
+    // Update input display and force focus/editing state
+    if (input) {
+        input.value = String(next);
+        input.focus();
+        this.isSapphireEditing = true;
+    }
 
     const pls = this.sppPaymentlines(order);
 
@@ -343,11 +479,19 @@ patch(PaymentScreen.prototype, {
 
     order.select_paymentline?.(line);
 
-    const add = Number(amount) || 0;
-    const cur = Number(line.amount ?? line.payment_amount ?? 0) || 0;
-    const next = cur + add;
+    if (!line || typeof line !== "object") {
+        console.error("[Sapphire] No valid payment line for QuickPay.");
+        return;
+    }
 
-    // ưu tiên update của record store
+    console.log("[Sapphire] QuickPay update:", {
+        method: this.sppPaymentlineMethod(line)?.name,
+        cur: cur,
+        add: add,
+        next: next
+    });
+
+    // Update store
     if (typeof line.update === "function") line.update({ amount: next });
     else if (typeof line.set_amount === "function") line.set_amount(next);
     else if (typeof line.setAmount === "function") line.setAmount(next);
@@ -369,15 +513,28 @@ patch(PaymentScreen.prototype, {
     }
   },
 
+  getSppMethodName(method) {
+    if (!method) return "";
+    const name = method.name || "";
+    if (name === "Customer Account" || name.en_US === "Customer Account") {
+      return "Transfer";
+    }
+    return name;
+  },
+
+  isSapphireTransferSelected(order) {
+    if (!order) return false;
+    const line = this.sppSelectedPaymentline(order);
+    const pm = this.sppPaymentlineMethod(line);
+    const name = pm?.name || "";
+    return name === "Customer Account" || name.en_US === "Customer Account";
+  },
+
   sppIsToInvoice(order) {
     if (!order) return false;
-
-    // Odoo thường có isToInvoice() hoặc is_to_invoice()
     if (typeof order.isToInvoice === "function") return !!order.isToInvoice();
     if (typeof order.is_to_invoice === "function")
       return !!order.is_to_invoice();
-
-    // store field hay gặp
     if (typeof order.to_invoice === "boolean") return order.to_invoice;
     if (typeof order.toInvoice === "boolean") return order.toInvoice;
 
@@ -388,39 +545,16 @@ patch(PaymentScreen.prototype, {
     return false;
   },
 
-  async onSapphireToggleInvoice(ev) {
+  async onSapphirePrint(ev) {
     if (ev) {
       ev.preventDefault();
       ev.stopPropagation();
-      ev.stopImmediatePropagation?.();
     }
-
-    const order = this.sppOrder?.() || this.pos?.getOrder?.();
-    if (!order) return;
-
-    const next = !this.sppIsToInvoice(order);
-
-    // Ưu tiên setter chuẩn
-    if (typeof order.set_to_invoice === "function") {
-      order.set_to_invoice(next);
-    } else if (typeof order.setToInvoice === "function") {
-      order.setToInvoice(next);
-    } else if (typeof order.update === "function") {
-      // store record
-      order.update({ to_invoice: next });
-    } else {
-      // fallback trực tiếp
-      order.to_invoice = next;
-      if (order.uiState) order.uiState.to_invoice = next;
+    const order = this.sppOrder();
+    if (order) {
+        await this.pos.printReceipt({ order });
     }
-
-    order.trigger?.("change", order);
-    this.render?.();
   },
-
-  // -------------------------------------------------
-  // PAY button (THANH TOÁN)
-  // -------------------------------------------------
   async onSapphirePay(ev) {
     if (ev) {
       ev.preventDefault();
@@ -446,4 +580,191 @@ patch(PaymentScreen.prototype, {
       this.el?.querySelector?.("button.button.validate");
     btn?.click?.();
   },
+
+  // --- Consistently provide methods for the item table (moved from PaymentScreenPatch.js) ---
+  sppOrderlines(order) {
+    return (
+      order?.get_orderlines?.() ||
+      order?.getOrderlines?.() ||
+      order?.lines ||
+      []
+    );
+  },
+  sppLineKey(line, i) {
+    return (
+      line?.uuid || line?.uid || line?.id || line?.cid || (line?.product?.id ? `p-${line.product.id}-${i}` : `l-${i}`)
+    );
+  },
+  sppLineQty(line) {
+    const q = (line?.get_quantity && line.get_quantity()) ?? line?.quantity ?? line?.qty ?? 0;
+    return Number.isFinite(Number(q)) ? Number(q) : 0;
+  },
+  sppLineUnitPrice(line) {
+    const u = (line?.get_unit_price && line.get_unit_price()) ?? line?.price_unit ?? line?.unit_price ?? 0;
+    return Number.isFinite(Number(u)) ? Number(u) : 0;
+  },
+  sppLineTotal(line) {
+    const v = (line?.get_display_price && line.get_display_price()) ?? (line?.get_price_with_tax && line.get_price_with_tax()) ?? line?.price_subtotal_incl ?? line?.price_subtotal ?? (this.sppLineQty(line) * this.sppLineUnitPrice(line));
+    return Number.isFinite(Number(v)) ? Number(v) : 0;
+  },
+  sppLineName(line) {
+    return line?.full_product_name || (line?.getFullProductName && line.getFullProductName()) || line?.product?.display_name || "Item";
+  },
+  sppLineBarcode(line) {
+    return line?.product?.barcode || line?.product?.default_code || "";
+  },
+  sppIndexOf(line) {
+    const order = this.sppOrder();
+    const lines = this.sppOrderlines(order);
+    const idx = lines.indexOf(line);
+    return idx >= 0 ? idx : 0;
+  },
+  onSapphireSearchInput(ev) {
+    const v = ev?.target?.value ?? "";
+    this.pos.searchProductWord = v;
+  },
+  onSapphireSearchKeydown(ev) {
+    if (ev?.key === "Enter") {
+      ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation?.();
+      return;
+    }
+    if (ev?.key === "F3") {
+      ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation?.();
+      ev.target?.focus?.();
+    }
+  },
+  sppIncQty(line) {
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    const qty = this.sppLineQty(line) + 1;
+    if (typeof line.set_quantity === "function") line.set_quantity(qty);
+    else if (typeof line.setQuantity === "function") line.setQuantity(qty);
+    else line.qty = qty;
+    order.trigger?.("change", order);
+    this.render?.();
+  },
+  sppDecQty(line) {
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    const current = this.sppLineQty(line);
+    if (current <= 1) { this.sppRemoveLine(line); return; }
+    const newQty = current - 1;
+    if (typeof line.set_quantity === "function") line.set_quantity(newQty);
+    else if (typeof line.setQuantity === "function") line.setQuantity(newQty);
+    else line.qty = newQty;
+    order.trigger?.("change", order);
+    this.render?.();
+  },
+  sppRemoveLine(line) {
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    if (order.remove_orderline) order.remove_orderline(line);
+    else if (line.delete) line.delete();
+    else if (line.set_quantity) line.set_quantity(0);
+    order.trigger?.("change", order);
+    this.render?.();
+  },
+  onSppIncLine(ev, line) {
+    ev?.preventDefault(); ev?.stopPropagation();
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    const next = this.sppLineQty(line) + 1;
+    if (typeof line.set_quantity === "function") line.set_quantity(next);
+    else line.qty = next;
+    order.trigger("change", order);
+    this.render();
+  },
+  onSppDecLine(ev, line) {
+    ev?.preventDefault(); ev?.stopPropagation();
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    const cur = this.sppLineQty(line);
+    const next = Math.max(cur - 1, 0);
+    if (next <= 0) {
+      if (order.remove_orderline) order.remove_orderline(line);
+      else if (line.delete) line.delete();
+    } else {
+      if (typeof line.set_quantity === "function") line.set_quantity(next);
+      else line.qty = next;
+    }
+    order.trigger("change", order);
+    this.render();
+  },
+  getPaymentLines() { // Renamed or used for Item table in XML
+    const order = this.sppOrder();
+    const lines = this.sppOrderlines(order);
+    return (lines || []).map((line) => {
+      const product = line.product;
+      const imageUrl = `/web/image?model=product.product&id=${product.id}&field=image_128&unique=${product.write_date}`;
+      return {
+        id: line.uid || line.id || line.cid,
+        name: this.sppLineName(line),
+        qty: this.sppLineQty(line),
+        unitPrice: this.formatSapphireNumber(this.sppLineUnitPrice(line)),
+        total: this.formatSapphireNumber(this.sppLineTotal(line)),
+        imageUrl,
+        _line: line,
+      };
+    });
+  },
+
+  getOrderTabs() {
+    const orders = (this.pos?.getOpenOrders?.() || []).filter((o) => o && !o.table_id);
+    return orders.map((order, idx) => ({
+      order,
+      key: order.cid || order.uid || order.name || idx,
+      label: `Hóa đơn ${idx + 1}`,
+    }));
+  },
+
+  getFilteredProducts() {
+    const word = (this.pos?.searchProductWord || "").trim().toLowerCase();
+    if (!word) return [];
+    const products = this.pos?.models["product.product"]?.filter((p) => {
+      return (
+        (p.display_name && p.display_name.toLowerCase().includes(word)) ||
+        (p.barcode && String(p.barcode).includes(word)) ||
+        (p.default_code && String(p.default_code).toLowerCase().includes(word))
+      );
+    }) || [];
+    return products.slice(0, 10);
+  },
+
+  async onSapphireAddProduct(product) {
+    if (!product) return;
+    await this.pos.addLineToCurrentOrder({
+      product_id: product,
+      product_tmpl_id: product.product_tmpl_id,
+    });
+    this.pos.searchProductWord = "";
+    this.render?.();
+  },
+
+  onSppSelectLine(ev, line) {
+    ev?.preventDefault?.(); ev?.stopPropagation?.();
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    if (typeof order.select_orderline === "function") order.select_orderline(line);
+    else if (typeof order.set_selected_orderline === "function") order.set_selected_orderline(line);
+    order.trigger?.("change", order);
+    this.render?.();
+  },
+
+  onSppRemoveLine(ev, line) {
+    ev?.preventDefault?.(); ev?.stopPropagation?.();
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    if (order.remove_orderline) order.remove_orderline(line);
+    else if (line.delete) line.delete();
+    order.trigger?.("change", order);
+    this.render?.();
+  },
+
+  onSppOpenLineMore(ev, line) {
+    ev?.preventDefault?.(); ev?.stopPropagation?.();
+    console.log("[Sapphire] more line:", line);
+  },
+
+  sppLineUnit(line) { return this.sppLineUnitPrice(line); },
+  sppLineUnitPriceValue(line) { return this.sppLineUnitPrice(line); },
 });

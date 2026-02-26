@@ -1371,20 +1371,20 @@
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 16px;
-  padding: 14px;
-  margin-top: 12px;
+  padding: 10px;
+  margin-top: 8px;
 }
 
 /* Customer search row */
 .pos .sapp-paypanel .spp-customer {
-  height: 44px;
+  height: 38px;
   display: flex;
   align-items: center;
   gap: 10px;
   background: #f3f4f6;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 0 12px;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 .pos .sapp-paypanel .spp-ico {
   opacity: 0.55;
@@ -1414,7 +1414,7 @@
 .pos .sapp-paypanel .spp-summary {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* IMPORTANT: make it 2 columns (label | value) to avoid "0  0đ" */
@@ -1422,7 +1422,7 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* If you still render .mid, hide it (fix double zero column) */
@@ -1439,6 +1439,21 @@
   font-weight: 800;
   color: #111827;
   min-width: 84px;
+}
+.pos .sapp-paypanel .spp-row .val.spp-input {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  width: 120px;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom 0.2s;
+}
+.pos .sapp-paypanel .spp-row .val.spp-input:focus {
+  outline: none;
+  border-bottom: 2px solid #2f80ed;
+  background: rgba(47, 128, 237, 0.05);
 }
 .pos .sapp-paypanel .spp-row .val.muted {
   color: #6b7280;
@@ -1468,7 +1483,7 @@
 .pos .spp-methods {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   margin-top: 14px;
   padding-top: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
@@ -1528,8 +1543,8 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -1639,23 +1654,23 @@
 
 /* circle nhỏ hơn */
 .pos .sapp-paypanel .spp-radio .radio-circle {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
   position: relative;
 }
 
 /* inner dot */
 .pos .sapp-paypanel .spp-radio input:checked + .radio-circle::after {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 /* TEXT — giảm size */
 .pos .sapp-paypanel .spp-radio .radio-label {
-  font-size: 15px; /* trước là 18px */
-  font-weight: 600; /* trước là 700–800 */
+  font-size: 13px; /* trước là 15px */
+  font-weight: 600;
   color: #111827;
 }
 /* Ẩn khối payment methods + payment lines cũ trên PaymentScreen */
@@ -2246,4 +2261,119 @@
   color: #6b7280;
   font-weight: 600;
   font-size: 14px;
+}
+
+/* --- Transfer QR Code --- */
+.pos .sapp-paypanel .spp-qr-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.pos .sapp-paypanel .spp-qr-left {
+  flex: 0 0 auto;
+}
+
+.pos .sapp-paypanel .spp-qr-right {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pos .sapp-paypanel .spp-qr-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.pos .sapp-paypanel .spp-qr-val {
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.pos .sapp-paypanel .spp-qr-img {
+  width: 100px;
+  height: 100px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: block;
+}
+
+
+/* --- POS Print Fix & Scaling --- */
+@media print {
+  @page {
+    margin: 0 !important;
+    size: auto;
+  }
+
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Hide noisy elements */
+  .sapphire-navbar, .sapp-paypanel, .left-content, .center-content, .o_dialog_container, .pos-topheader, .validation-buttons, .pos-topheader {
+    display: none !important;
+  }
+
+  /* Robust centering container */
+  .pos-receipt-print {
+    visibility: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    padding: 20px 0 !important;
+    background: white !important;
+  }
+
+  /* Scale and center the receipt */
+  .pos-receipt {
+    visibility: visible !important;
+    display: block !important;
+    width: 680px !important; /* Wider for "fitted" look on A4 */
+    margin: 0 auto !important;
+    text-align: center !important;
+    font-size: 1.3em !important;
+  }
+
+  /* Force internal elements to respect centering */
+  .pos-receipt-logo,
+  .pos-receipt-title,
+  .pos-receipt-header,
+  .pos-receipt-contact,
+  .pos-receipt-order-data,
+  .pos-receipt-center-align {
+    text-align: center !important;
+    margin: 0 auto !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Keep orderlines readable */
+  .pos-receipt .orderlines,
+  .pos-receipt .summary {
+    text-align: left !important;
+    width: 100% !important;
+  }
 }
