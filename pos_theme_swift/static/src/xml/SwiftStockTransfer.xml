@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="pos_theme_swift.StockTransfer" owl="1">
+        <div t-att-class="['st-container', state.sidebarCollapsed ? 'is-collapsed' : ''].join(' ')">
+
+            <t t-if="state.view === 'list'">
+                <!-- ══ SIDEBAR ════════════════════════════════════════════ -->
+                <div class="st-sidebar">
+                    <div class="st-sidebar-content">
+
+                        <div class="st-filter-section">
+                            <div class="st-filter-title">Chuyển đi</div>
+                            <select class="st-select" t-on-change="(ev) => this.onFilterChange('loc_src', ev.target.value)">
+                                <option value="">Chọn chi nhánh</option>
+                                <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
+                                    <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="st-filter-section">
+                            <div class="st-filter-title">Nhận về</div>
+                            <select class="st-select" t-on-change="(ev) => this.onFilterChange('loc_dest', ev.target.value)">
+                                <option value="">Chọn chi nhánh</option>
+                                <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
+                                    <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="st-filter-section">
+                            <div class="st-filter-title">Trạng thái</div>
+                            <div class="st-checkbox-group">
+                                <label class="st-checkbox-label">
+                                    <input type="checkbox" t-att-checked="state.filters.states.includes('draft')" t-on-change="() => this.onFilterChange('state', 'draft')"/>
+                                    <span>Phiếu tạm</span>
+                                    <span class="st-badge is-draft">×</span>
+                                </label>
+                                <label class="st-checkbox-label">
+                                    <input type="checkbox" t-att-checked="state.filters.states.includes('shipped')" t-on-change="() => this.onFilterChange('state', 'shipped')"/>
+                                    <span>Đang chuyển</span>
+                                    <span class="st-badge is-shipped">×</span>
+                                </label>
+                                <label class="st-checkbox-label">
+                                    <input type="checkbox" t-att-checked="state.filters.states.includes('done')" t-on-change="() => this.onFilterChange('state', 'done')"/>
+                                    <span>Đã nhận</span>
+                                    <span class="st-badge is-done">×</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="st-filter-section">
+                            <div class="st-filter-title">Thời gian</div>
+                            <div class="st-radio-list">
+                                <label class="st-radio-label">
+                                    <input type="radio" name="date_range" value="today" t-att-checked="state.filters.date_range === 'today'" t-on-change="() => this.onFilterChange('date_range', 'today')"/>
+                                    <span>Hôm nay</span>
+                                </label>
+                                <label class="st-radio-label">
+                                    <input type="radio" name="date_range" value="this_month" t-att-checked="state.filters.date_range === 'this_month'" t-on-change="() => this.onFilterChange('date_range', 'this_month')"/>
+                                    <span>Tháng này</span>
+                                </label>
+                                <label class="st-radio-label">
+                                    <input type="radio" name="date_range" value="custom" t-att-checked="state.filters.date_range === 'custom'" t-on-change="() => this.onFilterChange('date_range', 'custom')"/>
+                                    <span>Tùy chỉnh</span>
+                                    <i class="fa fa-calendar ms-auto text-muted"/>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <button class="st-sidebar-toggle" t-on-click="toggleSidebar">
+                        <i t-att-class="state.sidebarCollapsed ? 'fa fa-chevron-right' : 'fa fa-chevron-left'"/>
+                    </button>
+                </div>
+
+                <!-- ══ LIST VIEW ════════════════════════════════════════ -->
+                <div class="st-main">
+                    <div class="st-navbar">
+                        <div class="st-nav-left">
+                            <span class="st-nav-title">Chuyển hàng</span>
+                            <div class="st-nav-search">
+                                <i class="fa fa-search st-search-icon-left"/>
+                                <input type="text" placeholder="Theo mã phiếu chuyển" t-on-input="onSearchInput"/>
+                                <i class="fa fa-exchange st-search-icon-right"/>
+                            </div>
+                        </div>
+                        <div class="st-nav-actions">
+                            <button class="st-btn is-primary" t-on-click="createNewTransfer"><i class="fa fa-plus me-1"/> Chuyển hàng</button>
+                            <button class="st-btn"><i class="fa fa-file-excel-o me-1"/> Import file</button>
+                            <button class="st-btn dropdown-toggle"><i class="fa fa-file-text-o me-1"/> Xuất file</button>
+                            <button class="st-icon-btn"><i class="fa fa-th-large"/></button>
+                            <button class="st-icon-btn"><i class="fa fa-cog"/></button>
+                            <button class="st-icon-btn"><i class="fa fa-question-circle-o"/></button>
+                        </div>
+                    </div>
+
+                    <div class="st-table-wrap">
+                        <table class="st-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-check"><input type="checkbox"/></th>
+                                    <th class="col-star"><i class="fa fa-star-o"/></th>
+                                    <th>Mã chuyển hàng</th>
+                                    <th>Ngày chuyển</th>
+                                    <th>Ngày nhận</th>
+                                    <th>Từ chi nhánh</th>
+                                    <th>Tới chi nhánh</th>
+                                    <th class="text-end">Giá trị chuyển</th>
+                                    <th class="text-center">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="state.loading">
+                                    <tr><td colspan="9" class="text-center py-5">Đang tải dữ liệu...</td></tr>
+                                </t>
+                                <t t-else="">
+                                    <t t-foreach="state.records" t-as="r" t-key="r.id">
+                                        <tr t-on-click="() => this.openTransfer(r)">
+                                            <td class="col-check"><input type="checkbox"/></td>
+                                            <td class="col-star"><i class="fa fa-star-o"/></td>
+                                            <td class="st-col-code"><t t-esc="r.name"/></td>
+                                            <td><t t-esc="r.date_transfer"/></td>
+                                            <td><t t-esc="r.date_receive"/></td>
+                                            <td><t t-esc="r.loc_src"/></td>
+                                            <td><t t-esc="r.loc_dest"/></td>
+                                            <td class="text-end font-monospace"><t t-esc="formatNumber(r.total_value)"/></td>
+                                            <td class="text-center">
+                                                <span t-att-class="['st-status-badge', 'is-' + r.state].join(' ')">
+                                                    <t t-esc="getStatusLabel(r.state)"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="state.records.length === 0">
+                                        <tr><td colspan="9" class="text-center py-5 text-muted">Không tìm thấy phiếu chuyển nào</td></tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+
+            <!-- ══ FORM/RECEIVE VIEW ════════════════════════════════ -->
+            <t t-else="">
+                <div t-att-class="['st-main', state.view === 'receive' ? 'is-receive' : 'is-form'].join(' ')">
+                    <div class="st-navbar">
+                        <div class="st-nav-left">
+                            <button class="st-btn-back" t-on-click="() => this.state.view = 'list'">
+                                <i class="fa fa-arrow-left"/>
+                            </button>
+                            <span class="st-nav-title"><t t-esc="state.view === 'receive' ? 'Chi tiết nhận hàng' : 'Chuyển hàng'"/></span>
+
+                            <t t-if="state.view === 'form'">
+                                <div class="st-form-search-wrap">
+                                    <div class="st-nav-search">
+                                        <i class="fa fa-search st-search-icon-left"/>
+                                        <input type="text" placeholder="Gõ tên hoặc mã hàng" t-att-value="state.searchProductKeyword" t-on-input="onProductSearch"/>
+                                        <i class="fa fa-th st-search-icon-right"/>
+                                    </div>
+                                    <div t-if="state.showProductDropdown" class="st-result-dropdown">
+                                        <t t-foreach="state.productSearchResults" t-as="p" t-key="p.id">
+                                            <div class="st-result-item" t-on-click="() => this.addProduct(p)">
+                                                <div class="st-ri-body">
+                                                    <div class="st-ri-name"><t t-esc="p.name"/></div>
+                                                    <div class="st-ri-sub">
+                                                        <span class="st-ri-code"><t t-esc="p.barcode || '---'"/></span>
+                                                        <span class="st-ri-qty">Tồn: <t t-esc="p.qty_on_hand"/></span>
+                                                        <span class="st-ri-price"><t t-esc="formatNumber(p.price)"/></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="st-nav-search">
+                                    <i class="fa fa-search st-search-icon-left"/>
+                                    <input type="text" placeholder="Tìm hàng hóa theo mã hoặc tên (F3)"/>
+                                    <i class="fa fa-th st-search-icon-right"/>
+                                </div>
+                            </t>
+                        </div>
+                        <div class="st-nav-actions">
+                            <button class="st-icon-btn"><i class="fa fa-qrcode"/></button>
+                            <button class="st-icon-btn"><i class="fa fa-print"/></button>
+                            <button class="st-icon-btn"><i class="fa fa-eye"/></button>
+                            <button class="st-icon-btn is-danger"><i class="fa fa-exclamation-triangle"/></button>
+                        </div>
+                    </div>
+
+                    <div class="st-form-content">
+                        <!-- Left Panel -->
+                        <div class="st-form-main">
+
+                            <t t-if="state.view === 'receive'">
+                                <div class="st-tabs">
+                                    <button t-att-class="state.receiveTab === 'all' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'all'">Tất cả (<t t-esc="state.currentTransfer.lines.length"/>)</button>
+                                    <button t-att-class="state.receiveTab === 'match' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'match'">Khớp</button>
+                                    <button t-att-class="state.receiveTab === 'mismatch' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'mismatch'">Lệch</button>
+                                    <button t-att-class="state.receiveTab === 'unreceived' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'unreceived'">Chưa nhận</button>
+                                </div>
+                            </t>
+
+                            <table class="st-form-table">
+                                <thead>
+                                    <tr>
+                                        <th t-if="state.view === 'form'" style="width: 40px;"></th>
+                                        <th style="width: 50px;">STT</th>
+                                        <th>Mã hàng</th>
+                                        <th>Tên hàng</th>
+                                        <th>ĐVT</th>
+                                        <th t-if="state.view === 'form'" class="text-end">Tồn kho</th>
+                                        <th t-if="state.view === 'receive'" class="text-end">Tồn kho</th>
+                                        <th t-if="state.view === 'form'" class="text-end">Tồn kho nhận</th>
+                                        <th class="text-center" style="width: 120px;">SL chuyển</th>
+                                        <th t-if="state.view === 'receive'" class="text-center" style="width: 120px;">SL nhận</th>
+                                        <th class="text-end">Giá chuyển<t t-if="state.view === 'receive'">/nhận</t></th>
+                                        <th class="text-end">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.view === 'receive' ? filteredReceiveLines : state.currentTransfer.lines" t-as="line" t-key="line.product_id">
+                                        <tr t-att-class="state.view === 'receive' &amp;&amp; line.qty !== line.received_qty ? 'is-mismatch' : ''">
+                                            <td t-if="state.view === 'form'" class="text-center text-muted">
+                                                <i class="fa fa-trash-o cursor-pointer" t-on-click="() => this.removeLine(line_index)"/>
+                                            </td>
+                                            <td class="text-center"><t t-esc="line_index + 1"/></td>
+                                            <td class="st-col-code text-primary"><t t-esc="line.product_code"/></td>
+                                            <td>
+                                                <div class="fw-bold"><t t-esc="line.product_name"/> <i class="fa fa-info-circle text-muted ms-1"/></div>
+                                                <div class="text-muted small">Ghi chú... <i class="fa fa-pencil ms-1"/></div>
+                                            </td>
+                                            <td><t t-esc="line.uom"/></td>
+                                            <td class="text-end"><t t-esc="line.qty_on_hand"/></td>
+                                            <td t-if="state.view === 'form'" class="text-end text-muted"><t t-esc="line.qty_dest || 0"/></td>
+                                            <td class="text-center">
+                                                <t t-if="state.view === 'form'">
+                                                    <div class="st-qty-input">
+                                                        <t t-if="state.currentTransfer.state === 'draft' or !state.currentTransfer.id">
+                                                            <button t-on-click="() => line.qty = Math.max(0, line.qty - 1)"><i class="fa fa-chevron-down"/></button>
+                                                            <input type="number" t-model="line.qty"/>
+                                                            <button t-on-click="() => line.qty += 1"><i class="fa fa-chevron-up"/></button>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="fw-bold"><t t-esc="line.qty"/></span>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                                <t t-else=""><t t-esc="line.qty"/></t>
+                                            </td>
+                                            <td t-if="state.view === 'receive'" class="text-center">
+                                                <div class="st-qty-input">
+                                                    <t t-if="state.currentTransfer.state !== 'done'">
+                                                        <button t-on-click="() => line.received_qty = Math.max(0, line.received_qty - 1)"><i class="fa fa-chevron-down"/></button>
+                                                        <input type="number" t-model="line.received_qty"/>
+                                                        <button t-on-click="() => line.received_qty += 1"><i class="fa fa-chevron-up"/></button>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="fw-bold"><t t-esc="line.received_qty"/></span>
+                                                    </t>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-if="state.view === 'form'">
+                                                    <input type="number" class="st-price-input" t-model="line.price"/>
+                                                </t>
+                                                <t t-else=""><t t-esc="formatNumber(line.price)"/></t>
+                                            </td>
+                                            <td class="text-end fw-bold"><t t-esc="formatNumber(line.qty * line.price)"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Right Panel -->
+                        <div class="st-form-side">
+                            <div class="st-side-header">
+                                <div class="st-side-brand">
+                                    <i class="fa fa-user-circle me-2"/>
+                                    <b><t t-esc="state.currentTransfer.sender || 'E FRESH MART'"/></b>
+                                    <span class="ms-auto text-muted small"><t t-esc="state.currentTransfer.date_transfer"/></span>
+                                </div>
+                            </div>
+
+                            <div class="st-side-field">
+                                <label>Mã chuyển hàng</label>
+                                <input type="text" class="st-input" t-att-placeholder="state.currentTransfer.name || 'Mã phiếu tự động'" disabled="1"/>
+                            </div>
+
+                            <div class="st-side-field">
+                                <label>Trạng thái</label>
+                                <span class="st-val-status"><t t-esc="getStatusLabel(state.currentTransfer.state)"/></span>
+                            </div>
+
+                            <div class="st-side-field" t-if="state.view === 'receive'">
+                                <label>Chi nhánh gửi</label>
+                                <span class="st-val-text"><t t-esc="state.currentTransfer.loc_src"/></span>
+                            </div>
+
+                            <div class="st-side-field" t-if="state.view === 'receive'">
+                                <label>Ngày chuyển</label>
+                                <span class="st-val-text"><t t-esc="state.currentTransfer.date_transfer"/></span>
+                            </div>
+
+                            <div t-if="state.view === 'form'" class="st-side-field">
+                                <label>Chuyển tới</label>
+                                <t t-if="state.currentTransfer.id">
+                                     <span class="st-val-text"><t t-esc="state.currentTransfer.loc_dest"/></span>
+                                </t>
+                                <t t-else="">
+                                    <select class="st-select" t-model="state.currentTransfer.loc_dest_id">
+                                        <option value="">Chọn chi nhánh</option>
+                                        <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
+                                            <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
+                                        </t>
+                                    </select>
+                                </t>
+                            </div>
+
+                            <div class="st-side-field">
+                                <label>Tổng số lượng <t t-if="state.view === 'receive'">chuyển</t></label>
+                                <span class="st-val-qty"><t t-esc="state.currentTransfer.lines.reduce((a, b) => a + b.qty, 0)"/></span>
+                            </div>
+
+                            <div class="st-side-field" t-if="state.view === 'receive'">
+                                <label>Tổng số lượng nhận</label>
+                                <span class="st-val-qty"><t t-esc="state.currentTransfer.lines.reduce((a, b) => a + (b.received_qty || 0), 0)"/></span>
+                            </div>
+
+                            <div class="st-side-field">
+                                <div class="st-note-box">
+                                    <i class="fa fa-pencil me-2"/>
+                                    <textarea placeholder="Ghi chú" t-model="state.currentTransfer.note"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="st-side-actions">
+                                <t t-if="state.currentTransfer.state === 'done'">
+                                    <div class="alert alert-success w-100 text-center m-0">
+                                        <i class="fa fa-check-circle me-1"/> Phiếu đã hoàn thành
+                                    </div>
+                                </t>
+                                <t t-elif="state.view === 'form' and (state.currentTransfer.state === 'draft' or !state.currentTransfer.id)">
+                                    <button class="st-action-btn is-blue" t-on-click="() => this.saveTransfer(false)">
+                                        <i class="fa fa-save me-2"/> Lưu tạm
+                                    </button>
+                                    <button class="st-action-btn is-green" t-on-click="() => this.saveTransfer(true)">
+                                        <i class="fa fa-check me-2"/> Hoàn thành
+                                    </button>
+                                </t>
+                                <t t-elif="state.view === 'receive' and state.currentTransfer.state === 'shipped'">
+                                    <button class="st-action-btn is-blue" t-on-click="() => this.saveTransfer(false)">
+                                        <i class="fa fa-save me-2"/> Lưu tạm
+                                    </button>
+                                    <button class="st-action-btn is-green" t-on-click="receiveTransfer">
+                                        <i class="fa fa-check me-2"/> Nhận hàng
+                                    </button>
+                                </t>
+                                <t t-else="">
+                                    <div class="alert alert-info w-100 text-center m-0">
+                                        Phiếu ở trạng thái: <t t-esc="getStatusLabel(state.currentTransfer.state)"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

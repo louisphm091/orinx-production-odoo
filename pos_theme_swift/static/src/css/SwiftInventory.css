@@ -1,0 +1,588 @@
+/* ================================
+   Swift Inventory List (backend-like)
+   ================================ */
+
+.swift-inv-page{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f6f8fb;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+/* ---------- Topbar ---------- */
+.swift-inv-topbar{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 2px 12px;
+}
+
+.swift-inv-title{
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Search */
+.swift-inv-search{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  padding: 8px 12px;
+  height: 40px;
+  box-shadow: 0 1px 0 rgba(16,24,40,.02);
+}
+
+.swift-inv-searchIcon{
+  color:#94a3b8;
+  font-size: 14px;
+}
+
+.swift-inv-searchInput{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color:#0f172a;
+}
+
+.swift-inv-searchInput::placeholder{
+  color:#94a3b8;
+}
+
+/* Actions */
+.swift-inv-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.swift-btnPrimary,
+.swift-btnLight,
+.swift-iconBtn{
+  height: 36px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swift-btnPrimary{
+  background: #2563eb;
+  border-color: #2563eb;
+  color:#fff;
+}
+
+.swift-btnPrimary:hover{ filter: brightness(.98); }
+
+.swift-btnLight{
+  background: #fff;
+  border-color: #e6eaf2;
+  color:#0f172a;
+}
+
+.swift-btnLight:hover{
+  background:#f8fafc;
+}
+
+.swift-iconBtn{
+  width: 36px;
+  padding: 0;
+  justify-content: center;
+  background: #fff;
+  border-color: #e6eaf2;
+  color:#0f172a;
+}
+
+.swift-iconBtn:hover{ background:#f8fafc; }
+
+/* ---------- Table wrapper ---------- */
+.swift-inv-tableWrap{
+  flex: 1;
+  min-height: 0;
+  background:#fff;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  overflow: auto;
+  box-shadow: 0 1px 0 rgba(16,24,40,.02);
+}
+
+/* Table */
+.swift-inv-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  color:#0f172a;
+}
+
+.swift-inv-table thead th{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f8fafc;
+  border-bottom: 1px solid #e6eaf2;
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 700;
+  color:#334155;
+  white-space: nowrap;
+}
+
+.swift-inv-table tbody td{
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 10px;
+  vertical-align: middle;
+  color:#0f172a;
+}
+
+.swift-inv-table tbody tr:hover{
+  background:#f8fbff;
+}
+
+.swift-inv-table tbody tr.is-active{
+  background:#f3f7ff;
+}
+
+/* Column widths + alignment */
+.swift-inv-table .col-check{ width: 34px; padding-left: 12px; }
+.swift-inv-table .col-star{ width: 42px; }
+.swift-inv-table .col-code{ font-weight: 700; color:#0f172a; }
+.swift-inv-table .col-num{
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color:#0f172a;
+}
+.swift-inv-table .col-note{
+  max-width: 420px;
+  color:#475569;
+}
+.swift-inv-table .col-status{ width: 140px; text-align: right; padding-right: 16px; }
+
+/* Checkboxes */
+.swift-inv-table input[type="checkbox"]{
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  accent-color: #2563eb;
+}
+
+/* Star button */
+.swift-starBtn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color:#94a3b8;
+}
+
+.swift-starBtn:hover{ background:#f1f5f9; }
+
+.swift-starBtn .is-on{ color:#f59e0b; }
+
+/* Badges */
+.swift-badge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.swift-badge.is-draft{
+  background:#fff7ed;
+  color:#9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.swift-badge.is-done{
+  background:#ecfdf5;
+  color:#047857;
+  border: 1px solid #a7f3d0;
+}
+
+/* Empty + loading */
+.swift-empty{
+  text-align: center;
+  padding: 22px 12px;
+  color:#64748b;
+}
+
+.swift-inv-loading{
+  background:#fff;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  padding: 12px;
+  color:#0f172a;
+}
+
+/* =========================================================
+   Swift Inventory Form (Kiểm Kho)
+   ========================================================= */
+
+/* ── Page layout ─────────────────────────────────────────── */
+.sif-page {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background: #f0f2f5;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  overflow: hidden;
+}
+
+/* ── Left panel ──────────────────────────────────────────── */
+.sif-left {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #fff;
+  border-right: 1px solid #e6eaf2;
+  overflow: hidden;
+}
+
+/* Top bar */
+.sif-left-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e6eaf2;
+  background: #fff;
+  flex-shrink: 0;
+}
+.sif-backBtn {
+  background: transparent; border: none; cursor: pointer;
+  font-size: 16px; color: #334155; padding: 4px 8px;
+  border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
+}
+.sif-backBtn:hover { background: #f1f5f9; }
+
+.sif-left-title {
+  font-size: 16px; font-weight: 700; color: #0f172a; white-space: nowrap;
+}
+
+/* Search */
+.sif-search {
+  flex: 1 1 0; display: flex; align-items: center; gap: 8px;
+  background: #f8fafc; border: 1px solid #e6eaf2; border-radius: 10px;
+  padding: 6px 10px; height: 36px; min-width: 0;
+}
+.sif-searchIcon { color: #94a3b8; font-size: 13px; flex-shrink: 0; }
+.sif-searchInput {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 13px; color: #0f172a; min-width: 0;
+}
+.sif-searchInput::placeholder { color: #94a3b8; }
+
+/* Icon toolbar */
+.sif-toolbar { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.sif-iconBtn {
+  width: 34px; height: 34px; border: 1px solid #e6eaf2; border-radius: 8px;
+  background: #fff; color: #475569; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 13px;
+}
+.sif-iconBtn:hover { background: #f8fafc; }
+
+/* Tabs */
+.sif-tabs {
+  display: flex; align-items: center;
+  padding: 0 14px; border-bottom: 1px solid #e6eaf2;
+  background: #fff; flex-shrink: 0;
+}
+.sif-tab {
+  background: transparent; border: none;
+  border-bottom: 2px solid transparent; cursor: pointer;
+  padding: 9px 14px; font-size: 13px; font-weight: 500;
+  color: #64748b; white-space: nowrap; margin-bottom: -1px;
+}
+.sif-tab:hover { color: #2563eb; }
+.sif-tab.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 700; }
+
+/* Table wrapper */
+.sif-tableWrap { flex: 1; min-height: 0; overflow: auto; }
+
+/* Table */
+.sif-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  font-size: 13px; color: #0f172a;
+}
+.sif-table thead th {
+  position: sticky; top: 0; z-index: 5; background: #f8fafc;
+  border-bottom: 1px solid #e6eaf2; padding: 10px 8px;
+  text-align: left; font-weight: 700; color: #334155; white-space: nowrap;
+}
+.sif-table tbody td {
+  border-bottom: 1px solid #f1f5f9; padding: 9px 8px; vertical-align: middle;
+}
+.sif-table tbody tr:hover { background: #f8fbff; }
+.sif-table .col-stt  { width: 40px; color: #94a3b8; text-align: center; }
+.sif-table .col-code { font-weight: 600; }
+.sif-table .col-name { min-width: 160px; }
+.sif-table .col-num  { text-align: right; font-variant-numeric: tabular-nums; }
+.sif-table .col-editable { padding: 4px 8px; }
+
+/* Quantity input */
+.sif-qtyInput {
+  width: 72px; text-align: right; font-size: 13px;
+  border: 1px solid #e6eaf2; border-radius: 6px; padding: 4px 6px;
+  color: #0f172a; background: #fff; outline: none;
+}
+.sif-qtyInput:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.12); }
+
+/* Diff colors */
+.diff-inc { color: #16a34a; font-weight: 600; }
+.diff-dec { color: #dc2626; font-weight: 600; }
+
+/* Empty state */
+.sif-emptyState {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; padding: 40px 24px;
+}
+.sif-emptyTitle { font-size: 15px; font-weight: 600; color: #334155; }
+.sif-emptyHint  { font-size: 13px; color: #64748b; }
+.sif-templateLink { color: #2563eb; text-decoration: underline; }
+.sif-chooseFileBtn {
+  margin-top: 8px; height: 40px; padding: 0 20px;
+  background: #2563eb; color: #fff; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.sif-chooseFileBtn:hover { filter: brightness(.95); }
+.sif-fileInput { display: none; }
+
+/* ── Right panel ─────────────────────────────────────────── */
+.sif-right {
+  width: 280px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: #fff; border-left: 1px solid #e6eaf2; overflow: hidden;
+}
+
+/* Right header */
+.sif-right-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid #e6eaf2;
+  background: #f8fafc; flex-shrink: 0; gap: 8px;
+}
+.sif-branchName {
+  font-size: 13px; font-weight: 700; color: #0f172a;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sif-rightDate { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+
+/* Fields */
+.sif-fields {
+  padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+}
+.sif-field { display: flex; flex-direction: column; gap: 3px; }
+.sif-fieldLabel {
+  font-size: 11px; font-weight: 600; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.sif-fieldValue { font-size: 13px; color: #0f172a; font-weight: 500; }
+.sif-autoCode   { color: #94a3b8; font-style: italic; font-size: 13px; }
+.sif-totalQty   { font-size: 18px; font-weight: 700; color: #0f172a; }
+.sif-noteInput {
+  width: 100%; border: 1px solid #e6eaf2; border-radius: 8px; padding: 8px;
+  font-size: 13px; color: #0f172a; resize: none; outline: none;
+  background: #f8fafc; box-sizing: border-box;
+}
+.sif-noteInput:focus { border-color: #2563eb; background: #fff; }
+
+/* Recent inventories */
+.sif-recent {
+  flex: 1; overflow-y: auto; padding: 10px 14px;
+  border-top: 1px solid #e6eaf2; min-height: 0;
+}
+.sif-recentTitle {
+  font-size: 12px; font-weight: 700; color: #334155;
+  text-transform: uppercase; letter-spacing: .04em;
+  margin-bottom: 8px; background: #f0f4ff;
+  padding: 6px 10px; border-radius: 8px;
+}
+.sif-recentItem {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px;
+}
+.sif-recentCode {
+  font-weight: 600; color: #0f172a; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sif-recentDate  { color: #94a3b8; white-space: nowrap; }
+.sif-recentBadge { font-size: 10px; padding: 3px 7px; }
+.sif-recentEmpty { font-size: 12px; color: #94a3b8; text-align: center; padding: 12px; }
+
+/* Footer */
+.sif-footer {
+  display: flex; gap: 8px; padding: 12px 14px;
+  border-top: 1px solid #e6eaf2; background: #fff; flex-shrink: 0;
+}
+.sif-btnSave,
+.sif-btnComplete {
+  flex: 1; height: 44px; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.sif-btnSave     { background: #2563eb; color: #fff; }
+.sif-btnSave:hover { filter: brightness(.95); }
+.sif-btnComplete { background: #16a34a; color: #fff; }
+.sif-btnComplete:hover { filter: brightness(.95); }
+.sif-btnSave:disabled,
+.sif-btnComplete:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ── Extra elements (delete, spinner, links) ──────────────────── */
+
+/* Delete button column */
+.sif-table .col-del { width: 32px; padding-left: 10px; }
+.sif-deleteBtn {
+  background: transparent; border: none; cursor: pointer;
+  color: #94a3b8; font-size: 14px;
+  width: 28px; height: 28px; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.sif-deleteBtn:hover { background: #fee2e2; color: #dc2626; }
+
+/* Barcode link */
+.sif-barcodeLink {
+  color: #2563eb; font-weight: 600; cursor: pointer;
+}
+.sif-barcodeLink:hover { text-decoration: underline; }
+
+.sif-uomLink {
+  color: #2563eb; cursor: pointer;
+}
+.sif-uomLink:hover { text-decoration: underline; }
+
+.sif-spinner {
+  display: inline-flex; align-items: center;
+  border: 1px solid #e6eaf2; border-radius: 6px;
+  background: #fff; overflow: hidden; height: 28px;
+}
+.sif-spinnerInput {
+  width: 52px; text-align: right; font-size: 13px;
+  border: none; outline: none; background: transparent;
+  padding: 0 4px; color: #0f172a;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.sif-spinnerInput::-webkit-outer-spin-button,
+.sif-spinnerInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.sif-spinnerBtns {
+  display: flex; flex-direction: column;
+  border-left: 1px solid #e6eaf2;
+}
+.sif-spinBtn {
+  background: transparent; border: none; cursor: pointer;
+  padding: 0 4px; height: 14px; font-size: 10px; color: #475569;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.sif-spinBtn:hover { background: #f1f5f9; color: #2563eb; }
+
+.sif-toolbarRight { margin-left: 4px; }
+
+.sif-field--inline {
+  flex-direction: row; align-items: center; justify-content: space-between; gap: 8px;
+}
+.sif-field--inline .sif-fieldLabel { white-space: nowrap; }
+
+.sif-recentCheck {
+  color: #94a3b8; font-size: 13px; flex-shrink: 0;
+}
+.sif-recentQtyTag {
+  color: #94a3b8; font-size: 11px; margin-left: 4px;
+}
+
+/* ── Product search dropdown ──────────────────────────────── */
+.sif-search { position: relative; }
+
+.sif-searchClear {
+  background: none; border: none; cursor: pointer; padding: 0 6px;
+  color: #94a3b8; font-size: 13px; display: flex; align-items: center;
+}
+.sif-searchClear:hover { color: #475569; }
+
+.sif-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  z-index: 999;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.sif-dropdown-loading,
+.sif-dropdown-empty {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+}
+
+.sif-dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background .12s;
+}
+.sif-dropdown-item:last-child { border-bottom: none; }
+.sif-dropdown-item:hover { background: #eff6ff; }
+
+.sif-drop-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sif-drop-meta {
+  display: flex; gap: 10px; margin-top: 2px; font-size: 11px; color: #64748b;
+}
+.sif-drop-barcode { font-family: monospace; }
+.sif-drop-stock b { color: #16a34a; }
+
+/* ── Inline filter in tabs row ────────────────────────────── */
+.sif-filterWrap {
+  display: inline-flex; align-items: center;
+  margin-left: auto;
+  border: 1px solid #e6eaf2; border-radius: 8px;
+  background: #f8fafc; padding: 0 8px; height: 30px;
+  gap: 5px;
+}
+.sif-filterIcon { font-size: 11px; color: #94a3b8; }
+.sif-filterInput {
+  border: none; outline: none; background: transparent;
+  font-size: 12px; color: #374151; width: 140px;
+}

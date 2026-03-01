@@ -1,22 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <record id="action_swift_pos_report_client" model="ir.actions.client">
+        <field name="name">Báo Cáo</field>
+        <field name="tag">pos_theme_swift.swift_pos_sales_dashboard</field>
+    </record>
 
-  <record id="action_swift_pos_report_client" model="ir.actions.client">
-    <field name="name">Báo Cáo</field>
-    <field name="tag">pos_theme_swift.swift_pos_sales_dashboard</field>
-  </record>
+    <record id="action_swift_pos_inventory_management" model = "ir.actions.client">
+        <field name="name">Hàng Hoá</field>
+        <field name="tag">pos_theme_swift.swift_pos_inventory_management</field>
+    </record>
 
-  <record id="point_of_sale.menu_point_rep" model="ir.ui.menu">
-    <field name="active" eval="False"/>
-  </record>
+    <record id = "action_swift_pos_stock_transfer" model = "ir.actions.client">
+        <field name="name">Chuyển Hàng</field>
+        <field name="tag">pos_theme_swift.swift_pos_stock_transfer</field>
+    </record>
 
-  <menuitem
-    id="menu_swift_pos_report"
-    name="Báo Cáo"
-    parent="point_of_sale.menu_point_root"
-    action="pos_theme_swift.action_swift_pos_report_client"
-    sequence="110"
-    groups="point_of_sale.group_pos_manager"
-  />
+    <record id="point_of_sale.menu_point_rep" model="ir.ui.menu">
+        <field name="active" eval="False" />
+    </record>
+
+    <!-- Reset the English name back to 'Dashboard' so vi_VN.po translation can apply -->
+    <record id="point_of_sale.menu_pos_dashboard" model="ir.ui.menu">
+        <field name="name">Dashboard</field>
+    </record>
+
+    <menuitem
+        id="menu_swift_pos_report"
+        name="Báo Cáo"
+        parent="point_of_sale.menu_point_root"
+        action="pos_theme_swift.action_swift_pos_report_client"
+        sequence="110"
+        groups="point_of_sale.group_pos_manager"
+    />
+
+    <menuitem
+        id="menu_swift_pos_inventory"
+        name="Kiểm Kho"
+        parent="point_of_sale.menu_point_root"
+        action="pos_theme_swift.action_swift_pos_inventory_management"
+        sequence="110"
+        groups="point_of_sale.group_pos_manager"
+    />
+
+
+    <menuitem
+        id="menu_swift_pos_stock_transfer"
+        name = "Chuyển Hàng"
+        parent = "point_of_sale.menu_point_root"
+        action = "pos_theme_swift.action_swift_pos_stock_transfer"
+        sequence = "110"
+        groups = "point_of_sale.group_pos_manager"
+    />
+
+
 
 </odoo>

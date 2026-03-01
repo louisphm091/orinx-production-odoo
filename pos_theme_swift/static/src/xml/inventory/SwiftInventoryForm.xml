@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="pos_theme_swift.SwiftInventoryForm" owl="1">
+    <div class="sif-page" t-on-click="clearSearch">
+
+      <!-- ══ LEFT PANEL ══════════════════════════════════════════════════ -->
+      <div class="sif-left">
+
+        <!-- Top bar -->
+        <div class="sif-left-topbar">
+          <button class="sif-backBtn" t-on-click="onBack" title="Quay lại">
+            <i class="fa fa-arrow-left"/>
+          </button>
+          <span class="sif-left-title">Kiểm kho</span>
+
+          <!-- Live product search -->
+          <div class="sif-search" t-on-click.stop="">
+            <i class="fa fa-search sif-searchIcon"/>
+            <input
+              t-ref="searchInput"
+              type="text"
+              class="sif-searchInput"
+              placeholder="Tìm hàng hóa theo mã hoặc tên (F3)"
+              t-att-value="state.searchKeyword"
+              t-on-input="onProductSearchInput"
+              t-on-keydown="onProductSearchKeydown"
+              autocomplete="off"
+            />
+            <t t-if="state.searchKeyword">
+              <button class="sif-searchClear" t-on-click="clearSearch" title="Xóa tìm kiếm">
+                <i class="fa fa-times"/>
+              </button>
+            </t>
+
+            <!-- Dropdown results -->
+            <t t-if="state.showDropdown">
+              <div class="sif-dropdown">
+                <t t-if="state.searchLoading">
+                  <div class="sif-dropdown-loading">
+                    <i class="fa fa-spinner fa-spin"/> Đang tìm...
+                  </div>
+                </t>
+                <t t-elif="state.searchResults.length === 0">
+                  <div class="sif-dropdown-empty">Không tìm thấy sản phẩm.</div>
+                </t>
+                <t t-else="">
+                  <t t-foreach="state.searchResults" t-as="p" t-key="p.id">
+                    <div class="sif-dropdown-item" t-on-click.stop="() => addProduct(p)">
+                      <div class="sif-drop-name"><t t-esc="p.name"/></div>
+                      <div class="sif-drop-meta">
+                        <span class="sif-drop-barcode"><t t-esc="p.barcode || '—'"/></span>
+                        <span class="sif-drop-uom"><t t-esc="p.uom"/></span>
+                        <span class="sif-drop-stock">
+                          Tồn: <b><t t-esc="p.qty_on_hand"/></b>
+                        </span>
+                      </div>
+                    </div>
+                  </t>
+                </t>
+              </div>
+            </t>
+          </div>
+
+          <!-- Icon toolbar -->
+          <div class="sif-toolbar">
+            <button class="sif-iconBtn" title="Nhập từ Excel" t-on-click="onChooseFile">
+              <i class="fa fa-upload"/>
+            </button>
+          </div>
+          <div class="sif-toolbar sif-toolbarRight">
+            <button class="sif-iconBtn" title="In phiếu"><i class="fa fa-print"/></button>
+            <button class="sif-iconBtn" title="Xem trước"><i class="fa fa-eye"/></button>
+            <button class="sif-iconBtn" title="Thêm tùy chọn"><i class="fa fa-ellipsis-v"/></button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="sif-tabs">
+          <button t-att-class="state.tab === 'all' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('all')">
+            Tất cả (<t t-esc="tabCount('all')"/>)
+          </button>
+          <button t-att-class="state.tab === 'match' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('match')">
+            Khớp (<t t-esc="tabCount('match')"/>)
+          </button>
+          <button t-att-class="state.tab === 'diff' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('diff')">
+            Lệch (<t t-esc="tabCount('diff')"/>)
+          </button>
+          <button t-att-class="state.tab === 'unchecked' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('unchecked')">
+            Chưa kiểm (<t t-esc="tabCount('unchecked')"/>)
+          </button>
+
+          <!-- Inline filter (filters lines already in table) -->
+          <t t-if="state.lines.length > 0">
+            <div class="sif-filterWrap">
+              <i class="fa fa-filter sif-filterIcon"/>
+              <input
+                type="text"
+                class="sif-filterInput"
+                placeholder="Lọc trong danh sách..."
+                t-att-value="state.filterKeyword"
+                t-on-input="onFilterInput"
+              />
+            </div>
+          </t>
+        </div>
+
+        <!-- Importing overlay -->
+        <t t-if="state.importing">
+          <div class="sif-emptyState">
+            <i class="fa fa-spinner fa-spin fa-2x" style="color:#2563eb"/>
+            <div class="sif-emptyTitle" style="margin-top:12px">Đang nhập dữ liệu...</div>
+          </div>
+        </t>
+
+        <!-- Table (has lines) -->
+        <t t-elif="state.filteredLines.length > 0">
+          <div class="sif-tableWrap">
+            <table class="sif-table">
+              <thead>
+                <tr>
+                  <th class="col-del"></th>
+                  <th class="col-stt">STT</th>
+                  <th>Mã hàng</th>
+                  <th class="col-name">Tên hàng</th>
+                  <th>DVT</th>
+                  <th class="col-num">Tồn kho</th>
+                  <th class="col-num col-actual">Thực tế</th>
+                  <th class="col-num">SL lệch</th>
+                  <th class="col-num">Giá trị lệch</th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="state.filteredLines" t-as="line" t-key="line.id">
+                  <tr>
+                    <td class="col-del">
+                      <button class="sif-deleteBtn" t-on-click="() => deleteLine(line)" title="Xóa dòng">
+                        <i class="fa fa-trash-o"/>
+                      </button>
+                    </td>
+                    <td class="col-stt"><t t-esc="line_index + 1"/></td>
+                    <td class="col-code">
+                      <span class="sif-barcodeLink"><t t-esc="line.barcode || line.id"/></span>
+                    </td>
+                    <td class="col-name"><t t-esc="line.name"/></td>
+                    <td>
+                      <span class="sif-uomLink"><t t-esc="line.uom"/></span>
+                    </td>
+                    <td class="col-num"><t t-esc="_formatNumber(line.qty_on_hand)"/></td>
+                    <!-- Thực tế spinner -->
+                    <td class="col-num col-actual">
+                      <div class="sif-spinner">
+                        <input
+                          type="number"
+                          class="sif-spinnerInput"
+                          t-att-value="line.qty_actual"
+                          t-on-change="(ev) => onQtyChange(line, ev.target.value)"
+                          min="0"
+                          step="1"
+                        />
+                        <div class="sif-spinnerBtns">
+                          <button class="sif-spinBtn" t-on-click="() => incrementQty(line)">
+                            <i class="fa fa-caret-up"/>
+                          </button>
+                          <button class="sif-spinBtn" t-on-click="() => decrementQty(line)">
+                            <i class="fa fa-caret-down"/>
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td t-att-class="line.diff > 0 ? 'col-num diff-inc' : line.diff &lt; 0 ? 'col-num diff-dec' : 'col-num'">
+                      <t t-esc="_formatNumber(line.diff)"/>
+                    </td>
+                    <td t-att-class="line.diff_value > 0 ? 'col-num diff-inc' : line.diff_value &lt; 0 ? 'col-num diff-dec' : 'col-num'">
+                      <t t-esc="_formatNumber(line.diff_value)"/>
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+            </table>
+          </div>
+        </t>
+
+        <!-- Empty state -->
+        <t t-else="">
+          <div class="sif-emptyState">
+            <div class="sif-emptyTitle">Tìm hoặc nhập file để thêm sản phẩm</div>
+            <div class="sif-emptyHint">
+              Gõ tên / mã vạch vào ô tìm kiếm, hoặc tải lên file:
+            </div>
+            <button class="sif-chooseFileBtn" t-on-click="onChooseFile">
+              <i class="fa fa-upload me-1"/> Chọn file Excel / CSV
+            </button>
+          </div>
+        </t>
+
+        <!-- Hidden file input -->
+        <input
+          t-ref="fileInput"
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          class="sif-fileInput"
+          t-on-change="onFileChange"
+        />
+
+      </div><!-- /sif-left -->
+
+      <!-- ══ RIGHT PANEL ════════════════════════════════════════════════ -->
+      <div class="sif-right">
+
+        <!-- Header -->
+        <div class="sif-right-header">
+          <span class="sif-branchName">
+            <i class="fa fa-map-marker me-1"/>
+            <t t-esc="props.branchName || 'Chi nhánh'"/>
+          </span>
+          <span class="sif-rightDate"><t t-esc="state.now"/></span>
+        </div>
+
+        <!-- Fields -->
+        <div class="sif-fields">
+          <div class="sif-field sif-field--inline">
+            <label class="sif-fieldLabel">Mã kiểm kho</label>
+            <div class="sif-fieldValue sif-autoCode"><t t-esc="state.autoCode"/></div>
+          </div>
+
+          <div class="sif-field sif-field--inline">
+            <label class="sif-fieldLabel">Trạng thái</label>
+            <div class="sif-fieldValue">
+              <span t-att-class="state.status === 'done' ? 'swift-badge is-done' : 'swift-badge is-draft'">
+                <t t-esc="state.status === 'done' ? 'Đã cân bằng' : 'Phiếu tạm'"/>
+              </span>
+            </div>
+          </div>
+
+          <div class="sif-field sif-field--inline">
+            <label class="sif-fieldLabel">Tổng SL thực tế</label>
+            <div class="sif-fieldValue sif-totalQty">
+              <t t-esc="_formatNumber(state.totalQtyActual)"/>
+            </div>
+          </div>
+
+          <div class="sif-field sif-field--note">
+            <textarea
+              class="sif-noteInput"
+              placeholder="✏ Ghi chú..."
+              t-model="state.note"
+              rows="2"
+            />
+          </div>
+        </div>
+
+        <!-- Session products (Kiểm gần đây) -->
+        <div class="sif-recent">
+          <div class="sif-recentTitle">Kiểm gần đây</div>
+          <t t-if="state.sessionProducts.length > 0">
+            <t t-foreach="state.sessionProducts" t-as="sp" t-key="sp.name">
+              <div class="sif-recentItem">
+                <span class="sif-recentCheck"><i class="fa fa-square-o"/></span>
+                <span class="sif-recentCode">
+                  <t t-esc="sp.name"/>
+                  <span class="sif-recentQtyTag">(<t t-esc="sp.qty"/>)</span>
+                </span>
+              </div>
+            </t>
+          </t>
+          <t t-else="">
+            <div class="sif-recentEmpty">Chưa có sản phẩm nào.</div>
+          </t>
+        </div>
+
+        <!-- Footer actions -->
+        <div class="sif-footer">
+          <button class="sif-btnSave" t-on-click="onSave" t-att-disabled="state.saving">
+            <i class="fa fa-floppy-o me-1"/>
+            Lưu tạm
+          </button>
+          <button class="sif-btnComplete" t-on-click="onComplete" t-att-disabled="state.saving">
+            <i class="fa fa-check me-1"/>
+            Hoàn thành
+          </button>
+        </div>
+
+      </div><!-- /sif-right -->
+
+    </div><!-- /sif-page -->
+  </t>
+
+</templates>

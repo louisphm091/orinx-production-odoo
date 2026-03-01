@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_swift_stock_inventory,swift.stock.inventory,model_swift_stock_inventory,,1,1,1,1
+access_swift_stock_inventory_line,swift.stock.inventory.line,model_swift_stock_inventory_line,,1,1,1,1
+access_swift_stock_transfer,swift.stock.transfer,model_swift_stock_transfer,,1,1,1,1
+access_swift_stock_transfer_line,swift.stock.transfer.line,model_swift_stock_transfer_line,,1,1,1,1

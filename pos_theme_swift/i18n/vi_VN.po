@@ -13,6 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: pos_theme_swift
+#: model:ir.ui.menu,name:point_of_sale.menu_pos_dashboard
+msgid "Dashboard"
+msgstr "Bán Hàng"
+
+#. module: pos_theme_swift
 #. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/PaymentSwiftPay.js:0
 msgid "Transfer"

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="pos_theme_swift.SwiftInventory" owl="1">
+
+    <!-- ══ LIST VIEW ══════════════════════════════════════════════ -->
+    <t t-if="state.view === 'list'">
+      <div class="swift-inv-page">
+
+        <!-- Top bar -->
+        <div class="swift-inv-topbar">
+          <div class="swift-inv-title">Phiếu kiểm kho</div>
+
+          <div class="swift-inv-search">
+            <i class="fa fa-search swift-inv-searchIcon"/>
+            <input
+              type="text"
+              class="swift-inv-searchInput"
+              placeholder="Theo mã phiếu kiểm"
+              t-model="state.keyword"
+              t-on-input="onSearchInput"
+            />
+          </div>
+
+          <div class="swift-inv-actions">
+            <button type="button" class="swift-btnPrimary" t-on-click="onCreateInventory">
+              <i class="fa fa-plus me-1"/> Kiểm kho
+            </button>
+
+            <div class="dropdown">
+              <button class="swift-btnLight dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fa fa-file-text-o me-1"/> Xuất file
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" t-on-click="exportExcel">Excel</a></li>
+                <li><a class="dropdown-item" t-on-click="exportPdf">PDF</a></li>
+              </ul>
+            </div>
+
+            <button type="button" class="swift-iconBtn" title="Tùy chọn" t-on-click="openColumns">
+              <i class="fa fa-th-large"/>
+            </button>
+            <button type="button" class="swift-iconBtn" title="Cài đặt" t-on-click="openSettings">
+              <i class="fa fa-cog"/>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <t t-if="state.loading">
+          <div class="swift-inv-loading">Đang tải dữ liệu...</div>
+        </t>
+
+        <!-- Table -->
+        <t t-if="!state.loading">
+          <div class="swift-inv-tableWrap">
+            <table class="swift-inv-table">
+              <thead>
+                <tr>
+                  <th class="col-check">
+                    <input type="checkbox" t-model="state.checkAll" t-on-change="toggleCheckAll"/>
+                  </th>
+                  <th class="col-star"></th>
+
+                  <th>Mã kiểm kho</th>
+                  <th>Thời gian</th>
+                  <th>Ngày cân bằng</th>
+
+                  <th class="col-num">SL thực tế</th>
+                  <th class="col-num">Tổng thực tế</th>
+                  <th class="col-num">Tổng chênh lệch</th>
+                  <th class="col-num">SL lệch tăng</th>
+                  <th class="col-num">SL lệch giảm</th>
+
+                  <th>Ghi chú</th>
+                  <th class="col-status">Trạng thái</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <t t-foreach="state.records" t-as="r" t-key="r.id">
+                  <tr t-att-class="r.active ? 'is-active' : ''" t-on-click="() => openRow(r)">
+                    <td class="col-check" t-on-click.stop="">
+                      <input type="checkbox" t-model="r.selected" t-on-change="() => toggleRow(r)"/>
+                    </td>
+
+                    <td class="col-star" t-on-click.stop="">
+                      <button class="swift-starBtn" t-on-click="() => toggleStar(r)">
+                        <i t-att-class="r.starred ? 'fa fa-star is-on' : 'fa fa-star-o'"/>
+                      </button>
+                    </td>
+
+                    <td class="col-code"><t t-esc="r.code"/></td>
+                    <td><t t-esc="r.time"/></td>
+                    <td><t t-esc="r.balance_time || ''"/></td>
+
+                    <td class="col-num"><t t-esc="formatNumber(r.qty_actual)"/></td>
+                    <td class="col-num"><t t-esc="formatNumber(r.total_actual)"/></td>
+                    <td class="col-num"><t t-esc="formatNumber(r.diff_total)"/></td>
+                    <td class="col-num"><t t-esc="formatNumber(r.diff_inc)"/></td>
+                    <td class="col-num"><t t-esc="formatNumber(r.diff_dec)"/></td>
+
+                    <td class="col-note"><t t-esc="r.note || ''"/></td>
+
+                    <td class="col-status">
+                      <span
+                        t-att-class="[
+                          'swift-badge',
+                          r.status === 'draft' ? 'is-draft' : '',
+                          r.status === 'done' ? 'is-done' : ''
+                        ].join(' ')"
+                      >
+                        <t t-esc="r.status === 'draft' ? 'Phiếu tạm' : 'Đã cân bằng'"/>
+                      </span>
+                    </td>
+                  </tr>
+                </t>
+
+                <t t-if="!state.records || state.records.length === 0">
+                  <tr>
+                    <td colspan="12" class="swift-empty">Không có dữ liệu</td>
+                  </tr>
+                </t>
+              </tbody>
+            </table>
+          </div>
+        </t>
+
+      </div>
+    </t>
+
+    <!-- ══ FORM VIEW ══════════════════════════════════════════════ -->
+    <t t-if="state.view === 'form'">
+      <SwiftInventoryForm
+        t-props="{
+          inventoryId: state.editId,
+          branchName: state.branchName,
+          onBack: () => onFormBack(),
+          onSaved: () => onFormSaved(),
+        }"
+      />
+    </t>
+
+  </t>
+
+</templates>

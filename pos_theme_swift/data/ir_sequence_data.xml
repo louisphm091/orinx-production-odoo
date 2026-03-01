@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_swift_stock_inventory" model="ir.sequence">
+            <field name="name">Swift Stock Inventory</field>
+            <field name="code">swift.stock.inventory</field>
+            <field name="prefix">KK</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_swift_stock_transfer" model="ir.sequence">
+            <field name="name">Swift Stock Transfer</field>
+            <field name="code">swift.stock.transfer</field>
+            <field name="prefix">TRF</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
