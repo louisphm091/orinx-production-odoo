@@ -27,6 +27,8 @@
         <field name="tag">sale_planning.replenishment</field>
     </record>
 
+    <menuitem id="menu_sale_planning_root" name="Sale Planning" sequence="10"/>
+
     <record id="menu_sale_schedule_dashboard" model="ir.ui.menu">
       <field name="name">Lên Lịch Bán Hàng</field>
       <field name="parent_id" ref="menu_sale_planning_root"/>
@@ -34,8 +36,6 @@
       <field name="sequence">20</field>
       <field name="active" eval="True"/>
     </record>
-
-    <menuitem id="menu_sale_planning_root" name="Sale Planning" sequence="10"/>
 
     <menuitem id="menu_sale_planning_dashboard"
               name="Kế hoạch cung ứng / Mua hàng"
