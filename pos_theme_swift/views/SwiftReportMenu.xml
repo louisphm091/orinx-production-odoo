@@ -15,11 +15,16 @@
         <field name="tag">pos_theme_swift.swift_pos_stock_transfer</field>
     </record>
 
+    <record id="action_swift_pos_shift_management" model="ir.actions.client">
+        <field name="name">Ca làm việc</field>
+        <field name="tag">pos_theme_swift.swift_pos_shift_management</field>
+    </record>
+
+    <!-- ... existing records ... -->
     <record id="point_of_sale.menu_point_rep" model="ir.ui.menu">
         <field name="active" eval="False" />
     </record>
 
-    <!-- Reset the English name back to 'Dashboard' so vi_VN.po translation can apply -->
     <record id="point_of_sale.menu_pos_dashboard" model="ir.ui.menu">
         <field name="name">Dashboard</field>
     </record>
@@ -34,24 +39,33 @@
     />
 
     <menuitem
-        id="menu_swift_pos_inventory"
-        name="Kiểm Kho"
+        id="menu_swift_pos_goods"
+        name="Hàng Hoá"
         parent="point_of_sale.menu_point_root"
-        action="pos_theme_swift.action_swift_pos_inventory_management"
-        sequence="110"
-        groups="point_of_sale.group_pos_manager"
+        sequence="115"
     />
 
+    <menuitem
+        id="menu_swift_pos_inventory"
+        name="Kiểm Kho"
+        parent="menu_swift_pos_goods"
+        action="pos_theme_swift.action_swift_pos_inventory_management"
+        sequence="10"
+    />
 
     <menuitem
         id="menu_swift_pos_stock_transfer"
-        name = "Chuyển Hàng"
-        parent = "point_of_sale.menu_point_root"
-        action = "pos_theme_swift.action_swift_pos_stock_transfer"
-        sequence = "110"
-        groups = "point_of_sale.group_pos_manager"
+        name="Chuyển Hàng"
+        parent="menu_swift_pos_goods"
+        action="pos_theme_swift.action_swift_pos_stock_transfer"
+        sequence="20"
     />
 
-
-
+    <menuitem
+        id="menu_swift_pos_shift"
+        name="Ca làm việc"
+        parent="point_of_sale.menu_point_root"
+        action="pos_theme_swift.action_swift_pos_shift_management"
+        sequence="120"
+    />
 </odoo>

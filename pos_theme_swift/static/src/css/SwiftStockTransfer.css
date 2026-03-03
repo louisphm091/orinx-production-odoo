@@ -19,6 +19,7 @@
 
 .st-container.is-collapsed .st-sidebar {
     width: 0;
+    border-right: none;
 }
 
 .st-sidebar-content {
@@ -26,6 +27,13 @@
     height: 100%;
     padding: 20px;
     overflow-y: auto;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.st-container.is-collapsed .st-sidebar-content {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .st-filter-section {

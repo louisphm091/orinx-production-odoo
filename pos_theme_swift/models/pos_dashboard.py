@@ -499,3 +499,117 @@ class PosDashboardSwift(models.AbstractModel):
                 'state': t.state,
             })
         return res
+
+    # ──────────────────────────────────────────────────────────────
+    # Shift Management (Ca làm việc) helpers
+    # ──────────────────────────────────────────────────────────────
+
+    @api.model
+    def get_shift_init_data(self):
+        """Return everything the client needs to start the shift management UI."""
+        user = self.env.user
+        config = self.env['pos.config'].search([], limit=1)
+
+        # Current status
+        shift = self.env['swift.staff.shift'].search([
+            ('employee_id', '=', user.id),
+            ('state', '=', 'active')
+        ], limit=1)
+
+        status = {
+            'state': 'active' if shift else 'idle',
+            'check_in': fields.Datetime.to_string(shift.check_in) if shift else False,
+        }
+
+        return {
+            'user_name': user.name,
+            'branch_name': config.name if config else 'Chi nhánh',
+            'status': status,
+            'stats': self.get_shift_stats(),
+        }
+
+    @api.model
+    def get_shift_stats(self):
+        """Calculate total hours worked today and this week for the user."""
+        user_id = self.env.uid
+
+        # Determine local date range
+        user_tz = self.env.user.tz or 'UTC'
+        local = pytz.timezone(user_tz)
+        now_local = datetime.now(local)
+
+        start_today, _ = self._get_date_range('today', now_local)
+        start_week, _ = self._get_date_range('this_week', now_local)
+
+        def get_total_hours(start_date):
+            shifts = self.env['swift.staff.shift'].search([
+                ('employee_id', '=', user_id),
+                ('check_in', '>=', start_date),
+                ('state', '=', 'done')
+            ])
+            return sum(shifts.mapped('duration'))
+
+        return {
+            'today': get_total_hours(start_today),
+            'week': get_total_hours(start_week),
+        }
+
+    @api.model
+    def get_shift_status(self):
+        """Return the current active shift for the user."""
+        shift = self.env['swift.staff.shift'].search([
+            ('employee_id', '=', self.env.uid),
+            ('state', '=', 'active')
+        ], limit=1)
+        if shift:
+            return {
+                'id': shift.id,
+                'check_in': fields.Datetime.to_string(shift.check_in),
+                'state': 'active',
+            }
+        return {'state': 'idle'}
+
+    @api.model
+    def action_shift_toggle(self, note=''):
+        """Toggle check-in/out for the current user."""
+        shift = self.env['swift.staff.shift'].search([
+            ('employee_id', '=', self.env.uid),
+            ('state', '=', 'active')
+        ], limit=1)
+        if shift:
+            shift.write({
+                'check_out': fields.Datetime.now(),
+                'state': 'done',
+                'note': note
+            })
+            return {'state': 'idle'}
+        else:
+            new_shift = self.env['swift.staff.shift'].create({
+                'employee_id': self.env.uid,
+                'check_in': fields.Datetime.now(),
+                'state': 'active',
+                'note': note
+            })
+            return {
+                'id': new_shift.id,
+                'check_in': fields.Datetime.to_string(new_shift.check_in),
+                'state': 'active'
+            }
+
+    @api.model
+    def get_recent_shifts(self, limit=10):
+        """Return the most recent shifts for the current user."""
+        shifts = self.env['swift.staff.shift'].search([
+            ('employee_id', '=', self.env.uid)
+        ], limit=limit, order='check_in desc')
+        res = []
+        for s in shifts:
+            res.append({
+                'id': s.id,
+                'check_in': fields.Datetime.to_string(s.check_in),
+                'check_out': fields.Datetime.to_string(s.check_out) if s.check_out else '',
+                'duration': s.duration,
+                'state': s.state,
+                'note': s.note or '',
+            })
+        return res

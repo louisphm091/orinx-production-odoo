@@ -40,6 +40,9 @@ Developed and maintained by Orinx.
             'pos_theme_swift/static/src/js/SwiftStockTransfer.js',
             'pos_theme_swift/static/src/xml/SwiftStockTransfer.xml',
             'pos_theme_swift/static/src/css/SwiftStockTransfer.css',
+            'pos_theme_swift/static/src/js/SwiftShiftManagement.js',
+            'pos_theme_swift/static/src/xml/SwiftShiftManagement.xml',
+            'pos_theme_swift/static/src/css/SwiftShiftManagement.css',
         ],
         'point_of_sale._assets_pos': [
             'pos_theme_swift/static/src/js/PosAppPatch.js',
