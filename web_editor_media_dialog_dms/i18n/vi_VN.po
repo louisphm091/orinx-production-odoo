@@ -1,0 +1,46 @@
+#. module: web_editor_media_dialog_dms
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-08 00:00+0000\n"
+"PO-Revision-Date: 2026-03-08 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: vi_VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: web_editor_media_dialog_dms
+msgid "All DMS files have been loaded"
+msgstr "Tất cả tệp DMS đã được tải"
+
+#. module: web_editor_media_dialog_dms
+msgid "Allow open to public users"
+msgstr "Cho phép mở cho người dùng công khai"
+
+#. module: web_editor_media_dialog_dms
+msgid "File"
+msgstr "Tệp"
+
+#. module: web_editor_media_dialog_dms
+msgid "File streaming helper model for controllers"
+msgstr "Mô hình hỗ trợ truyền tệp cho bộ điều khiển"
+
+#. module: web_editor_media_dialog_dms
+msgid "Invalid access token"
+msgstr "Mã truy cập không hợp lệ"
+
+#. module: web_editor_media_dialog_dms
+msgid "Load more..."
+msgstr "Tải thêm..."
+
+#. module: web_editor_media_dialog_dms
+msgid "No DMS files found."
+msgstr "Không tìm thấy tệp DMS nào."
+
+#. module: web_editor_media_dialog_dms
+msgid "Search a dms file"
+msgstr "Tìm kiếm tệp DMS"

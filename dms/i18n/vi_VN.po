@@ -1,0 +1,374 @@
+#. module: dms
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-08 00:00+0000\n"
+"PO-Revision-Date: 2026-03-08 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: vi_VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: dms
+msgid "Documents"
+msgstr "Tài liệu"
+
+#. module: dms
+msgid "Document"
+msgstr "Tài liệu"
+
+#. module: dms
+msgid "Directory"
+msgstr "Thư mục"
+
+#. module: dms
+msgid "Directories"
+msgstr "Thư mục"
+
+#. module: dms
+msgid "Subdirectories"
+msgstr "Thư mục con"
+
+#. module: dms
+msgid "Root Directories"
+msgstr "Thư mục gốc"
+
+#. module: dms
+msgid "File"
+msgstr "Tệp"
+
+#. module: dms
+msgid "Files"
+msgstr "Tệp"
+
+#. module: dms
+msgid "All Files"
+msgstr "Tất cả tệp"
+
+#. module: dms
+msgid "My Files"
+msgstr "Tệp của tôi"
+
+#. module: dms
+msgid "Archived Files"
+msgstr "Tệp đã lưu trữ"
+
+#. module: dms
+msgid "Storage"
+msgstr "Kho lưu trữ"
+
+#. module: dms
+msgid "Storages"
+msgstr "Các kho lưu trữ"
+
+#. module: dms
+msgid "Category"
+msgstr "Danh mục"
+
+#. module: dms
+msgid "Categories"
+msgstr "Danh mục"
+
+#. module: dms
+msgid "Tag"
+msgstr "Thẻ"
+
+#. module: dms
+msgid "Tags"
+msgstr "Thẻ"
+
+#. module: dms
+msgid "Access Groups"
+msgstr "Nhóm quyền truy cập"
+
+#. module: dms
+msgid "Group"
+msgstr "Nhóm"
+
+#. module: dms
+msgid "Groups"
+msgstr "Nhóm"
+
+#. module: dms
+msgid "Group Name"
+msgstr "Tên nhóm"
+
+#. module: dms
+msgid "Name"
+msgstr "Tên"
+
+#. module: dms
+msgid "Company"
+msgstr "Công ty"
+
+#. module: dms
+msgid "Model"
+msgstr "Mô hình"
+
+#. module: dms
+msgid "Size"
+msgstr "Kích thước"
+
+#. module: dms
+msgid "Elements"
+msgstr "Phần tử"
+
+#. module: dms
+msgid "Color"
+msgstr "Màu sắc"
+
+#. module: dms
+msgid "Create"
+msgstr "Tạo"
+
+#. module: dms
+msgid "Cancel"
+msgstr "Hủy"
+
+#. module: dms
+msgid "Move"
+msgstr "Di chuyển"
+
+#. module: dms
+msgid "Warning"
+msgstr "Cảnh báo"
+
+#. module: dms
+msgid "Archived"
+msgstr "Đã lưu trữ"
+
+#. module: dms
+msgid "Locked"
+msgstr "Đã khóa"
+
+#. module: dms
+msgid "Lock"
+msgstr "Khóa"
+
+#. module: dms
+msgid "Unlock"
+msgstr "Mở khóa"
+
+#. module: dms
+msgid "Meta Information"
+msgstr "Thông tin meta"
+
+#. module: dms
+msgid "Access Information"
+msgstr "Thông tin truy cập"
+
+#. module: dms
+msgid "Technical Information"
+msgstr "Thông tin kỹ thuật"
+
+#. module: dms
+msgid "Email Alias"
+msgstr "Bí danh email"
+
+#. module: dms
+msgid "Accept Emails from"
+msgstr "Nhận email từ"
+
+#. module: dms
+msgid "Alias Setting"
+msgstr "Cài đặt bí danh"
+
+#. module: dms
+msgid "File Upload"
+msgstr "Tải tệp lên"
+
+#. module: dms
+msgid "File Size"
+msgstr "Kích thước tệp"
+
+#. module: dms
+msgid "File Extensions"
+msgstr "Phần mở rộng tệp"
+
+#. module: dms
+msgid "Save Type"
+msgstr "Kiểu lưu"
+
+#. module: dms
+msgid "Extensions"
+msgstr "Phần mở rộng"
+
+#. module: dms
+msgid "General Settings"
+msgstr "Cài đặt chung"
+
+#. module: dms
+msgid "Define forbidden file extensions"
+msgstr "Xác định các phần mở rộng tệp bị cấm"
+
+#. module: dms
+msgid "Define the maximum upload size of a file in MB"
+msgstr "Xác định kích thước tải lên tối đa của tệp theo MB"
+
+#. module: dms
+msgid "Defines a list of forbidden file extensions. (Example: 'exe,msi')"
+msgstr "Xác định danh sách phần mở rộng tệp bị cấm. (Ví dụ: 'exe,msi')"
+
+#. module: dms
+msgid "Defines the maximum upload size in MB. Default (25MB)"
+msgstr "Xác định kích thước tải lên tối đa theo MB. Mặc định (25MB)"
+
+#. module: dms
+msgid "Show storages"
+msgstr "Hiển thị kho lưu trữ"
+
+#. module: dms
+msgid "Migrate Files"
+msgstr "Di chuyển tệp"
+
+#. module: dms
+msgid "Manual File Migration"
+msgstr "Di chuyển tệp thủ công"
+
+#. module: dms
+msgid "Current Save Type"
+msgstr "Kiểu lưu hiện tại"
+
+#. module: dms
+msgid "Migration Status"
+msgstr "Trạng thái di chuyển"
+
+#. module: dms
+msgid "Storage is Hidden"
+msgstr "Kho lưu trữ bị ẩn"
+
+#. module: dms
+msgid "Inherit Groups"
+msgstr "Kế thừa nhóm"
+
+#. module: dms
+msgid "Inherit permissions from related record"
+msgstr "Kế thừa quyền từ bản ghi liên quan"
+
+#. module: dms
+msgid "Create files from message attachments"
+msgstr "Tạo tệp từ tệp đính kèm của tin nhắn"
+
+#. module: dms
+msgid "Linked attachments model"
+msgstr "Mô hình tệp đính kèm liên kết"
+
+#. module: dms
+msgid "Linked attachments record ID"
+msgstr "ID bản ghi tệp đính kèm liên kết"
+
+#. module: dms
+msgid "Attachment File"
+msgstr "Tệp đính kèm"
+
+#. module: dms
+msgid "Only managers can execute this action."
+msgstr "Chỉ quản lý mới có thể thực hiện hành động này."
+
+#. module: dms
+msgid "Only files in the same root directory can be moved."
+msgstr "Chỉ có thể di chuyển các tệp trong cùng thư mục gốc."
+
+#. module: dms
+msgid "No attachment was provided"
+msgstr "Không có tệp đính kèm được cung cấp"
+
+#. module: dms
+msgid "Invalid attachments!"
+msgstr "Tệp đính kèm không hợp lệ!"
+
+#. module: dms
+msgid "A file must have model and resource ID in attachment storage."
+msgstr "Một tệp phải có mô hình và ID tài nguyên trong kho tệp đính kèm."
+
+#. module: dms
+msgid "The file name is invalid."
+msgstr "Tên tệp không hợp lệ."
+
+#. module: dms
+msgid "A file with the same name already exists in this directory."
+msgstr "Một tệp cùng tên đã tồn tại trong thư mục này."
+
+#. module: dms
+msgid "The file has a forbidden file extension."
+msgstr "Tệp có phần mở rộng bị cấm."
+
+#. module: dms
+msgid "The maximum upload size is %s MB."
+msgstr "Kích thước tải lên tối đa là %s MB."
+
+#. module: dms
+msgid "Error! You cannot create recursive directories."
+msgstr "Lỗi! Bạn không thể tạo thư mục đệ quy."
+
+#. module: dms
+msgid "Error! You cannot create recursive categories."
+msgstr "Lỗi! Bạn không thể tạo danh mục đệ quy."
+
+#. module: dms
+msgid "A directory has to have model in attachment storage."
+msgstr "Thư mục phải có mô hình trong kho tệp đính kèm."
+
+#. module: dms
+msgid "This directory needs to be associated to a record."
+msgstr "Thư mục này cần được liên kết với một bản ghi."
+
+#. module: dms
+msgid "A root directory has to have a storage."
+msgstr "Thư mục gốc phải có một kho lưu trữ."
+
+#. module: dms
+msgid "A directory can't be a root and have a parent directory."
+msgstr "Một thư mục không thể vừa là gốc vừa có thư mục cha."
+
+#. module: dms
+msgid "A directory has to have a parent directory."
+msgstr "Thư mục phải có thư mục cha."
+
+#. module: dms
+msgid "The directory name is invalid."
+msgstr "Tên thư mục không hợp lệ."
+
+#. module: dms
+msgid "A directory with the same name already exists."
+msgstr "Một thư mục cùng tên đã tồn tại."
+
+#. module: dms
+msgid "It is not possible to change the storage."
+msgstr "Không thể thay đổi kho lưu trữ."
+
+#. module: dms
+msgid "Parent group '%(parent)s' is child of '%(current)s'."
+msgstr "Nhóm cha '%(parent)s' lại là nhóm con của '%(current)s'."
+
+#. module: dms
+msgid "%s (copy)"
+msgstr "%s (bản sao)"
+
+#. module: dms
+msgid "%s Files"
+msgstr "%s Tệp"
+
+#. module: dms
+msgid "%s Subdirectories"
+msgstr "%s Thư mục con"
+
+#. module: dms
+msgid "An error occurred during the upload"
+msgstr "Đã xảy ra lỗi trong quá trình tải lên"
+
+#. module: dms
+msgid "You must select a directory first"
+msgstr "Bạn phải chọn thư mục trước"
+
+#. module: dms
+msgid "Dms Path Field"
+msgstr "Trường đường dẫn DMS"
+
+#. module: dms
+msgid "Preview Record"
+msgstr "Xem trước bản ghi"
