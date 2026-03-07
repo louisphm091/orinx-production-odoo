@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 import random
 from datetime import date
 
@@ -20,60 +20,60 @@ class SaleScheduleDashboard(models.AbstractModel):
         # --- KPIs (mock) ---
         kpis = {
             "wave_count": 5,
-            "main_sku": "Quần jean nữ",
+            "main_sku": _("Women's Jeans"),
             "revenue": 820_000_000,
             "revenue_delta": 10,
             "risk_sku_count": 2,
             "need_review_count": 1,
         }
 
-        # --- timeline header (tháng 4) ---
-        cols = ["Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10"]
+        # --- timeline header (April) ---
+        cols = [_("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct")]
         # timeline rows
         rows = [
             {
                 "key": "r1",
-                "sku": "Quần jean nữ",
-                "campaign": "Sale hè",
+                "sku": _("Women's Jeans"),
+                "campaign": _("Summer Sale"),
                 "stock": 1200,
                 "target": 420_000_000,
                 # bar position: 0..8 (for cols) + width in cols
-                "bars": [{"label": "01 – 30 Th4", "start": 2, "span": 7, "color": "green"}],
+                "bars": [{"label": _("01 – 30 Apr"), "start": 2, "span": 7, "color": "green"}],
             },
             {
                 "key": "r2",
-                "sku": "Áo thun nam",
-                "campaign": "Bán thường",
+                "sku": _("Men's T-shirt"),
+                "campaign": _("Regular Sale"),
                 "stock": 900,
                 "target": 260_000_000,
-                "bars": [{"label": "01 – 26 Th4", "start": 1, "span": 6, "color": "blue"}],
+                "bars": [{"label": _("01 – 26 Apr"), "start": 1, "span": 6, "color": "blue"}],
             },
             {
                 "key": "r3",
-                "sku": "Váy công sở",
+                "sku": _("Office Dress"),
                 "campaign": "Clearance",
                 "stock": 400,
                 "target": 140_000_000,
-                "bars": [{"label": "01 – 14 Th4", "start": 0, "span": 4, "color": "yellow"}],
+                "bars": [{"label": _("01 – 14 Apr"), "start": 0, "span": 4, "color": "yellow"}],
             },
         ]
 
         # --- selected schedule detail (mock) ---
         selected = {
-            "sku": "Quần jean nữ",
-            "campaign": "Sale hè",
+            "sku": _("Women's Jeans"),
+            "campaign": _("Summer Sale"),
             "sku_code": "QJN-NU",
             "date_from": "01/04",
             "date_to": "30/04",
             "target_revenue": 420_000_000,
             "current_stock": 1200,
-            "status": "Đang bán",
+            "status": _("On Sale"),
         }
 
         inventory_link = {
             "onhand": 1200,
             "daily_sell": 40,
-            "out_of_stock_date": "18 Th4",
+            "out_of_stock_date": _("18 Apr"),
             "out_of_stock_in_days": 12,
         }
 
@@ -87,8 +87,8 @@ class SaleScheduleDashboard(models.AbstractModel):
 
         # --- risk alerts list ---
         risk_alerts = [
-            {"key": "a1", "sku": "Váy công sở", "message": "Nguy cơ thiếu hàng sau 5 ngày", "trend": "up"},
-            {"key": "a2", "sku": "Áo thun nam", "message": "Bán chậm hơn kế hoạch 16%", "trend": "down"},
+            {"key": "a1", "sku": _("Office Dress"), "message": _("Risk of shortage in 5 days"), "trend": "up"},
+            {"key": "a2", "sku": _("Men's T-shirt"), "message": _("Sales 16%% slower than plan"), "trend": "down"},
         ]
 
         return {

@@ -2,6 +2,7 @@
 
 import { patch } from "@web/core/utils/patch";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { _t } from "@web/core/l10n/translation";
 
 const _keyByOrder = new WeakMap();
 let _seq = 0;
@@ -22,7 +23,8 @@ patch(ProductScreen.prototype, {
     return orders.map((order, idx) => ({
       order,
       key: stableKey(order),
-      label: `Hóa đơn ${idx + 1}`,
+      label: _t("Order %s", idx + 1),
     }));
   },
 });
+

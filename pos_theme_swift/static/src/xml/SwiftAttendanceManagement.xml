@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_theme_swift.SwiftAttendanceManagement" owl="1">
+        <div class="sat-page">
+            <div class="sat-topbar">
+                <div class="sat-title">Bảng chấm công</div>
+
+                <div class="sat-searchWrap">
+                    <i class="fa fa-search"/>
+                    <input type="text" placeholder="Tìm kiếm nhân viên" t-model="state.keyword" t-on-input="onSearchInput"/>
+                    <i class="fa fa-caret-down"/>
+                </div>
+
+                <button class="sat-selectBtn">Theo tuần <i class="fa fa-caret-down ms-1"/></button>
+
+                <div class="sat-weekBox">
+                    <button t-on-click="prevWeek"><i class="fa fa-angle-left"/></button>
+                    <span><t t-esc="state.weekLabel"/></span>
+                    <button t-on-click="nextWeek"><i class="fa fa-angle-right"/></button>
+                </div>
+
+                <div class="sat-actions">
+                    <button class="sat-lightBtn"><i class="fa fa-user-o me-1"/> Xem theo nhân viên <i class="fa fa-caret-down ms-1"/></button>
+                    <button class="sat-lightBtn" t-on-click="approveAttendance">
+                        <i class="fa fa-check-square-o me-1"/> Duyệt chấm công
+                    </button>
+                    <button class="sat-iconBtn"><i class="fa fa-ellipsis-h"/></button>
+                </div>
+            </div>
+
+            <div class="sat-tableWrap">
+                <table class="sat-table">
+                    <thead>
+                        <tr>
+                            <th>Nhân viên</th>
+                            <th>Loại lương</th>
+                            <th>Đi làm</th>
+                            <th>Nghỉ làm</th>
+                            <th>Đi muộn</th>
+                            <th>Về sớm</th>
+                            <th>Làm thêm</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-if="state.loading">
+                            <tr>
+                                <td colspan="7" class="sat-empty">Đang tải dữ liệu...</td>
+                            </tr>
+                        </t>
+
+                        <t t-foreach="state.rows" t-as="r" t-key="r.userId">
+                            <tr t-on-click="() => openDetail(r)">
+                                <td>
+                                    <div class="sat-empName"><t t-esc="r.employeeName"/></div>
+                                    <div class="sat-empCode"><t t-esc="r.employeeCode"/></div>
+                                </td>
+                                <td><t t-esc="r.salaryType"/></td>
+                                <td>
+                                    <t t-if="r.hasData">
+                                        <div><t t-esc="formatDays(r.workedDays)"/></div>
+                                        <div><t t-esc="formatHours(r.workedHours)"/></div>
+                                    </t>
+                                    <t t-else="">0 ngày</t>
+                                </td>
+                                <td><t t-esc="formatDays(r.offDays)"/></td>
+                                <td><t t-esc="formatHours(r.late)"/></td>
+                                <td><t t-esc="formatHours(r.early)"/></td>
+                                <td><t t-esc="formatHours(r.overtime)"/></td>
+                            </tr>
+                            <t t-if="!r.hasData">
+                                <tr class="sat-noteRow">
+                                    <td></td>
+                                    <td colspan="6">Nhân viên chưa có dữ liệu chấm công</td>
+                                </tr>
+                            </t>
+                        </t>
+
+                        <t t-if="!state.loading and !state.rows.length">
+                            <tr>
+                                <td colspan="7" class="sat-empty">Không có dữ liệu nhân viên.</td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+
+            <t t-if="state.showDetail">
+                <div class="sat-modalBackdrop" t-on-click="closeDetail"/>
+                <div class="sat-modal">
+                    <button class="sat-modalClose" t-on-click="closeDetail">×</button>
+                    <h3>Đi làm</h3>
+
+                    <t t-if="state.detailLoading">
+                        <div class="sat-empty">Đang tải chi tiết...</div>
+                    </t>
+
+                    <t t-if="!state.detailLoading and state.detail">
+                        <div class="sat-detailHead">
+                            <span><i class="fa fa-user-circle-o me-1"/> <t t-esc="state.detail.employeeName"/></span>
+                            <span><i class="fa fa-id-card-o me-1"/> <t t-esc="state.detail.employeeCode"/></span>
+                            <span><i class="fa fa-calendar me-1"/> <t t-esc="state.detail.from"/> - <t t-esc="state.detail.to"/></span>
+                        </div>
+
+                        <div class="sat-modalFilterRow">
+                            <label>Loại ngày</label>
+                            <select>
+                                <option>Tất cả loại ngày</option>
+                            </select>
+                        </div>
+
+                        <table class="sat-modalTable">
+                            <thead>
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Loại ngày</th>
+                                    <th>Ca làm việc</th>
+                                    <th>Chi nhánh</th>
+                                    <th>Giờ vào - ra</th>
+                                    <th>Giờ thực tế</th>
+                                    <th>Công thực tế</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="sat-summaryRow">
+                                    <td></td>
+                                    <td></td>
+                                    <td><t t-esc="state.detail.rows.length"/> ca</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><t t-esc="formatHours(state.detail.totalHours)"/></td>
+                                    <td><t t-esc="formatDays(state.detail.totalDays)"/></td>
+                                </tr>
+                                <t t-foreach="state.detail.rows" t-as="d" t-key="d.date + d.timeRange + d.shiftName">
+                                    <tr>
+                                        <td><t t-esc="d.date"/></td>
+                                        <td><t t-esc="d.dayType"/></td>
+                                        <td><t t-esc="d.shiftName"/></td>
+                                        <td><t t-esc="d.branch"/></td>
+                                        <td><t t-esc="d.timeRange"/></td>
+                                        <td><t t-esc="formatHours(d.hours)"/></td>
+                                        <td><t t-esc="formatDays(d.workday)"/></td>
+                                    </tr>
+                                </t>
+                                <t t-if="!state.detail.rows.length">
+                                    <tr>
+                                        <td colspan="7" class="sat-empty">Nhân viên chưa có dữ liệu chấm công trong tuần này.</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

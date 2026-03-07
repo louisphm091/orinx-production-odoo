@@ -3,34 +3,34 @@
   <data>
 
     <record id="action_sale_planning_dashboard" model="ir.actions.client">
-      <field name="name">Kế hoạch cung ứng</field>
+      <field name="name">Supply Planning</field>
       <field name="tag">sale_planning.dashboard</field>
     </record>
 
     <record id="action_sale_schedule_dashboard" model="ir.actions.client">
-      <field name="name">Lên Lịch Bán Hàng</field>
+      <field name="name">Sales Scheduling</field>
       <field name="tag">sale_schedule.dashboard</field>
     </record>
 
     <record id="action_sale_planning_dashboard_progress" model="ir.actions.client">
-      <field name="name">Theo dõi tiến độ thực hiện</field>
+      <field name="name">Progress Tracking</field>
       <field name="tag">sale_planning.dashboard_progress</field>
     </record>
 
     <record id="action_sale_planning_analytics" model="ir.actions.client">
-      <field name="name">Phân tích &amp; Báo cáo</field>
+      <field name="name">Analytics &amp; Reports</field>
       <field name="tag">sale_planning.analytics</field>
     </record>
 
     <record id="action_sale_planning_replenishment" model="ir.actions.client">
-        <field name="name">Quản lý đặt hàng bổ sung</field>
+        <field name="name">Replenishment Management</field>
         <field name="tag">sale_planning.replenishment</field>
     </record>
 
     <menuitem id="menu_sale_planning_root" name="Sale Planning" sequence="10"/>
 
     <record id="menu_sale_schedule_dashboard" model="ir.ui.menu">
-      <field name="name">Lên Lịch Bán Hàng</field>
+      <field name="name">Sales Scheduling</field>
       <field name="parent_id" ref="menu_sale_planning_root"/>
       <field name="action" ref="action_sale_schedule_dashboard"/>
       <field name="sequence">20</field>
@@ -38,27 +38,28 @@
     </record>
 
     <menuitem id="menu_sale_planning_dashboard"
-              name="Kế hoạch cung ứng / Mua hàng"
+              name="Supply Planning / Purchase"
               parent="menu_sale_planning_root"
               action="action_sale_planning_dashboard"
               sequence="10"/>
 
     <menuitem id="menu_sale_planning_replenishment"
-            name="Quản lý đặt hàng bổ sung"
+            name="Replenishment Management"
             parent="menu_sale_planning_root"
             action="action_sale_planning_replenishment"
             sequence="40"/>
 
     <menuitem id="menu_sale_planning_dashboard_progress"
-              name="Theo dõi tiến độ thực hiện"
+              name="Progress Tracking"
               parent="menu_sale_planning_root"
               action="action_sale_planning_dashboard_progress"
               sequence="30"/>
 
     <menuitem id="menu_sale_planning_analytics"
-              name="Phân tích &amp; Báo cáo"
+              name="Analytics &amp; Reports"
               parent="menu_sale_planning_root"
               action="action_sale_planning_analytics"
               sequence="30"/>
   </data>
 </odoo>
+

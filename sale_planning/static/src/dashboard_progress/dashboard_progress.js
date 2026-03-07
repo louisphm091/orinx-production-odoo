@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SalePlanningDashboardProgress extends Component {
   static template = "sale_planning.DashboardProgress";
@@ -67,7 +68,7 @@ export class SalePlanningDashboardProgress extends Component {
       this.renderCharts();
     } catch (e) {
       console.error(e);
-      this.state.error = "Không tải được dữ liệu dashboard tiến độ.";
+      this.state.error = _t("Failed to load progress dashboard data.");
       this.notification.add(this.state.error, { type: "danger" });
     } finally {
       this.state.loading = false;
@@ -116,7 +117,7 @@ export class SalePlanningDashboardProgress extends Component {
         datasets: [
           {
             type: "bar",
-            label: "Kế hoạch",
+            label: _t("Planned"),
             data: planned,
             backgroundColor: "rgba(148, 163, 184, 0.55)",
             borderRadius: 8,
@@ -125,7 +126,7 @@ export class SalePlanningDashboardProgress extends Component {
           },
           {
             type: "bar",
-            label: "Thực tế",
+            label: _t("Actual"),
             data: actual,
             backgroundColor: "rgba(16, 185, 129, 0.55)",
             borderRadius: 8,
@@ -134,7 +135,7 @@ export class SalePlanningDashboardProgress extends Component {
           },
           {
             type: "line",
-            label: "Xu hướng thực hiện",
+            label: _t("Execution Trend"),
             data: trend,
             borderColor: "rgba(16, 185, 129, 0.9)",
             borderDash: [6, 4],
@@ -179,7 +180,7 @@ export class SalePlanningDashboardProgress extends Component {
         labels,
         datasets: [
           {
-            label: "Tiến độ",
+            label: _t("Progress"),
             data: values,
             borderColor: "rgba(59, 130, 246, 0.9)",
             tension: 0.35,

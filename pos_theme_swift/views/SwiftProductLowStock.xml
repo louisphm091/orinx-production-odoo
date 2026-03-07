@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="swift_product_template_search_view_pos_low_stock" model="ir.ui.view">
+            <field name="name">product.template.search.pos.low.stock.swift</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="point_of_sale.product_template_search_view_pos"/>
+            <field name="arch" type="xml">
+                <filter name="filter_to_availabe_pos" position="after">
+                    <filter
+                        name="swift_filter_low_stock_10"
+                        string="Low Stock &lt;= 10"
+                        domain="[('is_storable', '=', True), ('qty_available', '&lt;=', 10)]"
+                    />
+                </filter>
+            </field>
+        </record>
+
+        <record id="swift_product_template_tree_view_pos_import_goods" model="ir.ui.view">
+            <field name="name">product.template.tree.pos.import.goods.swift</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="point_of_sale.product_template_tree_view_point_of_sale"/>
+            <field name="arch" type="xml">
+                <xpath expr="//list" position="inside">
+                    <header>
+                        <button
+                            name="action_swift_import_goods_filtered"
+                            type="object"
+                            string="Nhập hàng"
+                            class="btn btn-primary"
+                            display="always"
+                            context="{'swift_low_stock_mode': True}"
+                            groups="stock.group_stock_user"
+                        />
+                    </header>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="swift_product_template_kanban_view_pos_import_goods" model="ir.ui.view">
+            <field name="name">product.template.kanban.pos.import.goods.swift</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <header>
+                        <button
+                            name="action_swift_import_goods_filtered"
+                            type="object"
+                            string="Nhập hàng"
+                            class="btn btn-primary"
+                            display="always"
+                            context="{'swift_low_stock_mode': True}"
+                            groups="stock.group_stock_user"
+                        />
+                    </header>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

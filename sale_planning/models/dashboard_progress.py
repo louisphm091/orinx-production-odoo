@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 import random
 
 
@@ -21,12 +21,12 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
 
         # ---- Fashion SKU demo ----
         skus = [
-            {"sku": "Quần jean nữ", "cat": "Thời trang nữ"},
-            {"sku": "Váy công sở", "cat": "Thời trang nữ"},
-            {"sku": "Áo thun nam", "cat": "Thời trang nam"},
-            {"sku": "Áo khoác nữ", "cat": "Thời trang nữ"},
-            {"sku": "Áo sơ mi nam", "cat": "Thời trang nam"},
-            {"sku": "Chân váy", "cat": "Thời trang nữ"},
+            {"sku": _("Women's Jeans"), "cat": _("Women's Fashion")},
+            {"sku": _("Office Dress"), "cat": _("Women's Fashion")},
+            {"sku": _("Men's T-shirt"), "cat": _("Men's Fashion")},
+            {"sku": _("Women's Jacket"), "cat": _("Women's Fashion")},
+            {"sku": _("Men's Shirt"), "cat": _("Men's Fashion")},
+            {"sku": _("Skirt"), "cat": _("Women's Fashion")},
         ]
 
         # planned vs actual (tổng quan)
@@ -49,45 +49,45 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
 
         # Alerts / risks
         risks = [
-            {"name": "Váy công sở", "hint": "Chậm 15% so kế hoạch tuần", "level": "high"},
-            {"name": "Áo khoác nữ", "hint": "Nguy cơ trễ do tồn kho thấp", "level": "medium"},
+            {"name": _("Office Dress"), "hint": _("15%% behind weekly plan"), "level": "high"},
+            {"name": _("Women's Jacket"), "hint": _("Risk of delay due to low inventory"), "level": "medium"},
         ]
 
         # Mini cards (theo SKU/đơn)
         sku_cards = [
             {
                 "key": "c1",
-                "name": "Quần jean nữ",
-                "status": "Đúng tiến độ",
+                "name": _("Women's Jeans"),
+                "status": _("On track"),
                 "status_type": "ok",
                 "percent": 92,
                 "revenue": 420_000_000,
-                "tags": ["Bán chạy", "Ổn định"],
+                "tags": [_("Top seller"), _("Stable")],
             },
             {
                 "key": "c2",
-                "name": "Váy công sở",
-                "status": "Chậm tiến độ",
+                "name": _("Office Dress"),
+                "status": _("Behind schedule"),
                 "status_type": "bad",
                 "percent": 70,
-                "reasons": ["Tồn kho thấp", "Nhu cầu giảm"],
+                "reasons": [_("Low inventory"), _("Decreased demand")],
             },
             {
                 "key": "c3",
-                "name": "Áo thun nam",
-                "status": "Đúng tiến độ",
+                "name": _("Men's T-shirt"),
+                "status": _("On track"),
                 "status_type": "ok",
                 "percent": 78,
                 "revenue": 310_000_000,
-                "tags": ["Ổn định"],
+                "tags": [_("Stable")],
             },
         ]
 
-        # Lịch sử thực hiện & xu hướng (line)
-        hist_labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "Tuần 5", "Tuần 6"]
+        # Execution history & trend (line)
+        hist_labels = [_("Week 1"), _("Week 2"), _("Week 3"), _("Week 4"), _("Week 5"), _("Week 6")]
         hist_values = [85, 83, 79, 82, 76, 74]
 
-        note = "Tiến độ giảm do nhóm Váy công sở bán chậm trong 2 tuần liên tiếp"
+        note = _("Progress decreased due to slow sales of Office Dress group for 2 consecutive weeks")
 
         return {
             "filters_echo": filters,
@@ -98,7 +98,7 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
                 "ontrack_sku_count": len(ontrack_skus),
                 "ontrack_sku_names": ", ".join([x["name"] for x in ontrack_skus[:2]]) or "-",
                 "critical_count": 1,
-                "critical_hint": "1 vấn đề nghiêm trọng",
+                "critical_hint": _("1 critical issue"),
             },
             "overall_chart": {
                 "labels": [x["name"] for x in overall],

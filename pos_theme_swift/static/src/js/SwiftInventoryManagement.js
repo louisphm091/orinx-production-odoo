@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, useState, onMounted } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 import { SwiftInventoryForm } from "./SwiftInventoryForm";
 
 export class SwiftInventory extends Component {
@@ -88,9 +89,9 @@ export class SwiftInventory extends Component {
       const configs = await this.orm.searchRead(
         "pos.config", [], ["name"], { limit: 1 }
       );
-      this.state.branchName = configs.length ? configs[0].name : "Chi nhánh";
+      this.state.branchName = configs.length ? configs[0].name : _t("Branch");
     } catch (_) {
-      this.state.branchName = "Chi nhánh";
+      this.state.branchName = _t("Branch");
     }
   }
 
@@ -183,19 +184,20 @@ export class SwiftInventory extends Component {
   // ─── stubs ───────────────────────────────────────────────────
 
   exportExcel() {
-    this.notification.add("Chức năng xuất Excel đang được phát triển.", { type: "info", title: "Thông báo" });
+    this.notification.add(_t("Excel export function is under development."), { type: "info", title: _t("Notification") });
   }
   exportPdf() {
-    this.notification.add("Chức năng xuất PDF đang được phát triển.", { type: "info", title: "Thông báo" });
+    this.notification.add(_t("PDF export function is under development."), { type: "info", title: _t("Notification") });
   }
   openColumns() {
-    this.notification.add("Tùy chọn cột đang được phát triển.", { type: "info", title: "Thông báo" });
+    this.notification.add(_t("Column options are under development."), { type: "info", title: _t("Notification") });
   }
   openSettings() {
-    this.notification.add("Cài đặt đang được phát triển.", { type: "info", title: "Thông báo" });
+    this.notification.add(_t("Settings are under development."), { type: "info", title: _t("Notification") });
   }
 }
 
 registry
   .category("actions")
   .add("pos_theme_swift.swift_pos_inventory_management", SwiftInventory);
+

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_theme_swift.SwiftWorkScheduleManagement" owl="1">
+        <div class="sws-page">
+            <div class="sws-headerTitle">THÊM LỊCH LÀM VIỆC</div>
+
+            <div class="sws-topbar">
+                <div class="sws-title">Lịch làm việc</div>
+
+                <div class="sws-searchWrap">
+                    <i class="fa fa-search"/>
+                    <input type="text" placeholder="Tìm kiếm nhân viên" t-model="state.keyword" t-on-input="onSearchInput"/>
+                    <i class="fa fa-caret-down"/>
+                </div>
+
+                <div class="sws-weekBox">
+                    <button t-on-click="prevWeek"><i class="fa fa-angle-left"/></button>
+                    <span><t t-esc="state.weekLabel"/></span>
+                    <button t-on-click="nextWeek"><i class="fa fa-angle-right"/></button>
+                </div>
+
+                <button class="sws-lightBtn" t-on-click="goCurrentWeek">Tuần này</button>
+
+                <div class="sws-actions">
+                    <button class="sws-lightBtn"><i class="fa fa-user-o me-1"/> Xem theo nhân viên <i class="fa fa-caret-down ms-1"/></button>
+                    <button class="sws-lightBtn"><i class="fa fa-sign-in me-1"/> Import</button>
+                    <button class="sws-lightBtn"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                </div>
+            </div>
+
+            <div class="sws-tableWrap">
+                <table class="sws-table">
+                    <thead>
+                        <tr>
+                            <th>Nhân viên</th>
+                            <t t-foreach="state.days" t-as="d" t-key="d.date">
+                                <th><t t-esc="d.label"/> <t t-esc="d.day"/></th>
+                            </t>
+                            <th>Lương dự kiến <i class="fa fa-info-circle"/></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="sws-summaryRow">
+                            <td></td>
+                            <t t-foreach="state.days" t-as="d" t-key="d.date + '_s'">
+                                <td></td>
+                            </t>
+                            <td>
+                                <div class="sws-salaryMain"><t t-esc="formatMoney(state.rows.reduce((a, r) => a + (r.estimatedSalary || 0), 0))"/></div>
+                            </td>
+                        </tr>
+
+                        <t t-if="state.loading">
+                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty">Đang tải dữ liệu...</td></tr>
+                        </t>
+
+                        <t t-foreach="state.rows" t-as="r" t-key="r.userId">
+                            <tr>
+                                <td class="sws-empCell">
+                                    <div class="sws-empName"><t t-esc="r.employeeName"/></div>
+                                    <div class="sws-empCode"><t t-esc="r.employeeCode"/></div>
+                                </td>
+
+                                <t t-foreach="state.days" t-as="d" t-key="r.userId + '_' + d.date">
+                                    <td class="sws-dayCell">
+                                        <t t-if="r.dayData[d.date] and r.dayData[d.date].length">
+                                            <t t-foreach="r.dayData[d.date]" t-as="s" t-key="s.id">
+                                                <div t-att-class="'sws-chip sws-' + (s.color || 'blue')" t-on-click="() => openScheduleModal(r, d)">
+                                                    <t t-esc="s.name"/>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <a href="#" class="sws-addLink" t-on-click.prevent="() => openScheduleModal(r, d)">
+                                                + Thêm lịch
+                                            </a>
+                                        </t>
+                                    </td>
+                                </t>
+
+                                <td class="sws-salaryCell">
+                                    <t t-if="r.salaryConfigured">
+                                        <div><t t-esc="formatMoney(r.estimatedSalary)"/></div>
+                                        <div class="sws-subInfo"><t t-esc="r.shiftCount"/> ca</div>
+                                    </t>
+                                    <t t-else="">Chưa thiết lập lương</t>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <t t-if="!state.loading and !state.rows.length">
+                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty">Không có dữ liệu nhân viên.</td></tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+
+            <t t-if="state.showScheduleModal">
+                <div class="sws-modalBackdrop" t-on-click="closeScheduleModal"/>
+                <div class="sws-modal">
+                    <button class="sws-modalClose" t-on-click="closeScheduleModal">×</button>
+                    <h3>Thêm lịch làm việc</h3>
+                    <div class="sws-modalSub">
+                        <span><t t-esc="state.scheduleTarget.employeeName"/></span>
+                        <span> - </span>
+                        <span><t t-esc="state.scheduleTarget.date"/></span>
+                    </div>
+
+                    <div class="sws-sectionTitle">Chọn ca làm việc <button class="sws-inlineBtn" t-on-click="openShiftModal">+</button></div>
+                    <div class="sws-templateGrid">
+                        <t t-foreach="state.templates" t-as="t" t-key="t.id">
+                            <label class="sws-templateItem">
+                                <input type="checkbox" t-att-checked="state.selectedTemplateIds.includes(t.id)" t-on-click="() => toggleTemplate(t.id)"/>
+                                <div class="sws-templateName"><t t-esc="t.name"/></div>
+                                <div class="sws-templateTime"><t t-esc="formatHourRange(t.startHour)"/> - <t t-esc="formatHourRange(t.endHour)"/></div>
+                            </label>
+                        </t>
+                    </div>
+
+                    <div class="sws-sectionTitle">Lặp lại hàng tuần <input type="checkbox" t-model="state.applyWeekly"/></div>
+                    <div class="sws-weekdayRow">
+                        <t t-foreach="getWeekdayButtons()" t-as="w" t-key="w.idx">
+                            <button t-att-class="'sws-weekdayBtn ' + (state.selectedWeekdays.includes(w.idx) ? 'is-active' : '')" t-on-click="() => toggleWeekday(w.idx)">
+                                <t t-esc="w.label"/>
+                            </button>
+                        </t>
+                    </div>
+
+                    <div class="sws-sectionTitle">Thêm lịch tương tự cho nhân viên khác <input type="checkbox" t-model="state.copyToOthers"/></div>
+                    <t t-if="state.copyToOthers">
+                        <input class="sws-copySearch" type="text" placeholder="Tìm kiếm nhân viên" t-model="state.copyEmployeeKeyword"/>
+                        <div class="sws-copyList">
+                            <t t-foreach="getFilteredCopyEmployees()" t-as="e" t-key="e.userId">
+                                <label class="sws-copyItem">
+                                    <input type="checkbox" t-att-checked="state.selectedCopyEmployeeIds.includes(e.userId)" t-on-click="() => toggleCopyEmployee(e.userId)"/>
+                                    <span><t t-esc="e.employeeName"/> (<t t-esc="e.employeeCode"/>)</span>
+                                </label>
+                            </t>
+                        </div>
+                    </t>
+
+                    <div class="sws-modalActions">
+                        <button class="sws-lightBtn" t-on-click="closeScheduleModal">Bỏ qua</button>
+                        <button class="sws-primaryBtn" t-on-click="saveSchedule">Lưu</button>
+                    </div>
+                </div>
+            </t>
+
+            <t t-if="state.showShiftModal">
+                <div class="sws-modalBackdrop"/>
+                <div class="sws-modal sws-smallModal">
+                    <button class="sws-modalClose" t-on-click="closeShiftModal">×</button>
+                    <h3>Thêm ca làm việc</h3>
+
+                    <div class="sws-formRow">
+                        <label>Tên</label>
+                        <input type="text" t-model="state.shiftForm.name"/>
+                    </div>
+                    <div class="sws-formRow">
+                        <label>Giờ làm việc</label>
+                        <input type="time" t-model="state.shiftForm.start_hour"/>
+                        <span>đến</span>
+                        <input type="time" t-model="state.shiftForm.end_hour"/>
+                    </div>
+                    <div class="sws-formRow">
+                        <label>Giờ cho phép chấm công</label>
+                        <input type="time" t-model="state.shiftForm.checkin_start_hour"/>
+                        <span>đến</span>
+                        <input type="time" t-model="state.shiftForm.checkin_end_hour"/>
+                    </div>
+                    <div class="sws-formRow">
+                        <label>Phạm vi áp dụng</label>
+                        <input type="text" t-model="state.shiftForm.branch_name"/>
+                    </div>
+
+                    <div class="sws-modalActions">
+                        <button class="sws-lightBtn" t-on-click="closeShiftModal">Bỏ qua</button>
+                        <button class="sws-primaryBtn" t-on-click="saveShiftTemplate">Lưu</button>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

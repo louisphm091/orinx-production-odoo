@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SaleScheduleDashboard extends Component {
     static template = "sale_planning.SaleScheduleDashboard";
@@ -59,7 +60,7 @@ export class SaleScheduleDashboard extends Component {
             this.state.last_update = data.last_update || "";
         } catch (e) {
             console.error(e);
-            this.state.error = "Không tải được dữ liệu Sale Schedule dashboard.";
+            this.state.error = _t("Failed to load Sale Schedule dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;

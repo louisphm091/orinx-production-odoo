@@ -9,14 +9,14 @@
 
         <!-- Top bar -->
         <div class="swift-inv-topbar">
-          <div class="swift-inv-title">Phiếu kiểm kho</div>
+          <div class="swift-inv-title">Inventory Voucher</div>
 
           <div class="swift-inv-search">
             <i class="fa fa-search swift-inv-searchIcon"/>
             <input
               type="text"
               class="swift-inv-searchInput"
-              placeholder="Theo mã phiếu kiểm"
+              placeholder="Search by voucher code"
               t-model="state.keyword"
               t-on-input="onSearchInput"
             />
@@ -24,12 +24,12 @@
 
           <div class="swift-inv-actions">
             <button type="button" class="swift-btnPrimary" t-on-click="onCreateInventory">
-              <i class="fa fa-plus me-1"/> Kiểm kho
+              <i class="fa fa-plus me-1"/> Audit
             </button>
 
             <div class="dropdown">
               <button class="swift-btnLight dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fa fa-file-text-o me-1"/> Xuất file
+                <i class="fa fa-file-text-o me-1"/> Export
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" t-on-click="exportExcel">Excel</a></li>
@@ -37,10 +37,10 @@
               </ul>
             </div>
 
-            <button type="button" class="swift-iconBtn" title="Tùy chọn" t-on-click="openColumns">
+            <button type="button" class="swift-iconBtn" title="Columns" t-on-click="openColumns">
               <i class="fa fa-th-large"/>
             </button>
-            <button type="button" class="swift-iconBtn" title="Cài đặt" t-on-click="openSettings">
+            <button type="button" class="swift-iconBtn" title="Settings" t-on-click="openSettings">
               <i class="fa fa-cog"/>
             </button>
           </div>
@@ -48,7 +48,7 @@
 
         <!-- Loading -->
         <t t-if="state.loading">
-          <div class="swift-inv-loading">Đang tải dữ liệu...</div>
+          <div class="swift-inv-loading">Loading data...</div>
         </t>
 
         <!-- Table -->
@@ -62,18 +62,18 @@
                   </th>
                   <th class="col-star"></th>
 
-                  <th>Mã kiểm kho</th>
-                  <th>Thời gian</th>
-                  <th>Ngày cân bằng</th>
+                  <th>Audit Code</th>
+                  <th>Time</th>
+                  <th>Balance Date</th>
 
-                  <th class="col-num">SL thực tế</th>
-                  <th class="col-num">Tổng thực tế</th>
-                  <th class="col-num">Tổng chênh lệch</th>
-                  <th class="col-num">SL lệch tăng</th>
-                  <th class="col-num">SL lệch giảm</th>
+                  <th class="col-num">Actual Qty</th>
+                  <th class="col-num">Total Actual</th>
+                  <th class="col-num">Total Diff</th>
+                  <th class="col-num">Diff Inc</th>
+                  <th class="col-num">Diff Dec</th>
 
-                  <th>Ghi chú</th>
-                  <th class="col-status">Trạng thái</th>
+                  <th>Notes</th>
+                  <th class="col-status">Status</th>
                 </tr>
               </thead>
 
@@ -110,7 +110,7 @@
                           r.status === 'done' ? 'is-done' : ''
                         ].join(' ')"
                       >
-                        <t t-esc="r.status === 'draft' ? 'Phiếu tạm' : 'Đã cân bằng'"/>
+                        <t t-esc="r.status === 'draft' ? 'Draft' : 'Balanced'"/>
                       </span>
                     </td>
                   </tr>
@@ -118,7 +118,7 @@
 
                 <t t-if="!state.records || state.records.length === 0">
                   <tr>
-                    <td colspan="12" class="swift-empty">Không có dữ liệu</td>
+                    <td colspan="12" class="swift-empty">No data</td>
                   </tr>
                 </t>
               </tbody>
@@ -144,3 +144,4 @@
   </t>
 
 </templates>
+

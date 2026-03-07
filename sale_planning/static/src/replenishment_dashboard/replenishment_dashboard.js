@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class ReplenishmentDashboard extends Component {
   static template = "sale_planning.ReplenishmentDashboard";
@@ -48,9 +49,9 @@ export class ReplenishmentDashboard extends Component {
   }
 
   badgeText(state) {
-    if (state === "approved") return "Đã duyệt";
-    if (state === "ordered") return "Đã đặt";
-    return "Đề xuất";
+    if (state === "approved") return _t("Approved");
+    if (state === "ordered") return _t("Ordered");
+    return _t("Proposed");
   }
 
   badgeClass(state) {
@@ -97,7 +98,7 @@ export class ReplenishmentDashboard extends Component {
       this.renderSpark();
     } catch (e) {
       console.error(e);
-      this.state.error = "Không tải được dữ liệu đặt hàng bổ sung.";
+      this.state.error = _t("Failed to load replenishment data.");
       this.notification.add(this.state.error, { type: "danger" });
     } finally {
       this.state.loading = false;

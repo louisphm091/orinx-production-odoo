@@ -14,11 +14,11 @@
             <thead>
               <tr>
                 <th class="col-idx">#</th>
-                <th class="col-name">Sản phẩm</th>
-                <th class="col-unit">Đơn giá</th>
-                <th class="col-uom">Đơn Vị</th>
-                <th class="col-qty">SL</th>
-                <th class="col-total">Thành tiền</th>
+                <th class="col-name">Product</th>
+                <th class="col-unit">Unit Price</th>
+                <th class="col-uom">UoM</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-total">Total</th>
               </tr>
             </thead>
 
@@ -31,7 +31,7 @@
                       <span class="idx-num"><t t-esc="this.sppIndexOf(line) + 1"/></span>
                       <button type="button"
                               class="idx-del"
-                              title="Xoá"
+                              title="Delete"
                               t-on-click.stop="() => this.sppRemoveLine(line)">
                         <i class="fa fa-trash"/>
                       </button>
@@ -88,7 +88,7 @@
           </table>
 
           <div class="sit-empty" t-else="">
-            Chưa có sản phẩm
+            No products yet
           </div>
         </div>
 

@@ -2,52 +2,48 @@
 <templates xml:space="preserve">
     <t t-name="pos_theme_swift.SwiftShiftManagement" owl="1">
         <div class="swift-inv-page sif-page ssm-page-root">
-
-            <!-- Management Top Bar (Matching Inventory) -->
             <div class="swift-inv-topbar">
-                <div class="swift-inv-title">Quản lý ca làm việc</div>
-                <div class="swift-inv-search" style="visibility: hidden;"></div>
+                <div class="swift-inv-title">Shift Management</div>
+                <div class="swift-inv-search" style="visibility: hidden;"/>
                 <div class="swift-inv-actions">
                     <button type="button" class="swift-btnLight" t-on-click="fetchShifts">
-                        <i class="fa fa-refresh me-1"/> Làm mới
+                        <i class="fa fa-refresh me-1"/> Refresh
                     </button>
-                    <button type="button" class="swift-iconBtn" title="Cài đặt">
+                    <button type="button" class="swift-iconBtn" title="Settings">
                         <i class="fa fa-cog"/>
                     </button>
                 </div>
             </div>
 
-            <!-- Two Column Layout (Matching sif structure) -->
             <div class="sif-content" style="display: flex; flex: 1; overflow: hidden;">
-                <!-- Left: Master Control -->
                 <div class="sif-left ssm-control-panel">
                     <div class="ssm-hero">
                         <div class="ssm-user-avatar">
                             <i class="fa fa-user-circle"/>
                         </div>
                         <div class="ssm-welcome">
-                            <h2 class="ssm-greet-text">Xin chào, <span class="staff-name"><t t-esc="state.userName"/></span></h2>
+                            <h2 class="ssm-greet-text">Hello, <span class="staff-name"><t t-esc="state.userName"/></span></h2>
                             <div t-att-class="'ssm-badge-status ' + (state.status === 'active' ? 'is-active' : 'is-idle')">
-                                <t t-if="state.status === 'active'"><i class="fa fa-check-circle me-1"/> ĐANG TRONG CA</t>
-                                <t t-else=""><i class="fa fa-clock-o me-1"/> BẠN ĐANG NGOÀI CA</t>
+                                <t t-if="state.status === 'active'"><i class="fa fa-check-circle me-1"/> ON SHIFT</t>
+                                <t t-else=""><i class="fa fa-clock-o me-1"/> YOU ARE OFF SHIFT</t>
                             </div>
                         </div>
                     </div>
 
                     <div class="ssm-timer-display">
-                        <div class="timer-label">THỜI GIAN LÀM VIỆC TRONG CA</div>
+                        <div class="timer-label">TOTAL TIME ON SHIFT</div>
                         <div class="timer-main"><t t-esc="state.elapsedTime"/></div>
                         <div t-if="state.status === 'active'" class="timer-start-info">
-                            Bắt đầu: <t t-esc="formatDateTime(state.checkInTime)"/>
+                            Start: <t t-esc="formatDateTime(state.checkInTime)"/>
                         </div>
                     </div>
 
                     <div class="ssm-form-area">
                         <div class="sif-field">
-                            <label class="sif-fieldLabel">GHI CHÚ / BÀN GIAO</label>
+                            <label class="sif-fieldLabel">NOTE / HANDOVER</label>
                             <textarea
                                 class="sif-noteInput ssm-textarea"
-                                placeholder="Nhập ghi chú hoặc nội dung bàn giao..."
+                                placeholder="Enter notes or handover content..."
                                 t-model="state.note"
                             />
                         </div>
@@ -55,44 +51,42 @@
                         <div class="ssm-btn-wrap">
                             <t t-if="state.status === 'idle'">
                                 <button class="swift-btnPrimary ssm-action-btn" t-on-click="toggleShift">
-                                    <i class="fa fa-play-circle me-2"/> BẮT ĐẦU CA
+                                    <i class="fa fa-play-circle me-2"/> START SHIFT
                                 </button>
                             </t>
                             <t t-else="">
                                 <button class="ssm-btn-danger ssm-action-btn" t-on-click="toggleShift">
-                                    <i class="fa fa-stop-circle me-2"/> KẾT THÚC CA
+                                    <i class="fa fa-stop-circle me-2"/> END SHIFT
                                 </button>
                             </t>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Details & Sidebar -->
                 <div class="sif-right ssm-sidebar">
                     <div class="sif-right-header">
                         <div class="sif-branchName"><t t-esc="state.branchName"/></div>
                         <div class="sif-rightDate"><t t-esc="formatDateTime(new Date()).split(' ')[0]"/></div>
                     </div>
 
-                    <!-- Shift Statistics -->
                     <div class="sif-fields ssm-stats-section">
                         <div class="sif-field">
-                            <label class="sif-fieldLabel">THỐNG KÊ THỜI GIAN</label>
+                            <label class="sif-fieldLabel">TIME STATISTICS</label>
                             <div class="ssm-stats-grid">
                                 <div class="ssm-stat-card">
                                     <div class="stat-val"><t t-esc="formatDuration(state.stats.today)"/></div>
-                                    <div class="stat-label">Hôm nay</div>
+                                    <div class="stat-label">Today</div>
                                 </div>
                                 <div class="ssm-stat-card">
                                     <div class="stat-val"><t t-esc="formatDuration(state.stats.week)"/></div>
-                                    <div class="stat-label">Tuần này</div>
+                                    <div class="stat-label">This Week</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="sif-recent ssm-history-feed">
-                        <div class="sif-recentTitle">LỊCH SỬ GẦN ĐÂY</div>
+                        <div class="sif-recentTitle">RECENT HISTORY</div>
                         <div class="ssm-feed-list">
                             <t t-foreach="state.recentShifts" t-as="s" t-key="s.id">
                                 <div class="sif-recentItem ssm-feed-entry">
@@ -110,7 +104,7 @@
                                 </div>
                             </t>
                             <t t-if="!state.recentShifts.length">
-                                <div class="sif-recentEmpty">Không có lịch sử</div>
+                                <div class="sif-recentEmpty">No history</div>
                             </t>
                         </div>
                     </div>

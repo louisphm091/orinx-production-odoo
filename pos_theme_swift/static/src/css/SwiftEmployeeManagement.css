@@ -1,0 +1,303 @@
+.sem-page {
+  height: 100%;
+  background: #fff;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #2d3a4b;
+  position: relative;
+}
+.sem-topbar {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.sem-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+.sem-searchWrap {
+  position: relative;
+}
+.sem-searchWrap input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 10px 0 30px;
+}
+.sem-searchWrap i {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  color: #7f8da1;
+}
+.sem-actions {
+  display: flex;
+  gap: 6px;
+}
+.sem-primaryBtn,
+.sem-lightBtn,
+.sem-iconBtn {
+  height: 32px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.sem-primaryBtn {
+  background: #2b78ff;
+  border-color: #2b78ff;
+  color: #fff;
+}
+.sem-iconBtn {
+  width: 32px;
+  padding: 0;
+}
+.sem-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 8px;
+  min-height: 0;
+}
+.sem-filter {
+  background: #ffff;
+  border: 1px solid #d8dfea;
+  border-radius: 6px;
+  padding: 10px;
+}
+.sem-filterTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.sem-filterTitle.mt {
+  margin-top: 12px;
+}
+.sem-filter label {
+  display: block;
+  margin-bottom: 6px;
+}
+.sem-chip {
+  display: inline-flex;
+  background: #2b78ff;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  gap: 6px;
+}
+.sem-input {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 8px;
+}
+.sem-main {
+  border: 1px solid #d7deea;
+  border-radius: 4px;
+  overflow: auto;
+}
+.sem-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+.sem-table th {
+  background: #d9e9fb;
+  padding: 8px 10px;
+  border-bottom: 1px solid #c5d5ea;
+  text-align: left;
+  white-space: nowrap;
+}
+.sem-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #e4eaf2;
+}
+.sem-table tr.is-selected {
+  background: #f7fbff;
+  box-shadow: inset 2px 0 0 #2b78ff;
+}
+.w-check {
+  width: 30px;
+}
+.sem-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: #d4d9e2;
+}
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
+.sub {
+  color: #7a889a;
+  font-size: 12px;
+}
+.sem-empty {
+  text-align: center;
+  color: #7a889a;
+  padding: 16px !important;
+}
+.sem-detailCell {
+  padding: 0 !important;
+}
+.sem-detailBox {
+  border: 1px solid #c9d8ef;
+  margin: 6px 8px 8px 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.sem-tabs {
+  display: flex;
+  gap: 14px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid #dbe4f0;
+}
+.sem-tab {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  padding: 7px 4px;
+  color: #6c7c91;
+  font-weight: 600;
+}
+.sem-tab.is-active {
+  color: #2b78ff;
+  border-bottom-color: #2b78ff;
+}
+.sem-gridInfo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 10px 14px;
+  padding: 14px;
+}
+.sem-gridInfo span {
+  display: block;
+  font-size: 11px;
+  color: #8392a5;
+}
+.sem-gridInfo strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+.sem-miniTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sem-miniTable th {
+  background: #f0f2f5;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #dde4ef;
+}
+.sem-miniTable td {
+  padding: 7px 8px;
+  border-bottom: 1px solid #e8edf4;
+}
+.sem-salaryCard {
+  padding: 10px;
+}
+.sem-row {
+  display: grid;
+  grid-template-columns: 180px 320px auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+.sem-row.end {
+  grid-template-columns: 180px auto;
+}
+.sem-row input,
+.sem-row select {
+  height: 32px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 8px;
+}
+.sem-finTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+.sem-finBtns {
+  display: flex;
+  gap: 6px;
+}
+.sem-actionsRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px;
+}
+.sem-modalBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 30;
+}
+.sem-modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(900px, calc(100% - 20px));
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  z-index: 31;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
+}
+.sem-modal.sem-small {
+  width: min(560px, calc(100% - 20px));
+}
+.sem-modalClose {
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+}
+.sem-modal h3 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  font-weight: 700;
+}
+.sem-formGrid {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 8px 10px;
+  align-items: center;
+}
+.sem-formGrid input,
+.sem-formGrid select {
+  height: 34px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 8px;
+}
+@media (max-width: 1100px) {
+  .sem-topbar {
+    grid-template-columns: 1fr;
+  }
+  .sem-content {
+    grid-template-columns: 1fr;
+  }
+  .sem-title {
+    font-size: 20px;
+  }
+}

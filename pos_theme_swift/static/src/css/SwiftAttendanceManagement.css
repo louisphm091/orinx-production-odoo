@@ -1,0 +1,255 @@
+.sat-page {
+    height: 100%;
+    background: #ffffff;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #2d3a4b;
+    font-size: 13px;
+    position: relative;
+}
+
+.sat-topbar {
+    display: grid;
+    grid-template-columns: 170px 1fr 110px 220px auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.sat-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    color: #1f2b3d;
+}
+
+.sat-searchWrap {
+    position: relative;
+}
+
+.sat-searchWrap input {
+    width: 100%;
+    height: 32px;
+    border: 1px solid #d5ddea;
+    border-radius: 6px;
+    padding: 0 30px 0 30px;
+    font-size: 13px;
+    background: #fff;
+}
+
+.sat-searchWrap i.fa-search {
+    position: absolute;
+    left: 10px;
+    top: 9px;
+    color: #7f8da1;
+}
+
+.sat-searchWrap i.fa-caret-down {
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    color: #7f8da1;
+}
+
+.sat-selectBtn,
+.sat-lightBtn,
+.sat-iconBtn {
+    height: 32px;
+    border: 1px solid #d5ddea;
+    border-radius: 6px;
+    background: #fff;
+    color: #2d3a4b;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+.sat-weekBox {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d5ddea;
+    border-radius: 6px;
+    height: 32px;
+    background: #fff;
+}
+
+.sat-weekBox button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: #6f7d90;
+}
+
+.sat-weekBox span {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+}
+
+.sat-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.sat-iconBtn {
+    width: 32px;
+    padding: 0;
+}
+
+.sat-tableWrap {
+    flex: 1;
+    border: 1px solid #d7deea;
+    border-radius: 4px;
+    overflow: auto;
+}
+
+.sat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.sat-table th {
+    background: #d9e9fb;
+    color: #27364b;
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid #c5d5ea;
+    white-space: nowrap;
+}
+
+.sat-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e4eaf2;
+    vertical-align: middle;
+}
+
+.sat-table tbody tr:hover {
+    background: #f8fbff;
+    cursor: pointer;
+}
+
+.sat-empName {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.sat-empCode {
+    color: #7a889a;
+    font-size: 12px;
+}
+
+.sat-noteRow td {
+    color: #6f7d90;
+    padding-top: 0;
+    font-size: 12px;
+}
+
+.sat-empty {
+    text-align: center;
+    color: #6f7d90;
+    padding: 16px !important;
+}
+
+.sat-modalBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 30;
+}
+
+.sat-modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(1020px, calc(100% - 24px));
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.2);
+    padding: 14px 14px 12px;
+    z-index: 31;
+}
+
+.sat-modalClose {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    color: #516074;
+}
+
+.sat-modal h3 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.sat-detailHead {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.sat-modalFilterRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sat-modalFilterRow label {
+    font-weight: 600;
+}
+
+.sat-modalFilterRow select {
+    width: 220px;
+    height: 32px;
+    border: 1px solid #d5ddea;
+    border-radius: 6px;
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+.sat-modalTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.sat-modalTable th {
+    background: #f0f2f5;
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid #dce3ee;
+}
+
+.sat-modalTable td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e7ecf3;
+}
+
+.sat-summaryRow td {
+    background: #f8fafe;
+    font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+    .sat-topbar {
+        grid-template-columns: 1fr;
+    }
+
+    .sat-actions {
+        justify-content: flex-start;
+    }
+
+    .sat-title {
+        font-size: 22px;
+    }
+}

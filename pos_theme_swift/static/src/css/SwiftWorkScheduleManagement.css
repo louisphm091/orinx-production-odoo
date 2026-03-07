@@ -1,0 +1,370 @@
+.sws-page {
+  height: 100%;
+  background: #fff;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #2d3a4b;
+  font-size: 13px;
+  position: relative;
+}
+
+.sws-headerTitle {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sws-topbar {
+  display: grid;
+  grid-template-columns: 130px 1fr 210px 90px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.sws-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sws-searchWrap {
+  position: relative;
+}
+.sws-searchWrap input {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 30px;
+  font-size: 13px;
+}
+.sws-searchWrap i.fa-search {
+  position: absolute;
+  left: 10px;
+  top: 9px;
+  color: #7f8da1;
+}
+.sws-searchWrap i.fa-caret-down {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  color: #7f8da1;
+}
+
+.sws-weekBox {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  height: 32px;
+  background: #fff;
+}
+.sws-weekBox button {
+  border: none;
+  background: transparent;
+  width: 30px;
+  height: 30px;
+  color: #6f7d90;
+}
+.sws-weekBox span {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+}
+
+.sws-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.sws-lightBtn,
+.sws-primaryBtn {
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.sws-primaryBtn {
+  background: #2b78ff;
+  color: #fff;
+  border-color: #2b78ff;
+}
+
+.sws-tableWrap {
+  flex: 1;
+  border: 1px solid #d7deea;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+.sws-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+.sws-table th {
+  background: #d9e9fb;
+  padding: 8px;
+  border-bottom: 1px solid #c5d5ea;
+  border-right: 1px solid #dbe3ef;
+  white-space: nowrap;
+}
+
+.sws-table td {
+  padding: 6px;
+  border-bottom: 1px solid #e4eaf2;
+  border-right: 1px solid #edf1f7;
+  vertical-align: top;
+  min-height: 60px;
+}
+
+.sws-empCell {
+  width: 170px;
+}
+.sws-empName {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.sws-empCode {
+  font-size: 12px;
+  color: #7a889a;
+}
+
+.sws-dayCell {
+  min-width: 130px;
+}
+
+.sws-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sws-red {
+  background: #f9e0e0;
+  color: #cf3030;
+}
+.sws-orange {
+  background: #f5e8d5;
+  color: #a66618;
+}
+.sws-green {
+  background: #dff2e5;
+  color: #2b8a4d;
+}
+.sws-blue {
+  background: #deebff;
+  color: #2b61c9;
+}
+
+.sws-addLink {
+  color: #2b78ff;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.sws-salaryCell {
+  width: 140px;
+  text-align: right;
+}
+
+.sws-subInfo {
+  color: #7a889a;
+  font-size: 12px;
+}
+
+.sws-summaryRow td {
+  background: #f8fafe;
+  font-weight: 700;
+}
+
+.sws-salaryMain {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.sws-empty {
+  text-align: center;
+  color: #7a889a;
+  padding: 16px !important;
+}
+
+.sws-modalBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 30;
+}
+
+.sws-modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(860px, calc(100% - 20px));
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px;
+  z-index: 31;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.2);
+}
+
+.sws-smallModal {
+  width: min(640px, calc(100% - 20px));
+  z-index: 32;
+}
+
+.sws-modalClose {
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+}
+
+.sws-modal h3 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.sws-modalSub {
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #576578;
+}
+
+.sws-sectionTitle {
+  font-weight: 700;
+  margin: 8px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sws-inlineBtn {
+  border: 1px solid #d5ddea;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  background: #fff;
+}
+
+.sws-templateGrid {
+  border: 1px solid #e2e8f1;
+  border-radius: 6px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.sws-templateItem {
+  border: 1px solid #e7edf6;
+  border-radius: 6px;
+  padding: 8px;
+  display: block;
+}
+
+.sws-templateName {
+  font-weight: 700;
+}
+
+.sws-templateTime {
+  font-size: 12px;
+  color: #7a889a;
+}
+
+.sws-weekdayRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sws-weekdayBtn {
+  border: 1px solid #d5ddea;
+  border-radius: 5px;
+  background: #f3f6fa;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.sws-weekdayBtn.is-active {
+  background: #2b78ff;
+  border-color: #2b78ff;
+  color: #fff;
+}
+
+.sws-copySearch,
+.sws-formRow input,
+.sws-formRow select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d5ddea;
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+.sws-copyList {
+  border: 1px solid #e2e8f1;
+  border-radius: 6px;
+  max-height: 110px;
+  overflow: auto;
+  margin-top: 6px;
+}
+
+.sws-copyItem {
+  display: block;
+  padding: 6px 8px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 12px;
+}
+
+.sws-formRow {
+  display: grid;
+  grid-template-columns: 160px 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sws-formRow label {
+  font-weight: 600;
+}
+
+.sws-modalActions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 1100px) {
+  .sws-topbar {
+    grid-template-columns: 1fr;
+  }
+  .sws-actions {
+    justify-content: flex-start;
+  }
+  .sws-title,
+  .sws-headerTitle {
+    font-size: 22px;
+  }
+}

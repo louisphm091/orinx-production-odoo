@@ -7,34 +7,34 @@
       <!-- HEADER -->
       <div class="sp_header mb-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-          <div class="sp_brand">THEO DÕI TIẾN ĐỘ THỰC HIỆN</div>
+          <div class="sp_brand">EXECUTION PROGRESS TRACKING</div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
           <button class="btn sp_pill" type="button">
-            SKU / Nhóm SKU <i class="fa fa-angle-down ms-1"/>
+            SKU / SKU Group <i class="fa fa-angle-down ms-1"/>
           </button>
-          <button class="btn sp_pill sp_active" type="button">Tuần</button>
-          <button class="btn sp_pill" type="button">Quý <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill sp_active" type="button">Week</button>
+          <button class="btn sp_pill" type="button">Quarter <i class="fa fa-angle-down ms-1"/></button>
         </div>
       </div>
 
       <div class="sp_subheader mb-3 d-flex justify-content-between align-items-center">
         <div class="text-muted">
-          Dashboard điều hành · <b>Ngành thời trang</b> · Theo thời gian
+          Executive Dashboard · <b>Fashion Industry</b> · By Time
         </div>
         <div class="d-flex gap-2">
           <button class="btn sp_pill" type="button">
-            <i class="fa fa-calendar-o me-1"/> Tuần <i class="fa fa-angle-down ms-1"/>
+            <i class="fa fa-calendar-o me-1"/> Week <i class="fa fa-angle-down ms-1"/>
           </button>
           <button class="btn sp_pill sp_active" type="button">
-            Tháng <i class="fa fa-angle-down ms-1"/>
+            Month <i class="fa fa-angle-down ms-1"/>
           </button>
         </div>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info">Đang tải dữ liệu...</div>
+        <div class="alert alert-info">Loading data...</div>
       </t>
       <t t-elif="state.error">
         <div class="alert alert-danger"><t t-esc="state.error"/></div>
@@ -45,30 +45,30 @@
         <div class="row g-3 mb-3">
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_yellow p-3">
-              <div class="sp_kpi_title">Đạt <b><t t-esc="state.kpis.progress_percent"/>%</b> kế hoạch</div>
-              <div class="sp_kpi_hint text-muted">Rộng x tùng</div>
+              <div class="sp_kpi_title">Achieved <b><t t-esc="state.kpis.progress_percent"/>%</b> of plan</div>
+              <div class="sp_kpi_hint text-muted">Range x width</div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_red p-3">
-              <div class="sp_kpi_title">SKU đang trễ</div>
-              <div class="sp_kpi_big"><t t-esc="state.kpis.late_sku_count"/> SKU</div>
+              <div class="sp_kpi_title">Late SKUs</div>
+              <div class="sp_kpi_big"><t t-esc="state.kpis.late_sku_count"/> SKUs</div>
               <div class="text-muted small"><t t-esc="state.kpis.late_sku_names"/></div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_green p-3">
-              <div class="sp_kpi_title">SKU đúng / vượt kế hoạch</div>
-              <div class="sp_kpi_big"><t t-esc="state.kpis.ontrack_sku_count"/> SKU</div>
+              <div class="sp_kpi_title">SKUs on / above plan</div>
+              <div class="sp_kpi_big"><t t-esc="state.kpis.ontrack_sku_count"/> SKUs</div>
               <div class="text-muted small"><t t-esc="state.kpis.ontrack_sku_names"/></div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_pink p-3">
-              <div class="sp_kpi_title">Cảnh báo cần xử lý</div>
+              <div class="sp_kpi_title">Alerts needing handling</div>
               <div class="sp_kpi_big"><t t-esc="state.kpis.critical_count"/></div>
               <div class="text-muted small"><t t-esc="state.kpis.critical_hint"/></div>
             </div>
@@ -80,10 +80,10 @@
           <div class="col-12 col-lg-8">
             <div class="card p-3 sp_panel">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Tiến độ thực hiện tổng thể</div>
+                <div class="sp_panel_title">Overall Execution Progress</div>
                 <div class="d-flex align-items-center gap-3 text-muted small">
-                  <span><i class="fa fa-square me-1"/>Kế hoạch</span>
-                  <span><i class="fa fa-square me-1"/>Thực tế</span>
+                  <span><i class="fa fa-square me-1"/>Planned</span>
+                  <span><i class="fa fa-square me-1"/>Actual</span>
                 </div>
               </div>
 
@@ -96,7 +96,7 @@
           <div class="col-12 col-lg-4">
             <div class="card p-3 sp_panel h-100">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Cảnh báo &amp; rủi ro</div>
+                <div class="sp_panel_title">Alerts &amp; Risks</div>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-ellipsis-h"/>
                 </button>
@@ -118,7 +118,7 @@
 
               <div class="mt-auto pt-2">
                 <button class="btn sp_pill w-100" type="button">
-                  <i class="fa fa-tag me-1"/> Xem tất cả <i class="fa fa-angle-down ms-1"/>
+                  <i class="fa fa-tag me-1"/> See All <i class="fa fa-angle-down ms-1"/>
                 </button>
               </div>
             </div>
@@ -130,7 +130,7 @@
           <div class="col-12 col-lg-8">
             <div class="card p-3 sp_panel">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Tiến độ theo SKU / đơn</div>
+                <div class="sp_panel_title">Progress by SKU / Order</div>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-ellipsis-h"/>
                 </button>
@@ -186,8 +186,8 @@
           <div class="col-12 col-lg-4">
             <div class="card p-3 sp_panel h-100">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Lịch sử thực hiện &amp; xu hướng</div>
-                <button class="btn sp_pill" type="button">Xem chi tiết <i class="fa fa-angle-down ms-1"/></button>
+                <div class="sp_panel_title">Execution History &amp; Trends</div>
+                <button class="btn sp_pill" type="button">View Details <i class="fa fa-angle-down ms-1"/></button>
               </div>
 
               <div class="position-relative mb-2" style="height: 170px;">

@@ -9,6 +9,74 @@ class PosDashboardSwift(models.AbstractModel):
     _name = 'pos.dashboard.swift'
     _description = 'POS Dashboard Logic for Swift'
 
+    def _partner_phone_value(self, partner):
+        if not partner:
+            return ''
+        if 'phone' in partner._fields and partner.phone:
+            return partner.phone
+        if 'mobile' in partner._fields and partner.mobile:
+            return partner.mobile
+        return ''
+
+    def _write_partner_phone(self, partner, phone):
+        if not partner:
+            return
+        vals = {}
+        if 'phone' in partner._fields:
+            vals['phone'] = phone
+        if 'mobile' in partner._fields:
+            vals['mobile'] = phone
+        if vals:
+            partner.sudo().write(vals)
+
+    def _to_float_amount(self, value, default=0.0):
+        if value in (None, False, ''):
+            return default
+        if isinstance(value, (int, float)):
+            return float(value)
+        s = str(value).strip()
+        if not s:
+            return default
+        s = s.replace(' ', '')
+        filtered = ''.join(ch for ch in s if ch.isdigit() or ch in ',.-')
+        if not filtered:
+            return default
+        # Support common VN number formats: 1.000.000 or 1,000,000
+        if filtered.count('.') > 1 and ',' not in filtered:
+            filtered = filtered.replace('.', '')
+        if filtered.count(',') > 1 and '.' not in filtered:
+            filtered = filtered.replace(',', '')
+        if ',' in filtered and '.' in filtered:
+            if filtered.rfind(',') > filtered.rfind('.'):
+                filtered = filtered.replace('.', '').replace(',', '.')
+            else:
+                filtered = filtered.replace(',', '')
+        elif ',' in filtered:
+            filtered = filtered.replace(',', '.')
+        try:
+            return float(filtered)
+        except Exception:
+            return default
+
+    def _to_date_value(self, value):
+        if not value:
+            return False
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, str):
+            raw = value.strip()
+            if not raw:
+                return False
+            for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+                try:
+                    return datetime.strptime(raw, fmt).date()
+                except Exception:
+                    continue
+        try:
+            return fields.Date.to_date(value)
+        except Exception:
+            return False
+
     @api.model
     def get_dashboard_data(self, filter_key='today'):
         # 1. Determine date ranges
@@ -116,14 +184,14 @@ class PosDashboardSwift(models.AbstractModel):
         now = fields.Datetime.now()
         diff = now - dt
         if diff.days > 0:
-            return _('%s ngày trước') % diff.days
+            return _('%s days ago') % diff.days
         hours = diff.seconds // 3600
         if hours > 0:
-            return _('%s giờ trước') % hours
+            return _('%s hours ago') % hours
         mins = (diff.seconds % 3600) // 60
         if mins > 0:
-            return _('%s phút trước') % mins
-        return _('vừa xong')
+            return _('%s minutes ago') % mins
+        return _('just now')
 
     def _get_top_products(self, start, end):
         domain = [('order_id.date_order', '>=', start), ('order_id.date_order', '<=', end), ('order_id.state', 'in', ['paid', 'done', 'invoiced'])]
@@ -231,19 +299,36 @@ class PosDashboardSwift(models.AbstractModel):
 
     @api.model
     def get_inventory_detail(self, inventory_id):
-        """Load an existing swift.stock.inventory record including lines."""
+        """Load an existing swift.stock.inventory record including lines.
+
+        qty_on_hand is returned as the LIVE current stock (from stock.quant),
+        not the stored snapshot, so col-num always reflects the real on-hand
+        quantity after any adjustments.
+        """
         try:
             inv = self.env['swift.stock.inventory'].browse(inventory_id)
             if not inv.exists():
                 return False
+
+            # Pre-fetch current quant quantities for all products in one query.
+            product_ids = inv.line_ids.mapped('product_id').ids
+            quants = self.env['stock.quant'].search([
+                ('product_id', 'in', product_ids),
+                ('location_id.usage', '=', 'internal'),
+            ])
+            live_qty = {}
+            for q in quants:
+                live_qty[q.product_id.id] = live_qty.get(q.product_id.id, 0.0) + q.quantity
+
             lines = []
             for line in inv.line_ids:
+                pid = line.product_id.id
                 lines.append({
-                    'product_id': line.product_id.id,
+                    'product_id': pid,
                     'product_name': line.product_id.display_name,
                     'barcode': line.product_id.barcode or '',
                     'uom': line.product_id.uom_id.name if line.product_id.uom_id else '',
-                    'qty_on_hand': line.qty_on_hand,
+                    'qty_on_hand': live_qty.get(pid, 0.0),   # live stock — not stored snapshot
                     'qty_actual': line.qty_actual,
                     'diff': line.diff,
                     'diff_value': line.diff_value,
@@ -523,7 +608,7 @@ class PosDashboardSwift(models.AbstractModel):
 
         return {
             'user_name': user.name,
-            'branch_name': config.name if config else 'Chi nhánh',
+            'branch_name': config.name if config else _('Branch'),
             'status': status,
             'stats': self.get_shift_stats(),
         }
@@ -613,3 +698,820 @@ class PosDashboardSwift(models.AbstractModel):
                 'note': s.note or '',
             })
         return res
+
+    # ──────────────────────────────────────────────────────────────
+    # Paycheck (Bảng lương) helpers
+    # ──────────────────────────────────────────────────────────────
+
+    def _fmt_date_vi(self, value):
+        if not value:
+            return ''
+        return value.strftime('%d/%m/%Y')
+
+    def _fmt_datetime_vi(self, value):
+        if not value:
+            return ''
+        local_dt = fields.Datetime.context_timestamp(self, value)
+        return local_dt.strftime('%d/%m/%Y %H:%M:%S')
+
+    @api.model
+    def get_paycheck_records(self, keyword=''):
+        domain = []
+        kw = (keyword or '').strip()
+        if kw:
+            domain += ['|', '|',
+                ('name', 'ilike', kw),
+                ('title', 'ilike', kw),
+                ('branch_name', 'ilike', kw),
+            ]
+
+        state_map = {
+            'draft': _('Đang tạo'),
+            'temporary': _('Tạm tính'),
+            'finalized': _('Đã chốt lương'),
+            'cancelled': _('Đã hủy'),
+        }
+        cycle_map = {
+            'monthly': _('Hàng tháng'),
+        }
+
+        records = self.env['swift.paycheck'].search(domain, order='date_from desc, id desc', limit=200)
+        result = []
+        for rec in records:
+            payslips = []
+            for line in rec.line_ids.sorted('id'):
+                payslips.append({
+                    'id': line.id,
+                    'code': line.name,
+                    'employee': line.user_id.name or '',
+                    'salary': line.amount,
+                    'paid': line.paid_amount,
+                    'remaining': line.remaining_amount,
+                })
+
+            history = []
+            for pay in sorted(rec.payment_ids, key=lambda p: p.payment_time or fields.Datetime.now(), reverse=True):
+                history.append({
+                    'id': pay.id,
+                    'time': self._fmt_datetime_vi(pay.payment_time),
+                    'method': _('Tiền mặt') if pay.method == 'cash' else _('Chuyển khoản'),
+                    'amount': pay.amount,
+                    'note': pay.note or '',
+                    'user': pay.user_id.name or '',
+                })
+
+            result.append({
+                'id': rec.id,
+                'code': rec.name,
+                'name': rec.title,
+                'cycle': cycle_map.get(rec.cycle, rec.cycle),
+                'period': f"{self._fmt_date_vi(rec.date_from)} - {self._fmt_date_vi(rec.date_to)}",
+                'branch': rec.branch_name or '',
+                'totalSalary': rec.total_salary,
+                'paidToEmployee': rec.paid_amount,
+                'remaining': rec.remaining_amount,
+                'status': state_map.get(rec.state, rec.state),
+                'createdAt': self._fmt_datetime_vi(rec.create_date),
+                'createdBy': rec.create_uid.name or '',
+                'preparedBy': rec.create_uid.name or '',
+                'employeeCount': rec.employee_count,
+                'scope': _('Tất cả nhân viên'),
+                'finalizedBy': rec.write_uid.name if rec.state == 'finalized' else '',
+                'note': rec.note or '',
+                'lastUpdated': self._fmt_datetime_vi(rec.write_date),
+                'payslips': payslips,
+                'history': history,
+            })
+        return result
+
+    @api.model
+    def action_create_paycheck(self):
+        paycheck = self.env['swift.paycheck'].create_default_paycheck()
+        return {
+            'id': paycheck.id,
+            'code': paycheck.name,
+        }
+
+    @api.model
+    def action_paycheck_pay(self, paycheck_id, method='cash', note=''):
+        paycheck = self.env['swift.paycheck'].browse(int(paycheck_id))
+        if not paycheck.exists():
+            return {'ok': False, 'message': _('Paycheck not found')}
+
+        remaining = paycheck.remaining_amount
+        if remaining <= 0:
+            return {'ok': False, 'message': _('No remaining amount to pay')}
+
+        self.env['swift.paycheck.payment'].create({
+            'paycheck_id': paycheck.id,
+            'amount': remaining,
+            'method': method if method in ('cash', 'bank') else 'cash',
+            'note': note or '',
+        })
+
+        for line in paycheck.line_ids:
+            if line.remaining_amount > 0:
+                line.paid_amount = line.amount
+
+        paycheck.state = 'finalized'
+        return {'ok': True}
+
+    # ──────────────────────────────────────────────────────────────
+    # Attendance (Bảng chấm công) helpers
+    # ──────────────────────────────────────────────────────────────
+
+    def _get_attendance_staff_users(self, keyword=''):
+        group_ids = []
+        grp_user = self.env.ref("point_of_sale.group_pos_user", raise_if_not_found=False)
+        grp_manager = self.env.ref("point_of_sale.group_pos_manager", raise_if_not_found=False)
+        if grp_user:
+            group_ids.append(grp_user.id)
+        if grp_manager:
+            group_ids.append(grp_manager.id)
+
+        domain = [('active', '=', True), ('share', '=', False)]
+        if group_ids:
+            domain.append(('group_ids', 'in', group_ids))
+        if keyword:
+            domain += ['|', ('name', 'ilike', keyword), ('login', 'ilike', keyword)]
+        users = self.env['res.users'].sudo().search(domain, order='name asc')
+
+        # Keep current internal user visible in HR-like submenus even when
+        # group assignment was recently changed and cache/session is stale.
+        current_user = self.env.user.sudo()
+        if current_user.exists() and current_user.active and not current_user.share:
+            matched_keyword = True
+            if keyword:
+                kw = (keyword or '').strip().lower()
+                matched_keyword = kw in (current_user.name or '').lower() or kw in (current_user.login or '').lower()
+            if matched_keyword and current_user not in users:
+                users |= current_user
+
+        return users.sorted(lambda u: (u.name or '').lower())
+
+    def _get_week_range_from_offset(self, week_offset=0):
+        today = fields.Date.context_today(self)
+        monday = today - timedelta(days=today.weekday()) + timedelta(days=7 * int(week_offset or 0))
+        sunday = monday + timedelta(days=6)
+        return monday, sunday
+
+    @api.model
+    def get_attendance_overview(self, week_offset=0, keyword=''):
+        start_date, end_date = self._get_week_range_from_offset(week_offset)
+        try:
+            start_dt = datetime.combine(start_date, datetime.min.time())
+            end_dt = datetime.combine(end_date, datetime.max.time())
+
+            users = self._get_attendance_staff_users(keyword)
+            shifts = self.env['swift.staff.shift'].sudo().search([
+                ('employee_id', 'in', users.ids),
+                ('check_in', '>=', fields.Datetime.to_string(start_dt)),
+                ('check_in', '<=', fields.Datetime.to_string(end_dt)),
+            ], order='check_in asc')
+
+            by_user = {}
+            for shift in shifts:
+                by_user.setdefault(shift.employee_id.id, []).append(shift)
+
+            has_employee_model = 'hr.employee' in self.env
+            has_contract_model = 'hr.contract' in self.env
+            rows = []
+
+            for user in users:
+                user_shifts = by_user.get(user.id, [])
+                worked_hours = 0.0
+                worked_dates = set()
+
+                for s in user_shifts:
+                    if s.check_in:
+                        worked_dates.add(fields.Datetime.context_timestamp(self, s.check_in).date())
+                    if s.state == 'done' and s.duration:
+                        worked_hours += s.duration
+                    elif s.state == 'active' and s.check_in:
+                        now = fields.Datetime.now()
+                        diff = now - s.check_in
+                        worked_hours += max(diff.total_seconds(), 0.0) / 3600.0
+
+                worked_days = len(worked_dates)
+                off_days = max(7 - worked_days, 0)
+                overtime = max(worked_hours - (worked_days * 8.0), 0.0)
+
+                employee_code = f"NV{str(user.id).zfill(6)}"
+                salary_type = _('Chưa thiết lập')
+                if has_employee_model:
+                    employee = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
+                    if employee:
+                        employee_code = employee.barcode or employee.identification_id or employee_code
+                        if has_contract_model:
+                            contract = self.env['hr.contract'].sudo().search([
+                                ('employee_id', '=', employee.id),
+                                ('state', 'in', ['open', 'running']),
+                            ], order='date_start desc, id desc', limit=1)
+                            if contract:
+                                salary_type = _('Theo ngày công chuẩn')
+
+                rows.append({
+                    'userId': user.id,
+                    'employeeName': user.name,
+                    'employeeCode': employee_code,
+                    'salaryType': salary_type,
+                    'workedDays': worked_days,
+                    'workedHours': round(worked_hours, 2),
+                    'offDays': off_days,
+                    'late': 0,
+                    'early': 0,
+                    'overtime': round(overtime, 2),
+                    'hasData': bool(user_shifts),
+                })
+        except Exception as e:
+            _logger.exception("get_attendance_overview failed: %s", e)
+            rows = []
+
+        return {
+            'weekStart': fields.Date.to_string(start_date),
+            'weekEnd': fields.Date.to_string(end_date),
+            'weekLabel': _('Tuần %s - Th %s %s') % (start_date.isocalendar().week, start_date.month, start_date.year),
+            'rows': rows,
+        }
+
+    @api.model
+    def get_attendance_employee_detail(self, user_id, week_start, week_end):
+        try:
+            user = self.env['res.users'].sudo().browse(int(user_id))
+            if not user.exists():
+                return {'ok': False, 'message': _('Employee not found')}
+
+            start_date = fields.Date.to_date(week_start)
+            end_date = fields.Date.to_date(week_end)
+            start_dt = datetime.combine(start_date, datetime.min.time())
+            end_dt = datetime.combine(end_date, datetime.max.time())
+
+            pos_config = self.env['pos.config'].sudo().search([], limit=1)
+            branch_name = pos_config.name if pos_config else _('Chi nhánh trung tâm')
+
+            shifts = self.env['swift.staff.shift'].sudo().search([
+                ('employee_id', '=', user.id),
+                ('check_in', '>=', fields.Datetime.to_string(start_dt)),
+                ('check_in', '<=', fields.Datetime.to_string(end_dt)),
+            ], order='check_in asc')
+
+            rows = []
+            total_hours = 0.0
+            for s in shifts:
+                check_in_local = fields.Datetime.context_timestamp(self, s.check_in) if s.check_in else False
+                check_out_local = fields.Datetime.context_timestamp(self, s.check_out) if s.check_out else False
+
+                hours = s.duration or 0.0
+                if s.state == 'active' and s.check_in:
+                    now = fields.Datetime.now()
+                    hours = max((now - s.check_in).total_seconds(), 0.0) / 3600.0
+                total_hours += hours
+
+                time_range = '--:--'
+                if check_in_local and check_out_local:
+                    time_range = f"{check_in_local.strftime('%H:%M')} - {check_out_local.strftime('%H:%M')}"
+                elif check_in_local:
+                    time_range = f"{check_in_local.strftime('%H:%M')} - --:--"
+
+                rows.append({
+                    'date': check_in_local.strftime('%d/%m/%Y') if check_in_local else '',
+                    'dayType': _('Ngày thường'),
+                    'shiftName': s.note or _('Ca làm việc'),
+                    'branch': branch_name,
+                    'timeRange': time_range,
+                    'hours': round(hours, 2),
+                    'workday': round(hours / 8.0, 2),
+                })
+
+            employee_code = f"NV{str(user.id).zfill(6)}"
+            if 'hr.employee' in self.env:
+                employee = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
+                if employee:
+                    employee_code = employee.barcode or employee.identification_id or employee_code
+
+            return {
+                'ok': True,
+                'employeeName': user.name,
+                'employeeCode': employee_code,
+                'from': start_date.strftime('%d/%m/%Y'),
+                'to': end_date.strftime('%d/%m/%Y'),
+                'totalHours': round(total_hours, 2),
+                'totalDays': round(total_hours / 8.0, 2),
+                'rows': rows,
+            }
+        except Exception as e:
+            _logger.exception("get_attendance_employee_detail failed: %s", e)
+            return {'ok': False, 'message': _('Cannot load employee attendance detail')}
+
+    @api.model
+    def action_approve_attendance(self, week_start, week_end, user_id=False):
+        """Approve attendance records (done shifts) for a week."""
+        try:
+            start_date = fields.Date.to_date(week_start)
+            end_date = fields.Date.to_date(week_end)
+            base_domain = [
+                ('state', 'in', ['done', 'active']),
+                ('check_in', '!=', False),
+            ]
+            if user_id:
+                base_domain.append(('employee_id', '=', int(user_id)))
+            else:
+                # Keep approval scope aligned with attendance table scope.
+                users = self._get_attendance_staff_users('')
+                base_domain.append(('employee_id', 'in', users.ids))
+
+            all_candidates = self.env['swift.staff.shift'].sudo().search(base_domain)
+            total_in_week = self.env['swift.staff.shift'].sudo().browse()
+            for s in all_candidates:
+                local_in = fields.Datetime.context_timestamp(self, s.check_in).date() if s.check_in else False
+                if local_in and start_date <= local_in <= end_date:
+                    total_in_week |= s
+
+            shifts = total_in_week.filtered(lambda s: not s.is_approved)
+            already_count = len(total_in_week) - len(shifts)
+
+            if not shifts:
+                return {'ok': True, 'count': 0, 'already_count': already_count}
+
+            shifts.write({
+                'is_approved': True,
+                'approved_by': self.env.user.id,
+                'approved_at': fields.Datetime.now(),
+            })
+            return {'ok': True, 'count': len(shifts), 'already_count': already_count}
+        except Exception as e:
+            _logger.exception("action_approve_attendance failed: %s", e)
+            return {'ok': False, 'count': 0}
+
+    # ──────────────────────────────────────────────────────────────
+    # Work Schedule (Lịch làm việc) helpers
+    # ──────────────────────────────────────────────────────────────
+
+    def _schedule_day_label(self, day):
+        labels = {
+            0: _('Thứ hai'),
+            1: _('Thứ ba'),
+            2: _('Thứ tư'),
+            3: _('Thứ năm'),
+            4: _('Thứ sáu'),
+            5: _('Thứ bảy'),
+            6: _('Chủ nhật'),
+        }
+        return labels.get(day.weekday(), '')
+
+    def _get_user_contract_wage(self, user):
+        if 'hr.employee' not in self.env or 'hr.contract' not in self.env:
+            return 0.0
+        employee = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
+        if not employee:
+            return 0.0
+        contract = self.env['hr.contract'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('state', 'in', ['open', 'running']),
+        ], order='date_start desc, id desc', limit=1)
+        return (contract.wage or 0.0) if contract else 0.0
+
+    @api.model
+    def get_work_schedule_overview(self, week_offset=0, keyword=''):
+        start_date, end_date = self._get_week_range_from_offset(week_offset)
+        users = self._get_attendance_staff_users(keyword)
+
+        days = []
+        day = start_date
+        while day <= end_date:
+            days.append({
+                'date': fields.Date.to_string(day),
+                'label': self._schedule_day_label(day),
+                'day': day.day,
+                'weekdayIndex': day.weekday(),
+            })
+            day += timedelta(days=1)
+
+        lines = self.env['swift.work.schedule.line'].sudo().search([
+            ('employee_id', 'in', users.ids),
+            ('date', '>=', start_date),
+            ('date', '<=', end_date),
+        ], order='date asc, id asc')
+
+        by_emp_date = {}
+        for line in lines:
+            by_emp_date.setdefault(line.employee_id.id, {}).setdefault(fields.Date.to_string(line.date), []).append({
+                'id': line.id,
+                'name': line.shift_template_id.name,
+                'start': line.shift_template_id.start_hour,
+                'end': line.shift_template_id.end_hour,
+                'color': line.shift_template_id.color_class or 'blue',
+                'duration': line.shift_template_id.duration_hours or 0.0,
+            })
+
+        rows = []
+        for user in users:
+            emp_code = f"NV{str(user.id).zfill(6)}"
+            if 'hr.employee' in self.env:
+                employee = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
+                if employee:
+                    emp_code = employee.barcode or employee.identification_id or emp_code
+
+            day_data = by_emp_date.get(user.id, {})
+            total_hours = 0.0
+            total_shifts = 0
+            for d in day_data.values():
+                for s in d:
+                    total_hours += s.get('duration', 0.0)
+                    total_shifts += 1
+
+            wage = self._get_user_contract_wage(user)
+            estimated_salary = 0.0
+            if wage > 0 and total_hours > 0:
+                estimated_salary = (wage / 208.0) * total_hours
+
+            rows.append({
+                'userId': user.id,
+                'employeeName': user.name,
+                'employeeCode': emp_code,
+                'dayData': day_data,
+                'estimatedSalary': estimated_salary,
+                'salaryConfigured': wage > 0,
+                'shiftCount': total_shifts,
+            })
+
+        templates = self.env['swift.work.shift.template'].sudo().search([], order='id desc')
+        template_data = []
+        for t in templates:
+            template_data.append({
+                'id': t.id,
+                'name': t.name,
+                'startHour': t.start_hour,
+                'endHour': t.end_hour,
+                'checkinStartHour': t.checkin_start_hour,
+                'checkinEndHour': t.checkin_end_hour,
+                'color': t.color_class or 'blue',
+            })
+
+        return {
+            'weekStart': fields.Date.to_string(start_date),
+            'weekEnd': fields.Date.to_string(end_date),
+            'weekLabel': _('Tuần %s - Th %s %s') % (start_date.isocalendar().week, start_date.month, start_date.year),
+            'days': days,
+            'rows': rows,
+            'templates': template_data,
+        }
+
+    @api.model
+    def save_work_schedule(self, employee_id, base_date, template_ids=None, apply_weekly=False, weekday_indexes=None, copy_employee_ids=None):
+        template_ids = template_ids or []
+        weekday_indexes = weekday_indexes or []
+        copy_employee_ids = copy_employee_ids or []
+
+        emp_ids = [int(employee_id)] + [int(x) for x in copy_employee_ids if x]
+        target_dates = []
+        date_obj = fields.Date.to_date(base_date)
+        target_dates.append(date_obj)
+
+        if apply_weekly and weekday_indexes:
+            start = date_obj - timedelta(days=date_obj.weekday())
+            end = start + timedelta(days=6)
+            d = start
+            wanted = {int(x) for x in weekday_indexes}
+            while d <= end:
+                if d.weekday() in wanted and d not in target_dates:
+                    target_dates.append(d)
+                d += timedelta(days=1)
+
+        for emp_id in emp_ids:
+            for d in target_dates:
+                self.env['swift.work.schedule.line'].sudo().search([
+                    ('employee_id', '=', emp_id),
+                    ('date', '=', d),
+                ]).unlink()
+
+                for tmpl_id in template_ids:
+                    tmpl = self.env['swift.work.shift.template'].sudo().browse(int(tmpl_id))
+                    if tmpl.exists():
+                        self.env['swift.work.schedule.line'].sudo().create({
+                            'employee_id': emp_id,
+                            'date': d,
+                            'shift_template_id': tmpl.id,
+                            'branch_name': tmpl.branch_name or '',
+                        })
+        return {'ok': True}
+
+    @api.model
+    def create_work_shift_template(self, vals):
+        vals = vals or {}
+        rec = self.env['swift.work.shift.template'].sudo().create({
+            'name': vals.get('name') or _('Ca mới'),
+            'start_hour': float(vals.get('start_hour') or 0.0),
+            'end_hour': float(vals.get('end_hour') or 0.0),
+            'checkin_start_hour': float(vals.get('checkin_start_hour') or 0.0),
+            'checkin_end_hour': float(vals.get('checkin_end_hour') or 0.0),
+            'branch_name': vals.get('branch_name') or '',
+            'color_class': vals.get('color') if vals.get('color') in ('red', 'orange', 'green', 'blue') else 'blue',
+        })
+        return {'id': rec.id}
+
+    # ──────────────────────────────────────────────────────────────
+    # Employee (Nhân viên) helpers
+    # ──────────────────────────────────────────────────────────────
+
+    def _generate_unique_employee_code(self, user):
+        profile_model = self.env['swift.employee.profile'].sudo()
+        base_code = f"NV{str(user.id).zfill(6)}"
+        if not profile_model.search_count([('employee_code', '=', base_code)]):
+            return base_code
+        index = 1
+        while True:
+            candidate = f"{base_code}-{index}"
+            if not profile_model.search_count([('employee_code', '=', candidate)]):
+                return candidate
+            index += 1
+
+    def _ensure_employee_profile(self, user):
+        profile_model = self.env['swift.employee.profile'].sudo()
+        profile = profile_model.search([('user_id', '=', user.id)], limit=1)
+        if profile:
+            return profile
+        generated_code = self._generate_unique_employee_code(user)
+        values = {
+            'user_id': user.id,
+            'employee_code': generated_code,
+            'attendance_code': generated_code,
+            'phone': self._partner_phone_value(user.partner_id),
+            'work_branch': _('Chi nhánh trung tâm'),
+            'pay_branch': _('Chi nhánh trung tâm'),
+        }
+        try:
+            with self.env.cr.savepoint():
+                return profile_model.create(values)
+        except Exception as e:
+            _logger.warning("_ensure_employee_profile create failed for user %s: %s", user.id, e)
+            # Handle race condition or legacy duplicate data without crashing UI RPC.
+            profile = profile_model.search([('user_id', '=', user.id)], limit=1)
+            if profile:
+                return profile
+            with self.env.cr.savepoint():
+                values['employee_code'] = self._generate_unique_employee_code(user)
+                values['attendance_code'] = values['employee_code']
+                return profile_model.create(values)
+
+    @api.model
+    def get_employee_list_data(self, keyword='', status='working'):
+        try:
+            users = self._get_attendance_staff_users(keyword)
+
+            # Also include users that already have employee profiles, even if POS
+            # group membership is not fully synced yet.
+            profile_domain = [('user_id.active', '=', True), ('user_id.share', '=', False)]
+            if status in ('working', 'off'):
+                profile_domain.append(('status', '=', status))
+            if keyword:
+                profile_domain += ['|', '|', '|',
+                    ('user_id.name', 'ilike', keyword),
+                    ('user_id.login', 'ilike', keyword),
+                    ('employee_code', 'ilike', keyword),
+                    ('attendance_code', 'ilike', keyword),
+                ]
+            prof_users = self.env['swift.employee.profile'].sudo().search(profile_domain).mapped('user_id')
+            users |= prof_users
+
+            rows = []
+            for user in users.sorted(lambda u: (u.name or '').lower()):
+                profile = self._ensure_employee_profile(user)
+                if status == 'working' and profile.status != 'working':
+                    continue
+                if status == 'off' and profile.status != 'off':
+                    continue
+
+                if not profile.id_number and 'hr.employee' in self.env:
+                    emp = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
+                    if emp and emp.identification_id:
+                        profile.id_number = emp.identification_id
+
+                rows.append({
+                    'userId': user.id,
+                    'employeeCode': profile.employee_code,
+                    'attendanceCode': profile.attendance_code or profile.employee_code,
+                    'employeeName': user.name,
+                    'phone': profile.phone or '',
+                    'idNumber': profile.id_number or '',
+                    'debtAdvance': profile.debt_advance_balance,
+                    'note': '',
+                    'status': profile.status,
+                })
+            return {'rows': rows}
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.exception("get_employee_list_data failed: %s", e)
+            return {'rows': []}
+
+    @api.model
+    def get_employee_detail_data(self, user_id):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self._ensure_employee_profile(user)
+
+        # schedule matrix this week
+        week_start, week_end = self._get_week_range_from_offset(0)
+        days = []
+        d = week_start
+        while d <= week_end:
+            days.append({'date': fields.Date.to_string(d), 'label': self._schedule_day_label(d), 'day': d.day})
+            d += timedelta(days=1)
+
+        lines = self.env['swift.work.schedule.line'].sudo().search([
+            ('employee_id', '=', user.id),
+            ('date', '>=', week_start),
+            ('date', '<=', week_end),
+        ], order='date asc')
+        shifts = []
+        by_shift = {}
+        for l in lines:
+            sid = l.shift_template_id.id
+            if sid not in by_shift:
+                by_shift[sid] = {
+                    'id': sid,
+                    'name': l.shift_template_id.name,
+                    'time': f"{int(l.shift_template_id.start_hour):02d}:00 - {int(l.shift_template_id.end_hour):02d}:00",
+                    'days': [],
+                }
+            by_shift[sid]['days'].append(fields.Date.to_string(l.date))
+        shifts = list(by_shift.values())
+
+        # payslips from paycheck lines
+        payslip_rows = []
+        paycheck_lines = self.env['swift.paycheck.line'].sudo().search([('user_id', '=', user.id)], order='id desc', limit=12)
+        for ln in paycheck_lines:
+            p = ln.paycheck_id
+            payslip_rows.append({
+                'code': ln.name,
+                'period': f"{self._fmt_date_vi(p.date_from)} - {self._fmt_date_vi(p.date_to)}",
+                'total': ln.amount,
+                'paid': ln.paid_amount,
+                'remaining': ln.remaining_amount,
+                'status': p.state,
+            })
+
+        finance_rows = []
+        for f in profile.finance_line_ids.sorted(lambda x: x.date or fields.Date.today(), reverse=True):
+            finance_rows.append({
+                'date': fields.Date.to_string(f.date),
+                'type': f.line_type,
+                'amount': f.amount,
+                'note': f.note or '',
+            })
+
+        return {
+            'ok': True,
+            'profile': {
+                'employeeCode': profile.employee_code,
+                'attendanceCode': profile.attendance_code or profile.employee_code,
+                'name': user.name,
+                'phone': profile.phone or '',
+                'idNumber': profile.id_number or '',
+                'birthDate': fields.Date.to_string(profile.birth_date) if profile.birth_date else '',
+                'gender': profile.gender or '',
+                'workBranch': profile.work_branch or '',
+                'payBranch': profile.pay_branch or '',
+                'department': profile.department or '',
+                'jobTitle': profile.job_title or '',
+                'salaryType': profile.salary_type,
+                'salaryAmount': profile.salary_amount,
+                'advancedSetting': profile.advanced_setting,
+                'overtimeEnabled': profile.overtime_enabled,
+                'debtAdvance': profile.debt_advance_balance,
+            },
+            'days': days,
+            'scheduleShifts': shifts,
+            'payslips': payslip_rows,
+            'financeRows': finance_rows,
+        }
+
+    @api.model
+    def get_available_employee_users(self, keyword=''):
+        domain = [('active', '=', True), ('share', '=', False)]
+        if keyword:
+            domain += ['|', ('name', 'ilike', keyword), ('login', 'ilike', keyword)]
+        users = self.env['res.users'].sudo().search(domain, order='name asc', limit=200)
+
+        profile_model = self.env['swift.employee.profile'].sudo()
+        profile_by_user = {
+            p.user_id.id: p for p in profile_model.search([('user_id', 'in', users.ids)])
+        } if users else {}
+
+        rows = []
+        for user in users:
+            profile = profile_by_user.get(user.id)
+            if profile and profile.status == 'working':
+                # already active in this employee system
+                continue
+            rows.append({
+                'userId': user.id,
+                'name': user.name,
+                'login': user.login or '',
+                'phone': self._partner_phone_value(user.partner_id),
+            })
+        return {'rows': rows}
+
+    @api.model
+    def create_employee_record(self, vals):
+        vals = vals or {}
+        try:
+            selected_user_id = vals.get('userId')
+            name = (vals.get('name') or '').strip()
+            if not name and not selected_user_id:
+                return {'ok': False, 'message': _('Name is required')}
+
+            phone = (vals.get('phone') or '').strip()
+            pos_group = self.env.ref('point_of_sale.group_pos_user', raise_if_not_found=False)
+            if selected_user_id:
+                user = self.env['res.users'].sudo().browse(int(selected_user_id))
+                if not user.exists():
+                    return {'ok': False, 'message': _('Employee not found')}
+            else:
+                login = phone or f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
+                if self.env['res.users'].sudo().with_context(active_test=False).search_count([('login', '=', login)]):
+                    login = f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
+
+                user_vals = {
+                    'name': name,
+                    'login': login,
+                    'active': True,
+                    'share': False,
+                }
+                if pos_group:
+                    user_vals['group_ids'] = [(4, pos_group.id)]
+
+                with self.env.cr.savepoint():
+                    try:
+                        user = self.env['res.users'].sudo().create(user_vals)
+                    except Exception:
+                        # Fallback for race/legacy duplicate login edge cases.
+                        user_vals['login'] = f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
+                        user = self.env['res.users'].sudo().create(user_vals)
+
+            if pos_group:
+                user.sudo().write({'group_ids': [(4, pos_group.id)]})
+            if name:
+                user.sudo().write({'name': name})
+            self._write_partner_phone(user.partner_id, phone)
+
+            profile = self._ensure_employee_profile(user)
+            if selected_user_id and profile.status == 'working':
+                return {'ok': False, 'message': _('User is already in employee list')}
+            profile.sudo().write({
+                'phone': phone,
+                'id_number': vals.get('idNumber') or '',
+                'birth_date': self._to_date_value(vals.get('birthDate')),
+                'gender': vals.get('gender') or False,
+                'work_branch': vals.get('workBranch') or _('Chi nhánh trung tâm'),
+                'pay_branch': vals.get('payBranch') or _('Chi nhánh trung tâm'),
+                'status': 'working',
+                'salary_type': vals.get('salaryType') or 'hour',
+                'salary_amount': self._to_float_amount(vals.get('salaryAmount'), 0.0),
+                'advanced_setting': bool(vals.get('advancedSetting')),
+                'overtime_enabled': bool(vals.get('overtimeEnabled')),
+            })
+            return {'ok': True, 'userId': user.id, 'createdNewUser': not bool(selected_user_id)}
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.exception("create_employee_record failed: %s", e)
+            return {'ok': False, 'message': _('Cannot create employee')}
+
+    @api.model
+    def update_employee_salary_setup(self, user_id, vals):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self._ensure_employee_profile(user)
+        profile.sudo().write({
+            'salary_type': vals.get('salaryType') or profile.salary_type,
+            'salary_amount': self._to_float_amount(vals.get('salaryAmount'), 0.0),
+            'advanced_setting': bool(vals.get('advancedSetting')),
+            'overtime_enabled': bool(vals.get('overtimeEnabled')),
+        })
+        return {'ok': True}
+
+    @api.model
+    def add_employee_finance_entry(self, user_id, line_type, amount, note=''):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self._ensure_employee_profile(user)
+        self.env['swift.employee.finance.line'].sudo().create({
+            'profile_id': profile.id,
+            'line_type': line_type if line_type in ('debt', 'advance', 'payment') else 'advance',
+            'amount': float(amount or 0.0),
+            'note': note or '',
+        })
+        return {'ok': True}
+
+    @api.model
+    def action_set_employee_status(self, user_id, status='off'):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        status_value = status if status in ('working', 'off') else 'off'
+        profile = self._ensure_employee_profile(user)
+        profile.sudo().write({'status': status_value})
+        return {'ok': True, 'status': status_value}

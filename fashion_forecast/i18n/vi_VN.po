@@ -1,0 +1,235 @@
+#. module: fashion_forecast
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-06 06:18+0000\n"
+"PO-Revision-Date: 2026-03-06 06:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "DEMAND FORECAST"
+msgstr "DỰ BÁO NHU CẦU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry"
+msgstr "Dự báo số lượng nhu cầu theo sản phẩm, thời gian và kịch bản để phục vụ kế hoạch cung ứng ngành thời trang"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Month"
+msgstr "Tháng"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "This Month"
+msgstr "Tháng này"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Next Month"
+msgstr "Tháng sau"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Refresh Forecast"
+msgstr "Làm mới dự báo"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Women's Fashion"
+msgstr "Thời trang nữ"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Men's Fashion"
+msgstr "Thời trang nam"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "SKU Group / SKU"
+msgstr "Nhóm SKU / SKU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "SKU Group"
+msgstr "Nhóm SKU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "SKU"
+msgstr "SKU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Week"
+msgstr "Tuần"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Quarter"
+msgstr "Quý"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Loading data..."
+msgstr "Đang tải dữ liệu..."
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Forecast Demand"
+msgstr "Nhu Cầu Dự Báo"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid " compared to last period"
+msgstr " so với kỳ trước"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Highest Demand SKU"
+msgstr "SKU Nhu Cầu Cao Nhất"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid " total demand"
+msgstr " tổng nhu cầu"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Stockout Risk"
+msgstr "Nguy Cơ Thiếu Hàng"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Manually Adjusted"
+msgstr "Đã Điều Chỉnh Thủ Công"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Yes"
+msgstr "Có"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "No"
+msgstr "Không"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Last update:"
+msgstr "Lần cập nhật:"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Demand Forecast over time"
+msgstr "Dự báo nhu cầu theo thời gian"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Demand Forecast by SKU"
+msgstr "Dự báo nhu cầu theo SKU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Category"
+msgstr "Danh Mục"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Demand"
+msgstr "Nhu Cầu"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Actual"
+msgstr "Thực Tế"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "No data yet"
+msgstr "Chưa có dữ liệu"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "View Details"
+msgstr "Xem Chi Tiết"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Forecast by SKU"
+msgstr "Dự báo theo SKU"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Shortage"
+msgstr "Thiếu"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "7 days"
+msgstr "7 ngày"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Use forecast results for:"
+msgstr "Sử dụng kết quả dự báo cho:"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Purchase Planning"
+msgstr "Lập kế hoạch đặt hàng"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Production Planning"
+msgstr "Lập kế hoạch sản xuất"
+
+#. module: fashion_forecast
+#. odoo-xml
+#: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.xml:0
+msgid "Inventory Balancing"
+msgstr "Cân đối tồn kho"

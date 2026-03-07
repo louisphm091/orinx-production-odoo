@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
-  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1" t-translation="off">
+  <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1">
 
     <xpath expr="//div[contains(@class,'payment-screen')]/div[contains(@class,'main-content')][1]" position="before">
       <div class="sapphire-navbar sapphire-navbar--payment">
@@ -10,7 +10,7 @@
             <input class="scp-search-input"
                    type="search"
                    t-att-value="pos.searchProductWord || ''"
-                   placeholder="Tìm hàng hóa (F3)"
+                   placeholder="Search products (F3)"
                    t-on-input="onSapphireSearchInput"
                    t-on-keydown="onSapphireSearchKeydown"/>
 
@@ -32,7 +32,7 @@
                 </div>
               </t>
               <t t-else="">
-                <div class="results-empty">Không tìm thấy sản phẩm</div>
+                <div class="results-empty">Product not found</div>
               </t>
             </div>
           </div>

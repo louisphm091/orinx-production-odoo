@@ -3,6 +3,7 @@
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { _t } from "@web/core/l10n/translation";
 
 const BottomBarMixin = {
   _sppGetPos() {
@@ -30,7 +31,7 @@ const BottomBarMixin = {
       (Array.isArray(partner) ? partner[1] : null) ||
       null;
 
-    return name || "Khách lẻ";
+    return name || _t("Walking Customer");
   },
 
   _sppSaleModeKey() {
@@ -139,3 +140,4 @@ const BottomBarMixin = {
 
 patch(PaymentScreen.prototype, BottomBarMixin);
 patch(ProductScreen.prototype, BottomBarMixin);
+

@@ -4,6 +4,8 @@ import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
+import { _t } from "@web/core/l10n/translation";
+
 class AnalyticsDashboard extends Component {
   static template = "sale_planning.AnalyticsDashboard";
 
@@ -22,7 +24,7 @@ class AnalyticsDashboard extends Component {
     this.state = useState({
       loading: true,
       error: null,
-      filters: { segment: "Thời trang nữ", sku_mode: "SKU", time_grain: "Tháng" },
+      filters: { segment: _t("Women's Fashion"), sku_mode: "SKU", time_grain: _t("Month") },
 
       kpis: null,
       behavior_chart: null,
@@ -88,7 +90,7 @@ class AnalyticsDashboard extends Component {
       this.renderAllCharts();
     } catch (e) {
       console.error(e);
-      this.state.error = "Không tải được dữ liệu Phân tích & Báo cáo.";
+      this.state.error = _t("Failed to load Analytics & Reports data.");
       this.notification.add(this.state.error, { type: "danger" });
     } finally {
       this.state.loading = false;
@@ -183,7 +185,7 @@ class AnalyticsDashboard extends Component {
     this.donutChart = new Chart(canvas.getContext("2d"), {
       type: "doughnut",
       data: {
-        labels: ["Nguyên giá", "Sale"],
+        labels: [_t("Full Price"), _t("Sale")],
         datasets: [{
           data: [mix.full_price || 0, mix.sale || 0],
           borderWidth: 0,

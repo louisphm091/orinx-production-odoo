@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 import random
 from datetime import date
 
@@ -93,12 +93,12 @@ class SalePlanningDashboard(models.AbstractModel):
             "last_update": fields.Datetime.to_string(fields.Datetime.now()),
         }
 
-        # ---------- MAIN LINE CHART (trend theo tháng) ----------
-        labels = ["Tháng 01", "Tháng 02", "Tháng 03", "Tháng 04", "Tháng 05", "Tháng 06"]
+        # ---------- MAIN LINE CHART (trend by month) ----------
+        labels = [_("Jan"), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun")]
         base = max(2000, int(demand_total / 6))
         demand_series = [int(base * f) for f in [0.75, 0.82, 0.90, 0.95, 1.02, 1.08]]
         plan_series = [int(v * random.uniform(0.75, 0.92)) for v in demand_series]
-        risk_band = [int(v * 0.12) for v in demand_series]  # “rủi ro thiếu”
+        risk_band = [int(v * 0.12) for v in demand_series]  # "out of stock risk"
 
         main_chart = {
             "labels": labels,
@@ -107,19 +107,19 @@ class SalePlanningDashboard(models.AbstractModel):
             "risk": risk_band,
         }
 
-        # ---------- CATEGORY BAR (Doanh thu dự báo theo danh mục) ----------
-        # Mock "triệu" (tr)
-        # lấy 3 category chính từ product line
+        # ---------- CATEGORY BAR (Forecast Revenue by Category) ----------
+        # Mock "Millions" (M)
+        # pick 3 main categories from product line
         cat_map = {}
         for p in products:
-            cat_name = (p.categ_id.name if p.categ_id else "Khác")
+            cat_name = (p.categ_id.name if p.categ_id else _("Other"))
             cat_map.setdefault(cat_name, 0)
             cat_map[cat_name] += random.randint(40, 180)
 
         # pick top 3
         top_cats = sorted(cat_map.items(), key=lambda x: x[1], reverse=True)[:3]
         if not top_cats:
-            top_cats = [("Quần jean nữ", 420), ("Áo thun nam", 310), ("Váy công sở", 180)]
+            top_cats = [(_("Women's Jeans"), 420), (_("Men's T-shirt"), 310), (_("Office Dress"), 180)]
 
         rev_rows = []
         palette = ["#10b981", "#60a5fa", "#fb923c"]
@@ -152,9 +152,9 @@ class SalePlanningDashboard(models.AbstractModel):
                 "hint": {
                     "sku_name": focus["sku_name"],
                     "days_left": days_left,
-                    "message": f"Hết hàng sau {days_left} ngày nếu hiện tại",
+                    "message": _("Out of stock in %s days if current trend continues") % days_left,
                 },
-                "growth_note": f"Tăng {random.choice([16,18,20])}% so với hiện tại",
+                "growth_note": _("Increase %s%% compared to current") % random.choice([16,18,20]),
             }
         else:
             inventory_forecast = None
@@ -169,7 +169,7 @@ class SalePlanningDashboard(models.AbstractModel):
                 "demand": r["demand"],
                 "onhand": r["onhand"],
                 "plan_buy": r["plan_buy"],
-                "status": "Nguy cơ thiếu hàng" if r["risk"] else "Ổn định",
+                "status": _("Out of Stock Risk") if r["risk"] else _("Stable"),
             })
 
         return {

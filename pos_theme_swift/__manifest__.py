@@ -19,11 +19,13 @@ Developed and maintained by Orinx.
     'author': 'Orinx',
     'company': 'Orinx',
     'website': 'https://orinx.com.vn',
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale', 'stock'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
+        'data/stock_alert_cron.xml',
         'views/SwiftReportMenu.xml',
+        'views/SwiftProductLowStock.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -43,6 +45,18 @@ Developed and maintained by Orinx.
             'pos_theme_swift/static/src/js/SwiftShiftManagement.js',
             'pos_theme_swift/static/src/xml/SwiftShiftManagement.xml',
             'pos_theme_swift/static/src/css/SwiftShiftManagement.css',
+            'pos_theme_swift/static/src/js/SwiftPaycheckManagement.js',
+            'pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml',
+            'pos_theme_swift/static/src/css/SwiftPaycheckManagement.css',
+            'pos_theme_swift/static/src/js/SwiftAttendanceManagement.js',
+            'pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml',
+            'pos_theme_swift/static/src/css/SwiftAttendanceManagement.css',
+            'pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js',
+            'pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml',
+            'pos_theme_swift/static/src/css/SwiftWorkScheduleManagement.css',
+            'pos_theme_swift/static/src/js/SwiftEmployeeManagement.js',
+            'pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml',
+            'pos_theme_swift/static/src/css/SwiftEmployeeManagement.css',
         ],
         'point_of_sale._assets_pos': [
             'pos_theme_swift/static/src/js/PosAppPatch.js',

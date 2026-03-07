@@ -7,16 +7,16 @@
       <!-- HEADER -->
       <div class="sp_rep_header d-flex justify-content-between align-items-start mb-3">
         <div>
-          <div class="sp_rep_title">QUẢN LÝ ĐẶT HÀNG BỔ SUNG</div>
+          <div class="sp_rep_title">REPLENISHMENT MANAGEMENT</div>
           <div class="sp_rep_sub text-muted">
-            Theo dõi – phê duyệt – kiểm soát các đề xuất bổ sung hàng dựa trên dự báo &amp; tồn kho
+            Track – Approve – Control replenishment suggestions based on forecast &amp; inventory
           </div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <button class="btn sp_pill" type="button">Thời trang nữ <i class="fa fa-angle-down ms-1"/></button>
-          <button class="btn sp_pill" type="button">Kho HCM <i class="fa fa-angle-down ms-1"/></button>
-          <button class="btn sp_pill" type="button">Tháng <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill" type="button">Women's Fashion <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill" type="button">HCM Warehouse <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill" type="button">Month <i class="fa fa-angle-down ms-1"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-envelope-o"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-angle-down"/></button>
         </div>
@@ -24,13 +24,13 @@
 
       <!-- TOP ACTIONS -->
       <div class="d-flex justify-content-end gap-2 mb-3">
-        <button class="btn sp_pill" type="button"><i class="fa fa-search me-1"/> Trang bài</button>
-        <button class="btn sp_pill" type="button"><i class="fa fa-cog me-1"/> Cài đặt ngưỡng tồn kho</button>
-        <button class="btn sp_pill" type="button"><i class="fa fa-download me-1"/> Xuất CSV</button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-search me-1"/> Article Page</button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-cog me-1"/> Stock Threshold Settings</button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-download me-1"/> Export CSV</button>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info">Đang tải dữ liệu...</div>
+        <div class="alert alert-info">Loading data...</div>
       </t>
       <t t-elif="state.error">
         <div class="alert alert-danger"><t t-esc="state.error"/></div>
@@ -43,10 +43,10 @@
             <div class="card sp_card p-3">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <div class="sp_kpi_label">Tổng số đề xuất</div>
-                  <div class="sp_kpi_value"><t t-esc="state.kpis.total_suggestions"/> đề xuất</div>
+                  <div class="sp_kpi_label">Total Suggestions</div>
+                  <div class="sp_kpi_value"><t t-esc="state.kpis.total_suggestions"/> suggestions</div>
                   <div class="sp_kpi_hint text-muted">
-                    <i class="fa fa-arrow-up text-success me-1"/><t t-esc="state.kpis.delta_vs_last_week"/> so với tuần trước
+                    <i class="fa fa-arrow-up text-success me-1"/><t t-esc="state.kpis.delta_vs_last_week"/> vs last week
                   </div>
                 </div>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
@@ -61,8 +61,8 @@
 
           <div class="col-12 col-lg-3">
             <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label"><i class="fa fa-exclamation-triangle text-warning me-1"/>Nguy cơ thiếu hàng</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.risk_skus"/> SKU</div>
+              <div class="sp_kpi_label"><i class="fa fa-exclamation-triangle text-warning me-1"/>Out of Stock Risk</div>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.risk_skus"/> SKUs</div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.risk_hint"/></div>
               <div class="sp_img_hint">🧺</div>
             </div>
@@ -70,8 +70,8 @@
 
           <div class="col-12 col-lg-3">
             <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label">Chờ duyệt</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.pending"/> đề xuất</div>
+              <div class="sp_kpi_label">Pending Approval</div>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.pending"/> suggestions</div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.pending_hint"/></div>
               <div class="sp_img_hint">🧾</div>
             </div>
@@ -79,8 +79,8 @@
 
           <div class="col-12 col-lg-3">
             <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label">Đã đặt hàng</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.ordered"/> đơn</div>
+              <div class="sp_kpi_label">Ordered</div>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.ordered"/> orders</div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.ordered_hint"/></div>
               <div class="sp_img_hint">📦</div>
             </div>
@@ -92,39 +92,39 @@
           <div class="col-12 col-lg-8">
             <div class="card sp_card p-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_section_title">Danh sách đề xuất đặt hàng bổ sung</div>
+                <div class="sp_section_title">Replenishment Suggestion List</div>
 
                 <div class="d-flex align-items-center gap-2">
                   <div class="sp_search">
                     <i class="fa fa-search"/>
                     <input t-model="state.search" placeholder="Search..." />
                   </div>
-                  <button class="btn sp_pill" type="button">Tất cả <i class="fa fa-angle-down ms-1"/></button>
+                  <button class="btn sp_pill" type="button">All <i class="fa fa-angle-down ms-1"/></button>
                 </div>
               </div>
 
               <div class="d-flex gap-2 mb-2">
-                <button class="btn sp_pill" type="button">Trạng thái: Tất cả <i class="fa fa-angle-down ms-1"/></button>
-                <button class="btn sp_pill" type="button">Filt <i class="fa fa-angle-down ms-1"/></button>
+                <button class="btn sp_pill" type="button">Status: All <i class="fa fa-angle-down ms-1"/></button>
+                <button class="btn sp_pill" type="button">Filter <i class="fa fa-angle-down ms-1"/></button>
               </div>
 
               <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0 sp_table">
                   <thead class="text-muted small">
                     <tr>
-                      <th>SKU / Sản phẩm</th>
-                      <th>Danh mục</th>
-                      <th>Kho</th>
-                      <th class="text-end">Tồn hiện tại</th>
-                      <th class="text-end">Dự báo 30 ngày</th>
-                      <th class="text-end">SL đề xuất bổ sung</th>
-                      <th class="text-end">Trạng thái</th>
+                      <th>SKU / Product</th>
+                      <th>Category</th>
+                      <th>Warehouse</th>
+                      <th class="text-end">Current Stock</th>
+                      <th class="text-end">30-day Forecast</th>
+                      <th class="text-end">Sug. Rep. Qty</th>
+                      <th class="text-end">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <t t-set="rows" t-value="filteredRows()"/>
                     <t t-if="!rows.length">
-                      <tr><td colspan="7" class="text-muted">Chưa có dữ liệu</td></tr>
+                      <tr><td colspan="7" class="text-muted">No data</td></tr>
                     </t>
                     <t t-else="">
                       <t t-foreach="rows" t-as="r" t-key="r.key">
@@ -154,7 +154,7 @@
               </div>
 
               <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
-                <div>10 / trang</div>
+                <div>10 / page</div>
                 <div class="d-flex gap-1">
                   <button class="btn btn-sm btn-light">‹</button>
                   <button class="btn btn-sm btn-light">1</button>
@@ -170,7 +170,7 @@
           <div class="col-12 col-lg-4">
             <div class="card sp_card p-3 h-100 sp_side">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="text-muted small">Đề xuất bổ sung</div>
+                <div class="text-muted small">Replenishment Suggestion</div>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-times"/>
                 </button>
@@ -188,33 +188,33 @@
                 <div class="sp_side_img">🧺</div>
               </div>
 
-              <div class="sp_block_title">Phân tích đề xuất</div>
+              <div class="sp_block_title">Proposal Analysis</div>
               <div class="sp_kv">
                 <div class="sp_kv_row">
-                  <div class="text-muted">Tồn kho hiện tại</div>
+                  <div class="text-muted">Current Stock</div>
                   <div class="fw-semibold"><t t-esc="state.detail.analysis.onhand"/></div>
                 </div>
                 <div class="sp_kv_row">
-                  <div class="text-muted">Dự báo bán 30 ngày</div>
+                  <div class="text-muted">30-day Sales Forecast</div>
                   <div class="fw-semibold"><t t-esc="state.detail.analysis.forecast_30d"/></div>
                 </div>
                 <div class="sp_kv_row">
-                  <div class="text-muted">Điểm re-order</div>
+                  <div class="text-muted">Reorder Point</div>
                   <div class="sp_tag_plus">+<t t-esc="state.detail.analysis.reorder_point"/></div>
                 </div>
               </div>
 
-              <div class="sp_block_title mt-3">Lý do bổ sung</div>
+              <div class="sp_block_title mt-3">Replenishment Reason</div>
               <div class="text-muted small">
                 <t t-esc="state.detail.reason"/>
               </div>
 
               <div class="mt-auto pt-3 d-flex gap-2">
-                <button class="btn btn-success flex-fill" type="button">Phê duyệt</button>
-                <button class="btn btn-outline-secondary flex-fill" type="button">Chỉnh sửa số lượng</button>
+                <button class="btn btn-success flex-fill" type="button">Approve</button>
+                <button class="btn btn-outline-secondary flex-fill" type="button">Edit Quantity</button>
               </div>
               <div class="text-end mt-2">
-                <button class="btn btn-link text-danger" type="button">Từ chối</button>
+                <button class="btn btn-link text-danger" type="button">Reject</button>
               </div>
             </div>
           </div>

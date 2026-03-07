@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, useState, onMounted, onPatched, onWillUnmount, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SwiftPosSalesDashboard extends Component {
   static template = "pos_theme_swift.SwiftPosSalesDashboard";
@@ -14,7 +15,7 @@ export class SwiftPosSalesDashboard extends Component {
     this.state = useState({
       loading: true,
       filter: "today",
-      filterLabel: "Hôm nay",
+      filterLabel: _t("Today"),
       tab: "day",
 
       kpi: { revenue: 0, refund: 0, net: 0, orders: 0 },
@@ -53,7 +54,7 @@ export class SwiftPosSalesDashboard extends Component {
 
   formatCompact(v) {
     const n = Number(v || 0);
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} tr`;
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} M`;
     if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
     return `${n}`;
   }
@@ -66,10 +67,10 @@ export class SwiftPosSalesDashboard extends Component {
 
   setFilter(key) {
     const labels = {
-      today: "Hôm nay",
-      yesterday: "Hôm qua",
-      this_week: "Tuần này",
-      this_month: "Tháng này",
+      today: _t("Today"),
+      yesterday: _t("Yesterday"),
+      this_week: _t("This Week"),
+      this_month: _t("This Month"),
     };
     this._setFilter(key, labels[key] || key);
   }
@@ -89,6 +90,10 @@ export class SwiftPosSalesDashboard extends Component {
     this.state.tab = tab;
     this.onRefresh();
   }
+
+  setTabDay() { this.setTab("day"); }
+  setTabHour() { this.setTab("hour"); }
+  setTabWeekday() { this.setTab("weekday"); }
 
   onTopModeChanged() { this.onRefresh(); }
   onTopRangeChanged() { this.onRefresh(); }
@@ -177,3 +182,4 @@ export class SwiftPosSalesDashboard extends Component {
 
 // register client action tag
 registry.category("actions").add("pos_theme_swift.swift_pos_sales_dashboard", SwiftPosSalesDashboard);
+

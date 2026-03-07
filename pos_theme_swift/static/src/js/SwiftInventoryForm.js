@@ -2,6 +2,7 @@
 
 import { Component, useState, onMounted, useRef } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SwiftInventoryForm extends Component {
   static template = "pos_theme_swift.SwiftInventoryForm";
@@ -30,7 +31,7 @@ export class SwiftInventoryForm extends Component {
       showDropdown: false,
       note: "",
       status: "draft",
-      autoCode: "Mã phiếu tự động",
+      autoCode: _t("Auto code"),
       totalQtyActual: 0,
       sessionProducts: [],
       lines: [],
@@ -77,7 +78,7 @@ export class SwiftInventoryForm extends Component {
     try {
       const rec = await this.orm.call("pos.dashboard.swift", "get_inventory_detail", [id]);
       if (rec) {
-        this.state.autoCode = rec.name || "Mã phiếu tự động";
+        this.state.autoCode = rec.name || _t("Auto code");
         this.state.status = rec.state || "draft";
         this.state.note = rec.note || "";
         this.state.lines = (rec.lines || []).map((l) => ({
@@ -294,13 +295,13 @@ export class SwiftInventoryForm extends Component {
     try {
       const rows = await this._parseFile(file);
       if (!rows || rows.length === 0) {
-        this.notification.add("File không có dữ liệu hàng hóa.", { type: "warning", title: "Nhập file" });
+        this.notification.add(_t("File has no product data."), { type: "warning", title: _t("Import file") });
         return;
       }
       await this._importRows(rows);
     } catch (e) {
       console.error("[SwiftInventoryForm] onFileChange:", e);
-      this.notification.add("Lỗi khi đọc file. Vui lòng kiểm tra định dạng.", { type: "danger", title: "Nhập file" });
+      this.notification.add(_t("Error reading file. Please check format."), { type: "danger", title: _t("Import file") });
     } finally {
       this.state.importing = false;
     }
@@ -399,7 +400,7 @@ export class SwiftInventoryForm extends Component {
     // Extract barcode + qty pairs
     const items = rows.map((r) => this._extractRowData(r)).filter(Boolean);
     if (!items.length) {
-      this.notification.add("Không tìm thấy cột mã hàng trong file.", { type: "warning", title: "Nhập file" });
+      this.notification.add(_t("Barcode column not found in file."), { type: "warning", title: _t("Import file") });
       return;
     }
 
@@ -415,7 +416,7 @@ export class SwiftInventoryForm extends Component {
       );
     } catch (e) {
       console.error("[SwiftInventoryForm] get_products_by_barcodes:", e);
-      this.notification.add("Không thể kết nối server để tra cứu sản phẩm.", { type: "danger" });
+      this.notification.add(_t("Cannot connect to server for product lookup."), { type: "danger" });
       return;
     }
 
@@ -462,13 +463,13 @@ export class SwiftInventoryForm extends Component {
 
     if (notFound > 0) {
       this.notification.add(
-        `Đã nhập ${found} sản phẩm. ${notFound} mã hàng không tìm thấy trong hệ thống.`,
-        { type: "warning", title: "Nhập file" }
+        _t("Imported %s products. %s codes not found in system.", found, notFound),
+        { type: "warning", title: _t("Import file") }
       );
     } else {
       this.notification.add(
-        `Đã nhập ${found} sản phẩm thành công.`,
-        { type: "success", title: "Nhập file" }
+        _t("Imported %s products successfully.", found),
+        { type: "success", title: _t("Import file") }
       );
     }
   }
@@ -492,14 +493,30 @@ export class SwiftInventoryForm extends Component {
         state,
         lines,
       }]);
-      const label = state === "done" ? "Đã hoàn thành kiểm kho." : "Đã lưu phiếu tạm.";
-      this.notification.add(label, { type: "success", title: "Kiểm kho" });
+      const label = state === "done" ? _t("Inventory completed.") : _t("Draft voucher saved.");
+      this.notification.add(label, { type: "success", title: _t("Inventory") });
+
+      // After validation, the server has set on-hand = qty_actual for each line.
+      // Sync the local state so col-num (qty_on_hand) shows the updated value
+      // and diff / diff_value both become 0 (no more discrepancy).
+      if (state === "done") {
+        for (const line of this.state.lines) {
+          line.qty_on_hand = line.qty_actual;
+          line.diff = 0;
+          line.diff_value = 0;
+        }
+        this.state.status = "done";
+        this._applyFilter();
+      }
+
       if (this.props.onSaved) this.props.onSaved(result);
     } catch (e) {
       console.error("[SwiftInventoryForm] _submit failed:", e);
-      this.notification.add("Lỗi khi lưu phiếu kiểm kho.", { type: "danger", title: "Lỗi" });
+      this.notification.add(_t("Error saving inventory voucher."), { type: "danger", title: _t("Error") });
     } finally {
       this.state.saving = false;
     }
   }
+
 }
+

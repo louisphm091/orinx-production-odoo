@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SalePlanningDashboard extends Component {
     static template = "sale_planning.Dashboard";
@@ -78,7 +79,7 @@ export class SalePlanningDashboard extends Component {
             this._scheduleRenderAllCharts();
         } catch (e) {
             console.error(e);
-            this.state.error = "Không tải được dữ liệu Sale Planning dashboard.";
+            this.state.error = _t("Failed to load Sale Planning dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;
@@ -89,7 +90,7 @@ export class SalePlanningDashboard extends Component {
     _getChart() {
         const Chart = window.Chart;
         if (!Chart) {
-            console.warn("Chart.js chưa load -> kiểm tra assets + path chart.umd.min.js");
+            console.warn("Chart.js not loaded -> check assets + path chart.umd.min.js");
             return null;
         }
         return Chart;
@@ -128,9 +129,9 @@ export class SalePlanningDashboard extends Component {
             data: {
                 labels,
                 datasets: [
-                    { label: "Nhu cầu", data: demand, tension: 0.35, fill: true },
-                    { label: "Kế hoạch mua", data: plan, tension: 0.35, fill: false, borderDash: [6, 4] },
-                    { label: "Rủi ro thiếu", data: risk, tension: 0.35, fill: false, borderDash: [2, 6] },
+                    { label: _t("Demand"), data: demand, tension: 0.35, fill: true },
+                    { label: _t("Supply Plan"), data: plan, tension: 0.35, fill: false, borderDash: [6, 4] },
+                    { label: _t("Out of Stock Risk"), data: risk, tension: 0.35, fill: false, borderDash: [2, 6] },
                 ],
             },
             options: {
@@ -175,7 +176,7 @@ export class SalePlanningDashboard extends Component {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => `${this.formatNumber(ctx.raw)} tr` } },
+                    tooltip: { callbacks: { label: (ctx) => `${this.formatNumber(ctx.raw)} M` } },
                 },
                 scales: {
                     x: { grid: { display: false }, border: { display: false } },
@@ -201,13 +202,13 @@ export class SalePlanningDashboard extends Component {
                 datasets: [
                     {
                         type: "bar",
-                        label: "Tồn kho",
+                        label: _t("Inventory"),
                         data: inv.onhand_series || [],
                         borderRadius: 8,
                     },
                     {
                         type: "line",
-                        label: "Xu hướng",
+                        label: _t("Trend"),
                         data: inv.trend_series || [],
                         borderDash: [6, 4],
                         tension: 0.45,

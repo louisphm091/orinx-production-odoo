@@ -5,11 +5,11 @@
     <div class="o_swift_pos_report">
       <!-- Header -->
       <div class="swift-pageHead">
-        <h2 class="swift-pageTitle">Kết quả bán hàng hôm nay</h2>
+        <h2 class="swift-pageTitle">Today's Sales Results</h2>
 
         <div class="swift-headActions">
           <button type="button" class="btn btn-light swift-btn" t-on-click="onRefresh">
-            <i class="fa fa-refresh me-1"/> Làm mới
+            <i class="fa fa-refresh me-1"/> Refresh
           </button>
 
           <div class="dropdown">
@@ -17,17 +17,17 @@
               <t t-esc="state.filterLabel"/>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" t-on-click="setFilterToday">Hôm nay</a></li>
-              <li><a class="dropdown-item" t-on-click="setFilterYesterday">Hôm qua</a></li>
-              <li><a class="dropdown-item" t-on-click="setFilterThisWeek">Tuần này</a></li>
-              <li><a class="dropdown-item" t-on-click="setFilterThisMonth">Tháng này</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterToday">Today</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterYesterday">Yesterday</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisWeek">This Week</a></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisMonth">This Month</a></li>
             </ul>
           </div>
         </div>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info m-0">Đang tải dữ liệu...</div>
+        <div class="alert alert-info m-0">Loading data...</div>
       </t>
 
       <t t-if="!state.loading">
@@ -36,16 +36,16 @@
           <div class="swift-kpiCard">
             <div class="swift-kpiTop">
               <div class="swift-kpiIcon is-blue"><i class="fa fa-usd"/></div>
-              <div class="swift-kpiTitle">Doanh thu</div>
+              <div class="swift-kpiTitle">Revenue</div>
             </div>
             <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.revenue)"/></div>
-            <div class="swift-kpiSub"><t t-esc="state.kpi.orders"/> hóa đơn</div>
+            <div class="swift-kpiSub"><t t-esc="state.kpi.orders"/> invoices</div>
           </div>
 
           <div class="swift-kpiCard">
             <div class="swift-kpiTop">
               <div class="swift-kpiIcon is-orange"><i class="fa fa-undo"/></div>
-              <div class="swift-kpiTitle">Trả hàng</div>
+              <div class="swift-kpiTitle">Refunds</div>
             </div>
             <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.refund)"/></div>
             <div class="swift-kpiSub"> </div>
@@ -54,19 +54,19 @@
           <div class="swift-kpiCard">
             <div class="swift-kpiTop">
               <div class="swift-kpiIcon is-red"><i class="fa fa-arrow-down"/></div>
-              <div class="swift-kpiTitle">Doanh thu thuần</div>
+              <div class="swift-kpiTitle">Net Revenue</div>
             </div>
             <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.net)"/></div>
-            <div class="swift-kpiSub">So với hôm qua</div>
+            <div class="swift-kpiSub">Compared to yesterday</div>
           </div>
 
           <div class="swift-kpiCard">
             <div class="swift-kpiTop">
               <div class="swift-kpiIcon is-gray"><i class="fa fa-file-text-o"/></div>
-              <div class="swift-kpiTitle">Hóa đơn</div>
+              <div class="swift-kpiTitle">Invoices</div>
             </div>
             <div class="swift-kpiValue"><t t-esc="state.kpi.orders"/></div>
-            <a href="#" class="swift-link" t-on-click.prevent="openOrders">Xem danh sách</a>
+            <a href="#" class="swift-link" t-on-click.prevent="openOrders">View List</a>
           </div>
         </div>
 
@@ -76,14 +76,14 @@
           <div class="swift-card swift-card--net">
             <div class="swift-cardHead">
               <div>
-                <div class="swift-cardTitle">Doanh thu thuần</div>
+                <div class="swift-cardTitle">Net Revenue</div>
                 <div class="swift-cardBig"><t t-esc="formatVND(state.kpi.net)"/></div>
               </div>
 
               <div class="swift-tabs">
-                <button type="button" t-att-class="state.tab==='day' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabDay">Theo ngày</button>
-                <button type="button" t-att-class="state.tab==='hour' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabHour">Theo giờ</button>
-                <button type="button" t-att-class="state.tab==='weekday' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabWeekday">Theo thứ</button>
+                <button type="button" t-att-class="state.tab==='day' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabDay">By Day</button>
+                <button type="button" t-att-class="state.tab==='hour' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabHour">By Hour</button>
+                <button type="button" t-att-class="state.tab==='weekday' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabWeekday">By Weekday</button>
               </div>
             </div>
 
@@ -97,14 +97,14 @@
           <!-- Recent activity -->
           <div class="swift-card swift-card--activity">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle">Hoạt động gần đây</div>
+              <div class="swift-cardTitle">Recent Activity</div>
             </div>
             <div class="swift-cardBody swift-activityList">
               <t t-foreach="state.recent_orders" t-as="o" t-key="o.id">
                 <div class="swift-activityItem">
                   <div class="swift-activityLeft">
                     <div class="swift-activityName"><t t-esc="o.partner"/></div>
-                    <div class="swift-activitySub">vừa bán đơn hàng</div>
+                    <div class="swift-activitySub">just sold an order</div>
                   </div>
                   <div class="swift-activityRight">
                     <div class="swift-activityAmt"><t t-esc="formatVND(o.amount_total)"/></div>
@@ -121,16 +121,16 @@
           <!-- Top products -->
           <div class="swift-card swift-card--topprod">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle">Top 10 hàng bán chạy</div>
+              <div class="swift-cardTitle">Top 10 Best Sellers</div>
               <div class="swift-selects">
                 <select class="form-select form-select-sm" t-model="state.topProductsMode" t-on-change="onTopModeChanged">
-                  <option value="revenue">Theo doanh thu</option>
-                  <option value="qty">Theo số lượng</option>
+                  <option value="revenue">By Revenue</option>
+                  <option value="qty">By Quantity</option>
                 </select>
                 <select class="form-select form-select-sm" t-model="state.topProductsRange" t-on-change="onTopRangeChanged">
-                  <option value="this_month">Tháng này</option>
-                  <option value="this_week">Tuần này</option>
-                  <option value="today">Hôm nay</option>
+                  <option value="this_month">This Month</option>
+                  <option value="this_week">This Week</option>
+                  <option value="today">Today</option>
                 </select>
               </div>
             </div>
@@ -151,11 +151,11 @@
           <!-- Placeholder customers -->
           <div class="swift-card swift-card--customers">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle">Top 10 khách mua nhiều nhất</div>
-              <span class="swift-pill">Hôm qua</span>
+              <div class="swift-cardTitle">Top 10 Top Customers</div>
+              <span class="swift-pill">Yesterday</span>
             </div>
             <div class="swift-cardBody">
-              <div class="text-muted">Bạn có thể bổ sung bảng / chart khách hàng ở đây.</div>
+              <div class="text-muted">You can add customer tables / charts here.</div>
             </div>
           </div>
         </div>
@@ -165,3 +165,4 @@
   </t>
 
 </templates>
+

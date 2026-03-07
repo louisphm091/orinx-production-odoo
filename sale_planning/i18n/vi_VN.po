@@ -1,0 +1,48 @@
+#. module: sale_planning
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-06 06:20+0000\n"
+"PO-Revision-Date: 2026-03-06 06:20+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: sale_planning
+#: model:ir.actions.client,name:sale_planning.action_sale_planning_dashboard
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_dashboard
+msgid "Supply Planning"
+msgstr "Kế hoạch cung ứng"
+
+#. module: sale_planning
+#: model:ir.actions.client,name:sale_planning.action_sale_schedule_dashboard
+#: model:ir.ui.menu,name:sale_planning.menu_sale_schedule_dashboard
+msgid "Sales Scheduling"
+msgstr "Lên Lịch Bán Hàng"
+
+#. module: sale_planning
+#: model:ir.actions.client,name:sale_planning.action_sale_planning_dashboard_progress
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_dashboard_progress
+msgid "Progress Tracking"
+msgstr "Theo dõi tiến độ thực hiện"
+
+#. module: sale_planning
+#: model:ir.actions.client,name:sale_planning.action_sale_planning_analytics
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_analytics
+msgid "Analytics & Reports"
+msgstr "Phân tích & Báo cáo"
+
+#. module: sale_planning
+#: model:ir.actions.client,name:sale_planning.action_sale_planning_replenishment
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_replenishment
+msgid "Replenishment Management"
+msgstr "Quản lý đặt hàng bổ sung"
+
+#. module: sale_planning
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_dashboard
+msgid "Supply Planning / Purchase"
+msgstr "Kế hoạch cung ứng / Mua hàng"

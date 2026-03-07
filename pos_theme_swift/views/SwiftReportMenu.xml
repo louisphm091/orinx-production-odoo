@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="action_swift_pos_report_client" model="ir.actions.client">
-        <field name="name">Báo Cáo</field>
+        <field name="name">Reports</field>
         <field name="tag">pos_theme_swift.swift_pos_sales_dashboard</field>
     </record>
 
     <record id="action_swift_pos_inventory_management" model = "ir.actions.client">
-        <field name="name">Hàng Hoá</field>
+        <field name="name">Inventory</field>
         <field name="tag">pos_theme_swift.swift_pos_inventory_management</field>
     </record>
 
     <record id = "action_swift_pos_stock_transfer" model = "ir.actions.client">
-        <field name="name">Chuyển Hàng</field>
+        <field name="name">Stock Transfer</field>
         <field name="tag">pos_theme_swift.swift_pos_stock_transfer</field>
     </record>
 
     <record id="action_swift_pos_shift_management" model="ir.actions.client">
-        <field name="name">Ca làm việc</field>
+        <field name="name">Shift Management</field>
         <field name="tag">pos_theme_swift.swift_pos_shift_management</field>
+    </record>
+    <record id="action_swift_pos_paycheck_management" model="ir.actions.client">
+        <field name="name">Paycheck</field>
+        <field name="tag">pos_theme_swift.swift_pos_paycheck_management</field>
+    </record>
+    <record id="action_swift_pos_attendance_management" model="ir.actions.client">
+        <field name="name">Attendance</field>
+        <field name="tag">pos_theme_swift.swift_pos_attendance_management</field>
+    </record>
+    <record id="action_swift_pos_work_schedule_management" model="ir.actions.client">
+        <field name="name">Work Schedule</field>
+        <field name="tag">pos_theme_swift.swift_pos_work_schedule_management</field>
+    </record>
+    <record id="action_swift_pos_employee_management" model="ir.actions.client">
+        <field name="name">Employee</field>
+        <field name="tag">pos_theme_swift.swift_pos_employee_management</field>
     </record>
 
     <!-- ... existing records ... -->
@@ -31,7 +47,7 @@
 
     <menuitem
         id="menu_swift_pos_report"
-        name="Báo Cáo"
+        name="Reports"
         parent="point_of_sale.menu_point_root"
         action="pos_theme_swift.action_swift_pos_report_client"
         sequence="110"
@@ -40,14 +56,14 @@
 
     <menuitem
         id="menu_swift_pos_goods"
-        name="Hàng Hoá"
+        name="Inventory"
         parent="point_of_sale.menu_point_root"
         sequence="115"
     />
 
     <menuitem
         id="menu_swift_pos_inventory"
-        name="Kiểm Kho"
+        name="Stock Count"
         parent="menu_swift_pos_goods"
         action="pos_theme_swift.action_swift_pos_inventory_management"
         sequence="10"
@@ -55,17 +71,56 @@
 
     <menuitem
         id="menu_swift_pos_stock_transfer"
-        name="Chuyển Hàng"
+        name="Stock Transfer"
         parent="menu_swift_pos_goods"
         action="pos_theme_swift.action_swift_pos_stock_transfer"
         sequence="20"
     />
 
     <menuitem
-        id="menu_swift_pos_shift"
-        name="Ca làm việc"
+        id="menu_swift_pos_shift_root"
+        name="Shift Management"
         parent="point_of_sale.menu_point_root"
-        action="pos_theme_swift.action_swift_pos_shift_management"
         sequence="120"
+    />
+
+    <menuitem
+        id="menu_swift_pos_shift"
+        name="Shift Management"
+        parent="menu_swift_pos_shift_root"
+        action="pos_theme_swift.action_swift_pos_shift_management"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_swift_pos_paycheck"
+        name="Paycheck"
+        parent="menu_swift_pos_shift_root"
+        action="pos_theme_swift.action_swift_pos_paycheck_management"
+        sequence="20"
+    />
+
+    <menuitem
+        id="menu_swift_pos_attendance"
+        name="Attendance"
+        parent="menu_swift_pos_shift_root"
+        action="pos_theme_swift.action_swift_pos_attendance_management"
+        sequence="30"
+    />
+
+    <menuitem
+        id="menu_swift_pos_work_schedule"
+        name="Work Schedule"
+        parent="menu_swift_pos_shift_root"
+        action="pos_theme_swift.action_swift_pos_work_schedule_management"
+        sequence="40"
+    />
+
+    <menuitem
+        id="menu_swift_pos_employee"
+        name="Employee"
+        parent="menu_swift_pos_shift_root"
+        action="pos_theme_swift.action_swift_pos_employee_management"
+        sequence="50"
     />
 </odoo>

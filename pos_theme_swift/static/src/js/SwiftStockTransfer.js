@@ -65,7 +65,7 @@ export class StockTransfer extends Component {
             this.state.records = await this.orm.call("pos.dashboard.swift", "get_stock_transfers", [filters]);
         } catch (e) {
             console.error("Failed to load transfers", e);
-            this.notification.add(_t("Lỗi khi tải dữ liệu chuyển hàng"), { type: "danger" });
+            this.notification.add(_t("Error loading stock transfer data"), { type: "danger" });
         } finally {
             this.state.loading = false;
         }
@@ -160,11 +160,11 @@ export class StockTransfer extends Component {
 
     async saveTransfer(isDone = false) {
         if (!this.state.currentTransfer.loc_dest_id) {
-            this.notification.add(_t("Vui lòng chọn chi nhánh nhận"), { type: "warning" });
+            this.notification.add(_t("Please select receiving branch"), { type: "warning" });
             return;
         }
         if (this.state.currentTransfer.lines.length === 0) {
-            this.notification.add(_t("Vui lòng thêm sản phẩm"), { type: "warning" });
+            this.notification.add(_t("Please add products"), { type: "warning" });
             return;
         }
 
@@ -181,12 +181,12 @@ export class StockTransfer extends Component {
                 })),
             };
             await this.orm.call("pos.dashboard.swift", "create_or_update_transfer", [vals]);
-            this.notification.add(isDone ? _t("Đã gửi yêu cầu chuyển hàng") : _t("Đã lưu tạm"), { type: "success" });
+            this.notification.add(isDone ? _t("Stock transfer request sent") : _t("Draft saved"), { type: "success" });
             this.state.view = 'list';
             await this.loadTransfers();
         } catch (e) {
             console.error("Save failed", e);
-            this.notification.add(_t("Lỗi khi lưu dữ liệu"), { type: "danger" });
+            this.notification.add(_t("Error saving data"), { type: "danger" });
         }
     }
 
@@ -208,12 +208,12 @@ export class StockTransfer extends Component {
                 received_qty: l.received_qty,
             }));
             await this.orm.call("pos.dashboard.swift", "action_receive_transfer", [this.state.currentTransfer.id, lines]);
-            this.notification.add(_t("Đã hoàn tất nhận hàng"), { type: "success" });
+            this.notification.add(_t("Goods receipt completed"), { type: "success" });
             this.state.view = 'list';
             await this.loadTransfers();
         } catch (e) {
             console.error("Receive failed", e);
-            this.notification.add(_t("Lỗi khi nhận hàng"), { type: "danger" });
+            this.notification.add(_t("Error receiving goods"), { type: "danger" });
         }
     }
 
@@ -248,12 +248,13 @@ export class StockTransfer extends Component {
 
     getStatusLabel(state) {
         const labels = {
-            'draft': 'Phiếu tạm',
-            'shipped': 'Đang chuyển',
-            'done': 'Đã nhận'
+            'draft': _t('Draft'),
+            'shipped': _t('Shipping'),
+            'done': _t('Received')
         };
         return labels[state] || state;
     }
 }
 
 registry.category("actions").add("pos_theme_swift.swift_pos_stock_transfer", StockTransfer);
+

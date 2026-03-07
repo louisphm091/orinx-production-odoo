@@ -13,6 +13,9 @@ class SwiftStaffShift(models.Model):
         ('done', 'Completed')
     ], string='Status', default='active')
     note = fields.Text(string='Note')
+    is_approved = fields.Boolean(string='Attendance Approved', default=False, copy=False, index=True)
+    approved_by = fields.Many2one('res.users', string='Approved By', copy=False)
+    approved_at = fields.Datetime(string='Approved At', copy=False)
 
     duration = fields.Float(string='Duration (Hours)', compute='_compute_duration', store=True)
 

@@ -1,6 +1,14 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_swift_stock_inventory,swift.stock.inventory,model_swift_stock_inventory,,1,1,1,1
 access_swift_stock_inventory_line,swift.stock.inventory.line,model_swift_stock_inventory_line,,1,1,1,1
+access_swift_low_stock_alert,swift.low.stock.alert,model_swift_low_stock_alert,,1,1,1,1
 access_swift_stock_transfer,swift.stock.transfer,model_swift_stock_transfer,,1,1,1,1
 access_swift_stock_transfer_line,swift.stock.transfer.line,model_swift_stock_transfer_line,,1,1,1,1
 access_swift_staff_shift,swift.staff.shift,model_swift_staff_shift,,1,1,1,1
+access_swift_paycheck,swift.paycheck,model_swift_paycheck,,1,1,1,1
+access_swift_paycheck_line,swift.paycheck.line,model_swift_paycheck_line,,1,1,1,1
+access_swift_paycheck_payment,swift.paycheck.payment,model_swift_paycheck_payment,,1,1,1,1
+access_swift_work_shift_template,swift.work.shift.template,model_swift_work_shift_template,,1,1,1,1
+access_swift_work_schedule_line,swift.work.schedule.line,model_swift_work_schedule_line,,1,1,1,1
+access_swift_employee_profile,swift.employee.profile,model_swift_employee_profile,,1,1,1,1
+access_swift_employee_finance_line,swift.employee.finance.line,model_swift_employee_finance_line,,1,1,1,1

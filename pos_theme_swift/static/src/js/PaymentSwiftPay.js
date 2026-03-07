@@ -737,7 +737,7 @@ patch(PaymentScreen.prototype, {
       order,
       // uuid/cid are always unique even for unsaved orders; never use name alone (new orders have name '/')
       key: order.uuid || order.cid || order.uid || `order-${idx}`,
-      label: `Hóa đơn ${idx + 1}`,
+      label: _t("Order %s", idx + 1),
     }));
   },
 
@@ -793,7 +793,7 @@ patch(PaymentScreen.prototype, {
   sppLineUnitPriceValue(line) { return this.sppLineUnitPrice(line); },
   async closeSession() {
     // Show a confirmation dialog before closing the session
-    const confirmed = window.confirm("Bạn có chắc chắn muốn đóng phiên bán hàng không?");
+    const confirmed = window.confirm(_t("Are you sure you want to close the sales session?"));
     if (!confirmed) return;
 
     try {

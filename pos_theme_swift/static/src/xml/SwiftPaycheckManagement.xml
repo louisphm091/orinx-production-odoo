@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pos_theme_swift.SwiftPaycheckManagement" owl="1">
+        <div class="spc-page swift-inv-page">
+            <div class="spc-topline">
+                <div class="spc-headline">Bảng lương</div>
+                <div class="spc-searchWrap">
+                    <i class="fa fa-search"/>
+                    <input type="text" placeholder="Theo mã, tên bảng lương" t-model="state.paycheckSearch" t-on-input="onSearchInput"/>
+                </div>
+                <div class="spc-tools">
+                    <button class="spc-btnPrimary" t-on-click="createPaycheck"><i class="fa fa-plus me-1"/> Bảng tính lương</button>
+                    <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                    <button class="spc-iconBtn"><i class="fa fa-list"/></button>
+                </div>
+            </div>
+
+            <div class="spc-content">
+                <aside class="spc-filter">
+                    <div class="spc-filterTitle">Chi nhánh</div>
+                    <div class="spc-chip">Chi nhánh trung tâm <span>×</span></div>
+
+                    <div class="spc-filterTitle mt">Kỳ hạn trả lương</div>
+                    <select class="spc-select">
+                        <option>Chọn kỳ hạn trả lương</option>
+                    </select>
+
+                    <div class="spc-filterTitle mt">Trạng thái</div>
+                    <label><input type="checkbox" checked="checked"/> Đang tạo</label>
+                    <label><input type="checkbox" checked="checked"/> Tạm tính</label>
+                    <label><input type="checkbox" checked="checked"/> Đã chốt lương</label>
+                    <label><input type="checkbox"/> Đã hủy</label>
+                </aside>
+
+                <section class="spc-grid">
+                    <table class="spc-table">
+                        <thead>
+                            <tr>
+                                <th class="w-check"><input type="checkbox"/></th>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Kỳ hạn trả</th>
+                                <th>Kỳ làm việc</th>
+                                <th>Chi nhánh</th>
+                                <th class="text-right">Tổng lương</th>
+                                <th class="text-right">Đã trả nhân viên</th>
+                                <th class="text-right">Còn cần trả</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="spc-summary">
+                                <td></td>
+                                <td colspan="5"></td>
+                                <td class="text-right"><t t-esc="formatMoney(getSummaryTotals().total)"/></td>
+                                <td class="text-right"><t t-esc="formatMoney(getSummaryTotals().paid)"/></td>
+                                <td class="text-right"><t t-esc="formatMoney(getSummaryTotals().remaining)"/></td>
+                                <td></td>
+                            </tr>
+
+                            <t t-if="state.loading">
+                                <tr>
+                                    <td colspan="10" class="spc-empty">Đang tải dữ liệu...</td>
+                                </tr>
+                            </t>
+
+                            <t t-foreach="state.paycheckRecords" t-as="r" t-key="r.id">
+                                <tr t-att-class="state.expandedPaycheckId === r.id ? 'is-selected' : ''" t-on-click="() => togglePaycheckDetail(r.id)">
+                                    <td class="w-check" t-on-click.stop=""><input type="checkbox"/></td>
+                                    <td><a href="#" t-on-click.prevent=""><t t-esc="r.code"/></a></td>
+                                    <td><t t-esc="r.name"/></td>
+                                    <td><t t-esc="r.cycle"/></td>
+                                    <td><t t-esc="r.period"/></td>
+                                    <td><t t-esc="r.branch"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(r.totalSalary)"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(r.paidToEmployee)"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(r.remaining)"/></td>
+                                    <td><t t-esc="r.status"/></td>
+                                </tr>
+
+                                <t t-if="state.expandedPaycheckId === r.id">
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="9" class="spc-detailCell">
+                                            <div class="spc-detailBox">
+                                                <div class="spc-tabs">
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'info' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('info')">Thông tin</button>
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'slip' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('slip')">Phiếu lương</button>
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'history' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('history')">Lịch sử thanh toán</button>
+                                                </div>
+
+                                                <t t-if="state.paycheckTab === 'info'">
+                                                    <div class="spc-infoGrid">
+                                                        <div><span>Mã:</span><strong><t t-esc="r.code"/></strong></div>
+                                                        <div><span>Tên:</span><strong><t t-esc="r.name"/></strong></div>
+                                                        <div><span>Kỳ hạn trả:</span><strong><t t-esc="r.cycle"/></strong></div>
+                                                        <div><span>Kỳ làm việc:</span><strong><t t-esc="r.period"/></strong></div>
+                                                        <div><span>Ngày tạo:</span><strong><t t-esc="r.createdAt || '-'"/></strong></div>
+                                                        <div><span>Người tạo:</span><strong><t t-esc="r.createdBy || '-'"/></strong></div>
+                                                        <div><span>Người lập bảng:</span><strong><t t-esc="r.preparedBy || '-'"/></strong></div>
+                                                        <div><span>Trạng thái:</span><strong><t t-esc="r.status"/></strong></div>
+                                                        <div><span>Tổng số nhân viên:</span><strong><t t-esc="r.employeeCount || 0"/></strong></div>
+                                                        <div><span>Tổng lương:</span><strong><t t-esc="formatMoney(r.totalSalary)"/></strong></div>
+                                                        <div><span>Đã trả nhân viên:</span><strong><t t-esc="formatMoney(r.paidToEmployee)"/></strong></div>
+                                                        <div><span>Còn cần trả:</span><strong><t t-esc="formatMoney(r.remaining)"/></strong></div>
+                                                        <div><span>Chi nhánh:</span><strong><t t-esc="r.branch"/></strong></div>
+                                                        <div><span>Phạm vi áp dụng:</span><strong><t t-esc="r.scope || '-'"/></strong></div>
+                                                        <div><span>Người chốt lương:</span><strong><t t-esc="r.finalizedBy || '-'"/></strong></div>
+                                                        <div><span>Ghi chú...</span><strong><t t-esc="r.note || ''"/></strong></div>
+                                                    </div>
+                                                    <div class="spc-detailFooter">
+                                                        <button class="spc-btnGhost"><i class="fa fa-trash-o me-1"/> Hủy bỏ</button>
+                                                        <div>Dữ liệu được cập nhật vào: <strong><t t-esc="r.lastUpdated || '-'"/></strong></div>
+                                                        <div class="spc-footerActions">
+                                                            <button class="spc-btnLight" t-on-click="loadPaychecks"><i class="fa fa-refresh me-1"/> Tải lại dữ liệu</button>
+                                                            <button class="spc-btnPrimary"><i class="fa fa-check-square-o me-1"/> Xem bảng lương</button>
+                                                            <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                                                        </div>
+                                                    </div>
+                                                </t>
+
+                                                <t t-if="state.paycheckTab === 'slip'">
+                                                    <div class="spc-slipTableWrap">
+                                                        <table class="spc-slipTable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="w-check"><input type="checkbox"/></th>
+                                                                    <th>Mã phiếu</th>
+                                                                    <th>Tên nhân viên</th>
+                                                                    <th class="text-right">Tổng lương</th>
+                                                                    <th class="text-right">Đã trả NV</th>
+                                                                    <th class="text-right">Còn cần trả</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr class="spc-summary">
+                                                                    <td></td>
+                                                                    <td colspan="2"></td>
+                                                                    <td class="text-right"><t t-esc="formatMoney(r.totalSalary)"/></td>
+                                                                    <td class="text-right"><t t-esc="formatMoney(r.paidToEmployee)"/></td>
+                                                                    <td class="text-right"><t t-esc="formatMoney(r.remaining)"/></td>
+                                                                </tr>
+                                                                <t t-foreach="r.payslips || []" t-as="p" t-key="p.id || p.code">
+                                                                    <tr>
+                                                                        <td class="w-check"><input type="checkbox"/></td>
+                                                                        <td><a href="#"><t t-esc="p.code"/></a></td>
+                                                                        <td><a href="#"><t t-esc="p.employee"/></a></td>
+                                                                        <td class="text-right"><t t-esc="formatMoney(p.salary)"/></td>
+                                                                        <td class="text-right"><t t-esc="formatMoney(p.paid)"/></td>
+                                                                        <td class="text-right"><t t-esc="formatMoney(p.remaining)"/></td>
+                                                                    </tr>
+                                                                </t>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="spc-slipFooter">
+                                                        <button class="spc-btnPrimary" t-on-click="openPaymentModal"><i class="fa fa-calculator me-1"/> Thanh toán</button>
+                                                    </div>
+                                                </t>
+
+                                                <t t-if="state.paycheckTab === 'history'">
+                                                    <div class="spc-slipTableWrap">
+                                                        <t t-if="r.history &amp;&amp; r.history.length">
+                                                            <table class="spc-slipTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Thời gian</th>
+                                                                        <th>Phương thức</th>
+                                                                        <th class="text-right">Số tiền</th>
+                                                                        <th>Người tạo</th>
+                                                                        <th>Ghi chú</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <t t-foreach="r.history" t-as="h" t-key="h.id">
+                                                                        <tr>
+                                                                            <td><t t-esc="h.time"/></td>
+                                                                            <td><t t-esc="h.method"/></td>
+                                                                            <td class="text-right"><t t-esc="formatMoney(h.amount)"/></td>
+                                                                            <td><t t-esc="h.user"/></td>
+                                                                            <td><t t-esc="h.note"/></td>
+                                                                        </tr>
+                                                                    </t>
+                                                                </tbody>
+                                                            </table>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <div class="spc-empty">Chưa có lịch sử thanh toán.</div>
+                                                        </t>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+
+                            <t t-if="!state.loading and !state.paycheckRecords.length">
+                                <tr>
+                                    <td colspan="10" class="spc-empty">Không có dữ liệu bảng lương.</td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <t t-if="state.showPaymentModal">
+                <div class="spc-modalBackdrop" t-on-click="closePaymentModal"/>
+                <div class="spc-modal">
+                    <button class="spc-modalClose" t-on-click="closePaymentModal">×</button>
+                    <h3>Thanh toán bảng lương</h3>
+                    <div class="spc-modalSub">
+                        <t t-if="getExpandedRecord()">
+                            <t t-esc="getExpandedRecord().name"/> | Kỳ làm việc: <t t-esc="getExpandedRecord().period"/> | Trạng thái: <t t-esc="getExpandedRecord().status"/>
+                        </t>
+                    </div>
+
+                    <div class="spc-modalGrid">
+                        <div><label>Tiền trả nhân viên</label><strong><t t-esc="formatMoney(getExpandedRecord() ? getExpandedRecord().remaining : 0)"/></strong></div>
+                        <div><label>Thời gian</label><input type="text" t-model="state.paymentTime"/></div>
+                        <div>
+                            <label>Phương thức</label>
+                            <select t-model="state.paymentMethod">
+                                <option value="cash">Tiền mặt</option>
+                                <option value="bank">Chuyển khoản</option>
+                            </select>
+                        </div>
+                        <div><label>Ghi chú</label><input type="text" t-model="state.paymentNote"/></div>
+                    </div>
+
+                    <table class="spc-slipTable spc-modalTable" t-if="getExpandedRecord()">
+                        <thead>
+                            <tr>
+                                <th>Mã phiếu</th>
+                                <th>Nhân viên</th>
+                                <th class="text-right">Thành tiền</th>
+                                <th class="text-right">Đã trả nhân viên</th>
+                                <th class="text-right">Còn cần trả</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="getExpandedRecord().payslips || []" t-as="p" t-key="p.id || p.code">
+                                <tr>
+                                    <td><a href="#"><t t-esc="p.code"/></a></td>
+                                    <td><t t-esc="p.employee"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(p.salary)"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(p.paid)"/></td>
+                                    <td class="text-right"><t t-esc="formatMoney(p.remaining)"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="spc-modalActions">
+                        <button class="spc-btnGhost" t-on-click="closePaymentModal">Bỏ qua</button>
+                        <button class="spc-btnPrimary" t-on-click="createPaySlip">Tạo phiếu chi</button>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

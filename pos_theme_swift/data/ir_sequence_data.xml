@@ -15,5 +15,26 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+        <record id="seq_swift_paycheck" model="ir.sequence">
+            <field name="name">Swift Paycheck</field>
+            <field name="code">swift.paycheck</field>
+            <field name="prefix">BL</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_swift_paycheck_line" model="ir.sequence">
+            <field name="name">Swift Paycheck Line</field>
+            <field name="code">swift.paycheck.line</field>
+            <field name="prefix">PL</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="seq_swift_employee_profile" model="ir.sequence">
+            <field name="name">Swift Employee</field>
+            <field name="code">swift.employee.profile</field>
+            <field name="prefix">NV</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

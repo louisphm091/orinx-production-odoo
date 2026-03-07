@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
 
 export class SwiftShiftManagement extends Component {
     static template = "pos_theme_swift.SwiftShiftManagement";
@@ -12,18 +13,21 @@ export class SwiftShiftManagement extends Component {
         this.notification = useService("notification");
 
         this.state = useState({
-            status: 'idle', // 'idle', 'active'
+            status: "idle", // 'idle', 'active'
             checkInTime: null,
-            elapsedTime: '00:00:00',
+            elapsedTime: "00:00:00",
             recentShifts: [],
-            note: '',
+            note: "",
             loading: true,
-            userName: "đang tải...",
-            branchName: "đang tải...",
+            userName: _t("loading..."),
+            branchName: _t("loading..."),
             stats: { today: 0, week: 0 },
         });
 
         this.timer = null;
+
+        this.toggleShift = this.toggleShift.bind(this);
+        this.fetchShifts = this.fetchShifts.bind(this);
 
         onMounted(async () => {
             await this.loadInitData();
@@ -38,33 +42,18 @@ export class SwiftShiftManagement extends Component {
     async loadInitData() {
         try {
             const data = await this.orm.call("pos.dashboard.swift", "get_shift_init_data", []);
-            this.state.userName = data.user_name || "Nhân viên";
-            this.state.branchName = data.branch_name || "Chi nhánh";
+            this.state.userName = data.user_name || _t("Employee");
+            this.state.branchName = data.branch_name || _t("Branch");
             this.state.stats = data.stats || { today: 0, week: 0 };
 
             const res = data.status;
-            if (res && res.state === 'active') {
-                this.state.status = 'active';
-                this.state.checkInTime = new Date(res.check_in + 'Z');
+            if (res && res.state === "active") {
+                this.state.status = "active";
+                this.state.checkInTime = new Date(res.check_in + "Z");
                 this.startTimer();
             }
         } catch (e) {
             console.error("Failed to load init data", e);
-        } finally {
-            this.state.loading = false;
-        }
-    }
-
-    async loadStatus() {
-        try {
-            const res = await this.orm.call("pos.dashboard.swift", "get_shift_status", []);
-            if (res && res.state === 'active') {
-                this.state.status = 'active';
-                this.state.checkInTime = new Date(res.check_in + 'Z');
-                this.startTimer();
-            }
-        } catch (e) {
-            console.error("Failed to load shift status", e);
         } finally {
             this.state.loading = false;
         }
@@ -82,8 +71,8 @@ export class SwiftShiftManagement extends Component {
     formatDateTime(dtStr) {
         if (!dtStr) return "";
         let d;
-        if (typeof dtStr === 'string') {
-            d = new Date(dtStr + 'Z');
+        if (typeof dtStr === "string") {
+            d = new Date(dtStr + "Z");
         } else {
             d = dtStr;
         }
@@ -108,8 +97,7 @@ export class SwiftShiftManagement extends Component {
             const hours = Math.floor(diff / 3600000);
             const minutes = Math.floor((diff % 3600000) / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
-            this.state.elapsedTime =
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            this.state.elapsedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
         }, 1000);
     }
 
@@ -123,26 +111,26 @@ export class SwiftShiftManagement extends Component {
     async toggleShift() {
         try {
             const res = await this.orm.call("pos.dashboard.swift", "action_shift_toggle", [], {
-                note: this.state.note
+                note: this.state.note,
             });
-            if (res.state === 'active') {
-                this.state.status = 'active';
-                this.state.checkInTime = new Date(res.check_in + 'Z');
+            if (res.state === "active") {
+                this.state.status = "active";
+                this.state.checkInTime = new Date(res.check_in + "Z");
                 this.startTimer();
-                this.notification.add("Đã bắt đầu ca làm việc", { type: "success" });
+                this.notification.add(_t("Shift started"), { type: "success" });
             } else {
-                this.state.status = 'idle';
+                this.state.status = "idle";
                 this.state.checkInTime = null;
-                this.state.elapsedTime = '00:00:00';
-                this.state.note = '';
+                this.state.elapsedTime = "00:00:00";
+                this.state.note = "";
                 this.stopTimer();
-                this.notification.add("Đã kết thúc ca làm việc", { type: "success" });
+                this.notification.add(_t("Shift ended"), { type: "success" });
             }
             await this.fetchShifts();
             await this.updateStats();
         } catch (e) {
             console.error("Shift toggle failed", e);
-            this.notification.add("Lỗi khi thực hiện thao tác", { type: "danger" });
+            this.notification.add(_t("Error performing action"), { type: "danger" });
         }
     }
 

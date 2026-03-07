@@ -8,15 +8,15 @@
       <div class="ssd_top d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center gap-2">
           <div class="ssd_logo"><i class="fa fa-repeat"/></div>
-          <div class="ssd_title">LÊN LỊCH BÁN HÀNG</div>
+          <div class="ssd_title">SALE SCHEDULING</div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
           <button class="btn btn-light ssd_pill">
-            <i class="fa fa-tag me-1"/> SKU / Nhóm SKU <i class="fa fa-angle-down ms-1"/>
+            <i class="fa fa-tag me-1"/> SKU / SKU Group <i class="fa fa-angle-down ms-1"/>
           </button>
           <button class="btn btn-light ssd_pill">
-            Tuần <i class="fa fa-angle-down ms-1"/>
+            Week <i class="fa fa-angle-down ms-1"/>
           </button>
           <button class="btn btn-primary ssd_iconbtn"><i class="fa fa-cog"/></button>
           <span class="ssd_avatar"/>
@@ -27,18 +27,18 @@
       <div class="ssd_sub card p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <div class="ssd_tabs">
-            <span class="fw-semibold">Ngành thời trang</span>
-            <span class="text-muted">· Theo SKU · Theo chiến dịch · Theo thời gian</span>
+            <span class="fw-semibold">Fashion Industry</span>
+            <span class="text-muted">· By SKU · By Campaign · By Time</span>
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-light ssd_btn"><i class="fa fa-plus me-1"/> Tạo lịch bán</button>
-            <button class="btn btn-success ssd_btn"><i class="fa fa-plus me-1"/> Tạo lịch bán</button>
+            <button class="btn btn-light ssd_btn"><i class="fa fa-plus me-1"/> Create Schedule</button>
+            <button class="btn btn-success ssd_btn"><i class="fa fa-plus me-1"/> Create Schedule</button>
           </div>
         </div>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info">Đang tải dữ liệu...</div>
+        <div class="alert alert-info">Loading data...</div>
       </t>
       <t t-elif="state.error">
         <div class="alert alert-danger"><t t-esc="state.error"/></div>
@@ -52,8 +52,8 @@
               <div class="d-flex align-items-center gap-2">
                 <div class="ssd_kpi_icon ssd_i_blue"><i class="fa fa-calendar-plus-o"/></div>
                 <div>
-                  <div class="ssd_kpi_big"><t t-esc="state.kpis.wave_count"/> đợt</div>
-                  <div class="text-muted small">SKU chính: <t t-esc="state.kpis.main_sku"/></div>
+                  <div class="ssd_kpi_big"><t t-esc="state.kpis.wave_count"/> waves</div>
+                  <div class="text-muted small">Main SKU: <t t-esc="state.kpis.main_sku"/></div>
                 </div>
               </div>
             </div>
@@ -67,7 +67,7 @@
                   <div class="ssd_kpi_big">
                     <t t-esc="formatMoneyVND(state.kpis.revenue)"/>
                   </div>
-                  <div class="text-success small">+<t t-esc="state.kpis.revenue_delta"/>% so kế hoạch</div>
+                  <div class="text-success small">+<t t-esc="state.kpis.revenue_delta"/>% vs plan</div>
                 </div>
               </div>
             </div>
@@ -78,8 +78,8 @@
               <div class="d-flex align-items-center gap-2">
                 <div class="ssd_kpi_icon ssd_i_red"><i class="fa fa-exclamation-triangle"/></div>
                 <div>
-                  <div class="ssd_kpi_big">Rủi ro lịch bán</div>
-                  <div class="text-muted small"><t t-esc="state.kpis.risk_sku_count"/> SKU có nguy cơ thiếu hàng</div>
+                  <div class="ssd_kpi_big">Schedule Risk</div>
+                  <div class="text-muted small"><t t-esc="state.kpis.risk_sku_count"/> SKUs at risk of shortage</div>
                 </div>
               </div>
             </div>
@@ -91,8 +91,8 @@
                 <div class="d-flex align-items-center gap-2">
                   <div class="ssd_kpi_icon ssd_i_yellow"><i class="fa fa-bell"/></div>
                   <div>
-                    <div class="ssd_kpi_big">Lịch cần điều chỉnh</div>
-                    <div class="text-muted small"><t t-esc="state.kpis.need_review_count"/> lịch cần xem lại</div>
+                    <div class="ssd_kpi_big">Schedules Needing Adjust.</div>
+                    <div class="text-muted small"><t t-esc="state.kpis.need_review_count"/> schedules to review</div>
                   </div>
                 </div>
                 <i class="fa fa-ellipsis-h text-muted"/>
@@ -107,7 +107,7 @@
           <div class="col-12 col-lg-8">
             <div class="card ssd_card p-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="fw-semibold">Timeline lịch bán theo SKU</div>
+                <div class="fw-semibold">Sale Schedule Timeline by SKU</div>
                 <div class="d-flex gap-2">
                   <button class="btn btn-light ssd_pill" t-on-click="() => setViewMode('timeline')">
                     <i class="fa fa-align-left me-1"/> Timeline
@@ -120,7 +120,7 @@
 
               <!-- GRID HEADER -->
               <div class="ssd_grid_header">
-                <div class="ssd_grid_left_head text-muted small">Th 2, 01 Th4</div>
+                <div class="ssd_grid_left_head text-muted small">Mon, 01 Apr</div>
                 <div class="ssd_grid_cols">
                   <t t-foreach="state.timeline.cols" t-as="c" t-key="c">
                     <div class="ssd_col_head"><t t-esc="c"/></div>
@@ -164,7 +164,7 @@
               <div class="col-12 col-lg-7">
                 <div class="card ssd_card p-3 h-100">
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="fw-semibold">Theo dõi hiệu quả theo lịch bán</div>
+                    <div class="fw-semibold">Performance Tracking by Schedule</div>
                     <i class="fa fa-ellipsis-h text-muted"/>
                   </div>
                   <div class="d-flex align-items-center gap-3">
@@ -172,7 +172,7 @@
                     <div class="flex-grow-1">
                       <div class="fw-semibold"><t t-esc="state.performance.title"/></div>
                       <div class="text-muted small">
-                        Đạt <t t-esc="state.performance.progress_percent"/>% kế hoạch (sau <t t-esc="state.performance.days"/> ngày)
+                        Reached <t t-esc="state.performance.progress_percent"/>% of plan (after <t t-esc="state.performance.days"/> days)
                       </div>
                       <div class="ssd_progress mt-2">
                         <div class="ssd_progress_bar" t-att-style="'width:' + state.performance.progress_percent + '%'"/>
@@ -185,7 +185,7 @@
               <div class="col-12 col-lg-5">
                 <div class="card ssd_card p-3 h-100">
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="fw-semibold">Cảnh báo rủi ro</div>
+                    <div class="fw-semibold">Risk Alerts</div>
                     <i class="fa fa-ellipsis-h text-muted"/>
                   </div>
 
@@ -211,7 +211,7 @@
           <div class="col-12 col-lg-4">
             <div class="card ssd_card p-3 mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="fw-semibold">Chi tiết lịch bán</div>
+                <div class="fw-semibold">Schedule Details</div>
                 <i class="fa fa-ellipsis-h text-muted"/>
               </div>
 
@@ -224,29 +224,29 @@
                 </div>
               </div>
 
-              <div class="mt-3 text-muted">Thời gian: <span class="fw-semibold text-dark">
+              <div class="mt-3 text-muted">Time: <span class="fw-semibold text-dark">
                 <t t-esc="state.selected.date_from"/> – <t t-esc="state.selected.date_to"/>
               </span></div>
 
               <div class="d-flex gap-2 mt-2">
-                <span class="badge bg-light text-dark">Tuần này</span>
-                <span class="badge bg-success">Đang bán</span>
-                <span class="badge bg-light text-dark">Kết thúc</span>
+                <span class="badge bg-light text-dark">This week</span>
+                <span class="badge bg-success">On sale</span>
+                <span class="badge bg-light text-dark">Ended</span>
               </div>
 
               <div class="mt-3 pt-3 border-top">
-                <div class="fw-semibold mb-2">Gắn với tồn kho</div>
-                <div class="text-muted">Tồn kho hiện tại: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.onhand"/></span> sản phẩm</div>
-                <div class="text-muted">Dự kiến bán mỗi ngày: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.daily_sell"/></span> sản phẩm</div>
-                <div class="text-muted">Ngày dự kiến hết hàng: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.out_of_stock_date"/></span>
-                  <span class="text-muted"> (sau <t t-esc="state.inventory_link.out_of_stock_in_days"/> ngày)</span>
+                <div class="fw-semibold mb-2">Linked to Inventory</div>
+                <div class="text-muted">Current on hand: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.onhand"/></span> units</div>
+                <div class="text-muted">Expected daily sales: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.daily_sell"/></span> units</div>
+                <div class="text-muted">Expected out of stock date: <span class="fw-semibold text-dark"><t t-esc="state.inventory_link.out_of_stock_date"/></span>
+                  <span class="text-muted"> (in <t t-esc="state.inventory_link.out_of_stock_in_days"/> days)</span>
                 </div>
               </div>
 
               <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-success flex-fill">Điều chỉnh lịch</button>
-                <button class="btn btn-light flex-fill">Tạm dừng bán</button>
-                <button class="btn btn-light flex-fill" disabled="1">Kết thúc sớm</button>
+                <button class="btn btn-success flex-fill">Adjust Schedule</button>
+                <button class="btn btn-light flex-fill">Pause Sale</button>
+                <button class="btn btn-light flex-fill" disabled="1">End Early</button>
               </div>
             </div>
 
