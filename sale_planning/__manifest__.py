@@ -17,7 +17,7 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    "depends": ["base", "web", "product", "stock", "mrp"],
+    "depends": ["base", "web", "product", "stock", "sale", "purchase"],
     "data": [
         "security/ir.model.access.csv",
         "views/menu.xml",

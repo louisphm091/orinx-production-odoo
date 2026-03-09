@@ -11,6 +11,7 @@ export class SalePlanningDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.notification = useService("notification");
+        this.action = useService("action");
 
         // refs (OWL)
         this.mainChartRef = useRef("mainChart");
@@ -24,6 +25,7 @@ export class SalePlanningDashboard extends Component {
 
         this.state = useState({
             loading: true,
+            creating: false,
             error: null,
             filters: {
                 warehouse_id: null,
@@ -48,7 +50,6 @@ export class SalePlanningDashboard extends Component {
         });
 
         onMounted(() => {
-            // render charts after first mount (DOM exists)
             this._scheduleRenderAllCharts();
         });
 
@@ -86,18 +87,88 @@ export class SalePlanningDashboard extends Component {
         }
     }
 
+    async onCreateSupplyPlan() {
+        if (this.state.creating) return;
+        try {
+            this.state.creating = true;
+            const result = await this.orm.call(
+                "sale.planning.dashboard",
+                "create_supply_plan",
+                [],
+                {}
+            );
+            if (result && result.ok) {
+                this.notification.add(result.message, { type: "success" });
+                // Navigate to the new purchase order
+                if (result.id) {
+                    this.action.doAction({
+                        type: "ir.actions.act_window",
+                        res_model: "purchase.order",
+                        res_id: result.id,
+                        views: [[false, "form"]],
+                        target: "current",
+                    });
+                }
+            } else {
+                this.notification.add(
+                    (result && result.message) || _t("Failed to create supply plan."),
+                    { type: "warning" }
+                );
+            }
+        } catch (e) {
+            console.error(e);
+            this.notification.add(_t("Error creating supply plan."), { type: "danger" });
+        } finally {
+            this.state.creating = false;
+        }
+    }
+
+    async onCreatePurchaseRecommendation() {
+        if (this.state.creating) return;
+        try {
+            this.state.creating = true;
+            const result = await this.orm.call(
+                "sale.planning.dashboard",
+                "create_purchase_recommendation",
+                [],
+                {}
+            );
+            if (result && result.ok) {
+                this.notification.add(result.message, { type: "success" });
+                if (result.id) {
+                    this.action.doAction({
+                        type: "ir.actions.act_window",
+                        res_model: "purchase.order",
+                        res_id: result.id,
+                        views: [[false, "form"]],
+                        target: "current",
+                    });
+                }
+            } else {
+                this.notification.add(
+                    (result && result.message) || _t("Failed to create purchase recommendation."),
+                    { type: "warning" }
+                );
+            }
+        } catch (e) {
+            console.error(e);
+            this.notification.add(_t("Error creating purchase recommendation."), { type: "danger" });
+        } finally {
+            this.state.creating = false;
+        }
+    }
+
     // -------- Chart helpers --------
     _getChart() {
         const Chart = window.Chart;
         if (!Chart) {
-            console.warn("Chart.js not loaded -> check assets + path chart.umd.min.js");
+            console.warn("Chart.js not loaded → check assets + path chart.umd.min.js");
             return null;
         }
         return Chart;
     }
 
     _scheduleRenderAllCharts() {
-        // không dùng nextTick để tránh lỗi; dùng requestAnimationFrame
         window.requestAnimationFrame(() => {
             this.renderMainChart();
             this.renderRevByCategoryChart();
@@ -129,18 +200,53 @@ export class SalePlanningDashboard extends Component {
             data: {
                 labels,
                 datasets: [
-                    { label: _t("Demand"), data: demand, tension: 0.35, fill: true },
-                    { label: _t("Supply Plan"), data: plan, tension: 0.35, fill: false, borderDash: [6, 4] },
-                    { label: _t("Out of Stock Risk"), data: risk, tension: 0.35, fill: false, borderDash: [2, 6] },
+                    {
+                        label: _t("Demand"),
+                        data: demand,
+                        tension: 0.35,
+                        fill: true,
+                        borderColor: "rgba(16, 185, 129, 0.9)",
+                        backgroundColor: "rgba(16, 185, 129, 0.08)",
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgba(16, 185, 129, 0.9)",
+                    },
+                    {
+                        label: _t("Supply Plan"),
+                        data: plan,
+                        tension: 0.35,
+                        fill: false,
+                        borderDash: [6, 4],
+                        borderColor: "rgba(59, 130, 246, 0.9)",
+                        backgroundColor: "transparent",
+                        pointRadius: 3,
+                    },
+                    {
+                        label: _t("Out of Stock Risk"),
+                        data: risk,
+                        tension: 0.35,
+                        fill: false,
+                        borderDash: [2, 6],
+                        borderColor: "rgba(251, 146, 60, 0.9)",
+                        backgroundColor: "transparent",
+                        pointRadius: 0,
+                    },
                 ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: { mode: "index", intersect: false },
-                plugins: { legend: { position: "bottom" } },
+                plugins: {
+                    legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 12 } } },
+                    tooltip: { enabled: true },
+                },
                 scales: {
-                    y: { beginAtZero: true, ticks: { callback: (v) => this.formatNumber(v) } },
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: "rgba(0,0,0,0.05)" },
+                        ticks: { callback: (v) => this.formatNumber(v) },
+                    },
                 },
             },
         });
@@ -205,6 +311,7 @@ export class SalePlanningDashboard extends Component {
                         label: _t("Inventory"),
                         data: inv.onhand_series || [],
                         borderRadius: 8,
+                        backgroundColor: "rgba(16, 185, 129, 0.35)",
                     },
                     {
                         type: "line",
@@ -214,6 +321,7 @@ export class SalePlanningDashboard extends Component {
                         tension: 0.45,
                         fill: false,
                         pointRadius: 0,
+                        borderColor: "rgba(251, 146, 60, 0.9)",
                     },
                 ],
             },
@@ -229,6 +337,11 @@ export class SalePlanningDashboard extends Component {
     formatNumber(value) {
         const n = Number(value || 0);
         return Number.isFinite(n) ? n.toLocaleString("en-US") : String(value);
+    }
+
+    fmtMoney(v) {
+        const n = Number(v || 0);
+        return n.toLocaleString("vi-VN");
     }
 }
 
