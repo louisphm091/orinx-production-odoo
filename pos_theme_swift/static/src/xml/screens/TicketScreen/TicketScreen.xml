@@ -13,7 +13,7 @@
                                     <div class="register-button menu-txt-hld"
         t-on-click="() => this.pos.navigate('ProductScreen')">
                                         <i class="fa fa-ticket menu-icon" />
-    <span class="menu-txt">Register</span>
+    <span class="menu-txt" t-out="this._t('Register')"/>
 </div>
                                 </li>
                             </ul>

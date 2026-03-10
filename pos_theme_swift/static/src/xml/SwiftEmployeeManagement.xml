@@ -3,33 +3,33 @@
     <t t-name="pos_theme_swift.SwiftEmployeeManagement" owl="1">
         <div class="sem-page">
             <div class="sem-topbar">
-                <div class="sem-title">Danh sách nhân viên</div>
+                <div class="sem-title" t-out="this._t('Employee List')"/>
                 <div class="sem-searchWrap">
                     <i class="fa fa-search"/>
-                    <input type="text" placeholder="Tìm theo mã, tên nhân viên" t-model="state.keyword" t-on-input="onSearchInput"/>
+                    <input type="text" t-att-placeholder="this._t('Search by code, employee name')" t-model="state.keyword" t-on-input="onSearchInput"/>
                 </div>
                 <div class="sem-actions">
-                    <button class="sem-primaryBtn" t-on-click="openCreate"><i class="fa fa-plus me-1"/> Nhân viên</button>
-                    <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff">Đánh dấu đã nghỉ</button>
-                    <button class="sem-lightBtn">Duyệt yêu cầu</button>
+                    <button class="sem-primaryBtn" t-on-click="openCreate"><i class="fa fa-plus me-1"/> <t t-out="this._t('Employee')"/></button>
+                    <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
+                    <button class="sem-lightBtn" t-out="this._t('Approve Requests')"/>
                     <button class="sem-iconBtn"><i class="fa fa-ellipsis-h"/></button>
                 </div>
             </div>
 
             <div class="sem-content">
                 <aside class="sem-filter">
-                    <div class="sem-filterTitle">Trạng thái nhân viên</div>
-                    <label><input type="radio" name="empStatus" t-att-checked="state.status==='working'" t-on-click="() => setStatus('working')"/> Đang làm việc</label>
-                    <label><input type="radio" name="empStatus" t-att-checked="state.status==='off'" t-on-click="() => setStatus('off')"/> Đã nghỉ</label>
+                    <div class="sem-filterTitle" t-out="this._t('Employee Status')"/>
+                    <label><input type="radio" name="empStatus" t-att-checked="state.status==='working'" t-on-click="() => setStatus('working')"/> <t t-out="this._t('Working')"/></label>
+                    <label><input type="radio" name="empStatus" t-att-checked="state.status==='off'" t-on-click="() => setStatus('off')"/> <t t-out="this._t('Off')"/></label>
 
-                    <div class="sem-filterTitle mt">Chi nhánh làm việc</div>
-                    <div class="sem-chip">Chi nhánh trung tâm <span>×</span></div>
-                    <div class="sem-filterTitle mt">Chi nhánh trả lương</div>
-                    <input class="sem-input" placeholder="Chọn chi nhánh"/>
-                    <div class="sem-filterTitle mt">Phòng ban</div>
-                    <input class="sem-input" placeholder="Chọn phòng ban"/>
-                    <div class="sem-filterTitle mt">Chức danh</div>
-                    <input class="sem-input" placeholder="Chọn chức danh"/>
+                    <div class="sem-filterTitle mt" t-out="this._t('Work Branch')"/>
+                    <div class="sem-chip"><t t-out="this._t('Central Branch')"/> <span>×</span></div>
+                    <div class="sem-filterTitle mt" t-out="this._t('Pay Branch')"/>
+                    <input class="sem-input" t-att-placeholder="this._t('Select branch')"/>
+                    <div class="sem-filterTitle mt" t-out="this._t('Department')"/>
+                    <input class="sem-input" t-att-placeholder="this._t('Select department')"/>
+                    <div class="sem-filterTitle mt" t-out="this._t('Job Title')"/>
+                    <input class="sem-input" t-att-placeholder="this._t('Select job title')"/>
                 </aside>
 
                 <section class="sem-main">
@@ -37,19 +37,19 @@
                         <thead>
                             <tr>
                                 <th class="w-check"><input type="checkbox"/></th>
-                                <th>Ảnh</th>
-                                <th>Mã nhân viên</th>
-                                <th>Mã chấm công</th>
-                                <th>Tên nhân viên</th>
-                                <th>Số điện thoại</th>
-                                <th>Số CMND/CCCD</th>
-                                <th>Nợ và tạm ứng</th>
-                                <th>Ghi chú</th>
+                                <th><t t-out="this._t('Image')"/></th>
+                                <th><t t-out="this._t('Employee Code')"/></th>
+                                <th><t t-out="this._t('Attendance Code')"/></th>
+                                <th><t t-out="this._t('Employee Name')"/></th>
+                                <th><t t-out="this._t('Phone Number')"/></th>
+                                <th><t t-out="this._t('ID Number')"/></th>
+                                <th><t t-out="this._t('Debt/Advance')"/></th>
+                                <th><t t-out="this._t('Notes')"/></th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-if="state.loading">
-                                <tr><td colspan="9" class="sem-empty">Đang tải dữ liệu...</td></tr>
+                                <tr><td colspan="9" class="sem-empty" t-out="this._t('Loading data...')"/></tr>
                             </t>
 
                             <t t-foreach="state.rows" t-as="r" t-key="r.userId">
@@ -71,26 +71,26 @@
                                         <td colspan="8" class="sem-detailCell">
                                             <div class="sem-detailBox">
                                                 <div class="sem-tabs">
-                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='info'?'is-active':'')" t-on-click="() => setTab('info')">Thông tin</button>
-                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='schedule'?'is-active':'')" t-on-click="() => setTab('schedule')">Lịch làm việc</button>
-                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='salary'?'is-active':'')" t-on-click="() => setTab('salary')">Thiết lập lương</button>
-                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='payslip'?'is-active':'')" t-on-click="() => setTab('payslip')">Phiếu lương</button>
-                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='finance'?'is-active':'')" t-on-click="() => setTab('finance')">Nợ và tạm ứng</button>
+                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='info'?'is-active':'')" t-on-click="() => setTab('info')" t-out="this._t('Info')"/>
+                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='schedule'?'is-active':'')" t-on-click="() => setTab('schedule')" t-out="this._t('Schedule')"/>
+                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='salary'?'is-active':'')" t-on-click="() => setTab('salary')" t-out="this._t('Salary Setup')"/>
+                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='payslip'?'is-active':'')" t-on-click="() => setTab('payslip')" t-out="this._t('Payslip')"/>
+                                                    <button t-att-class="'sem-tab ' + (state.activeTab==='finance'?'is-active':'')" t-on-click="() => setTab('finance')" t-out="this._t('Debt/Advance')"/>
                                                 </div>
 
                                                 <t t-if="state.activeTab==='info'">
                                                     <div class="sem-gridInfo">
-                                                        <div><span>Mã nhân viên</span><strong><t t-esc="state.detail.profile.employeeCode"/></strong></div>
-                                                        <div><span>Mã chấm công</span><strong><t t-esc="state.detail.profile.attendanceCode"/></strong></div>
-                                                        <div><span>Tên</span><strong><t t-esc="state.detail.profile.name"/></strong></div>
-                                                        <div><span>Số điện thoại</span><strong><t t-esc="state.detail.profile.phone"/></strong></div>
-                                                        <div><span>Số CMND/CCCD</span><strong><t t-esc="state.detail.profile.idNumber"/></strong></div>
-                                                        <div><span>Ngày sinh</span><strong><t t-esc="state.detail.profile.birthDate || '-'"/></strong></div>
-                                                        <div><span>Giới tính</span><strong><t t-esc="state.detail.profile.gender || '-'"/></strong></div>
-                                                        <div><span>Chi nhánh làm việc</span><strong><t t-esc="state.detail.profile.workBranch"/></strong></div>
-                                                        <div><span>Chi nhánh trả lương</span><strong><t t-esc="state.detail.profile.payBranch"/></strong></div>
-                                                        <div><span>Phòng ban</span><strong><t t-esc="state.detail.profile.department || '-'"/></strong></div>
-                                                        <div><span>Chức danh</span><strong><t t-esc="state.detail.profile.jobTitle || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Employee Code')"/><strong><t t-esc="state.detail.profile.employeeCode"/></strong></div>
+                                                        <div><span t-out="this._t('Attendance Code')"/><strong><t t-esc="state.detail.profile.attendanceCode"/></strong></div>
+                                                        <div><span t-out="this._t('Name')"/><strong><t t-esc="state.detail.profile.name"/></strong></div>
+                                                        <div><span t-out="this._t('Phone Number')"/><strong><t t-esc="state.detail.profile.phone"/></strong></div>
+                                                        <div><span t-out="this._t('ID Number')"/><strong><t t-esc="state.detail.profile.idNumber"/></strong></div>
+                                                        <div><span t-out="this._t('Birth Date')"/><strong><t t-esc="state.detail.profile.birthDate || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Gender')"/><strong><t t-esc="state.detail.profile.gender || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Work Branch')"/><strong><t t-esc="state.detail.profile.workBranch"/></strong></div>
+                                                        <div><span t-out="this._t('Pay Branch')"/><strong><t t-esc="state.detail.profile.payBranch"/></strong></div>
+                                                        <div><span t-out="this._t('Department')"/><strong><t t-esc="state.detail.profile.department || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Job Title')"/><strong><t t-esc="state.detail.profile.jobTitle || '-'"/></strong></div>
                                                     </div>
                                                 </t>
 
@@ -98,7 +98,7 @@
                                                     <table class="sem-miniTable">
                                                         <thead>
                                                             <tr>
-                                                                <th>Ca</th>
+                                                                <th t-out="this._t('Shift')"/>
                                                                 <t t-foreach="state.detail.days" t-as="d" t-key="d.date"><th><t t-esc="d.label"/> <t t-esc="d.day"/></th></t>
                                                             </tr>
                                                         </thead>
@@ -114,7 +114,7 @@
                                                                 </tr>
                                                             </t>
                                                             <t t-if="!state.detail.scheduleShifts.length">
-                                                                <tr><td t-att-colspan="state.detail.days.length + 1" class="sem-empty">Chưa có lịch làm việc tuần này.</td></tr>
+                                                                <tr><td t-att-colspan="state.detail.days.length + 1" class="sem-empty" t-out="this._t('No work schedule for this week.')"/></tr>
                                                             </t>
                                                         </tbody>
                                                     </table>
@@ -123,33 +123,33 @@
                                                 <t t-if="state.activeTab==='salary'">
                                                     <div class="sem-salaryCard">
                                                         <div class="sem-row">
-                                                            <label>Loại lương</label>
+                                                            <label t-out="this._t('Salary Type')"/>
                                                             <select t-model="state.detail.profile.salaryType">
-                                                                <option value="hour">Theo giờ làm việc</option>
-                                                                <option value="shift">Theo ca làm việc</option>
-                                                                <option value="month">Theo tháng</option>
+                                                                <option value="hour" t-out="this._t('By working hour')"/>
+                                                                <option value="shift" t-out="this._t('By working shift')"/>
+                                                                <option value="month" t-out="this._t('By month')"/>
                                                             </select>
                                                         </div>
                                                         <div class="sem-row">
-                                                            <label>Mức lương</label>
+                                                            <label t-out="this._t('Salary Amount')"/>
                                                             <input type="text" t-att-value="formatMoney(state.detail.profile.salaryAmount)" t-on-input="onDetailSalaryInput"/>
                                                             <span class="sem-unit">
-                                                                <t t-if="state.detail.profile.salaryType==='hour'">/ giờ</t>
-                                                                <t t-if="state.detail.profile.salaryType==='shift'">/ ca</t>
-                                                                <t t-if="state.detail.profile.salaryType==='month'">/ tháng</t>
+                                                                <t t-if="state.detail.profile.salaryType==='hour'">/ <t t-out="this._t('hour')"/></t>
+                                                                <t t-if="state.detail.profile.salaryType==='shift'">/ <t t-out="this._t('shift')"/></t>
+                                                                <t t-if="state.detail.profile.salaryType==='month'">/ <t t-out="this._t('month')"/></t>
                                                             </span>
                                                         </div>
                                                         <div class="sem-row end">
-                                                            <label>Thiết lập nâng cao</label>
+                                                            <label t-out="this._t('Advanced Setting')"/>
                                                             <input type="checkbox" t-model="state.detail.profile.advancedSetting"/>
                                                         </div>
                                                         <div class="sem-row end">
-                                                            <label>Lương làm thêm giờ</label>
+                                                            <label t-out="this._t('Overtime Salary')"/>
                                                             <input type="checkbox" t-model="state.detail.profile.overtimeEnabled"/>
                                                         </div>
                                                     </div>
                                                     <div class="sem-actionsRow">
-                                                        <button class="sem-primaryBtn" t-on-click="saveSalary">Cập nhật</button>
+                                                        <button class="sem-primaryBtn" t-on-click="saveSalary" t-out="this._t('Update')"/>
                                                     </div>
                                                 </t>
 
@@ -157,12 +157,12 @@
                                                     <table class="sem-miniTable">
                                                         <thead>
                                                             <tr>
-                                                                <th>Mã phiếu</th>
-                                                                <th>Kỳ làm việc</th>
-                                                                <th class="text-right">Tổng lương</th>
-                                                                <th class="text-right">Đã trả</th>
-                                                                <th class="text-right">Còn cần trả</th>
-                                                                <th>Trạng thái</th>
+                                                                <th t-out="this._t('Slip code')"/>
+                                                                <th t-out="this._t('Period')"/>
+                                                                <th class="text-right" t-out="this._t('Total salary')"/>
+                                                                <th class="text-right" t-out="this._t('Paid')"/>
+                                                                <th class="text-right" t-out="this._t('Remaining')"/>
+                                                                <th t-out="this._t('Status')"/>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -177,7 +177,7 @@
                                                                 </tr>
                                                             </t>
                                                             <t t-if="!state.detail.payslips.length">
-                                                                <tr><td colspan="6" class="sem-empty">Chưa có phiếu lương.</td></tr>
+                                                                <tr><td colspan="6" class="sem-empty" t-out="this._t('No payslips available.')"/></tr>
                                                             </t>
                                                         </tbody>
                                                     </table>
@@ -185,16 +185,16 @@
 
                                                 <t t-if="state.activeTab==='finance'">
                                                     <div class="sem-finTop">
-                                                        <div><strong>Số dư nợ và tạm ứng: </strong><t t-esc="formatMoney(state.detail.profile.debtAdvance)"/></div>
+                                                        <div><strong t-out="this._t('Debt/Advance Balance:')"/> <t t-esc="formatMoney(state.detail.profile.debtAdvance)"/></div>
                                                         <div class="sem-finBtns">
-                                                            <button class="sem-lightBtn" t-on-click="() => openFinance('debt')">Thêm nợ</button>
-                                                            <button class="sem-lightBtn" t-on-click="() => openFinance('advance')">Thêm tạm ứng</button>
-                                                            <button class="sem-primaryBtn" t-on-click="() => openFinance('payment')">Ghi nhận thanh toán</button>
+                                                            <button class="sem-lightBtn" t-on-click="() => openFinance('debt')" t-out="this._t('Add Debt')"/>
+                                                            <button class="sem-lightBtn" t-on-click="() => openFinance('advance')" t-out="this._t('Add Advance')"/>
+                                                            <button class="sem-primaryBtn" t-on-click="() => openFinance('payment')" t-out="this._t('Record Payment')"/>
                                                         </div>
                                                     </div>
                                                     <table class="sem-miniTable">
                                                         <thead>
-                                                            <tr><th>Ngày</th><th>Loại</th><th class="text-right">Số tiền</th><th>Ghi chú</th></tr>
+                                                            <tr><th t-out="this._t('Date')"/><th t-out="this._t('Type')"/><th class="text-right" t-out="this._t('Amount')"/><th t-out="this._t('Notes')"/></tr>
                                                         </thead>
                                                         <tbody>
                                                             <t t-foreach="state.detail.financeRows" t-as="f" t-key="f.date + f.type + f.amount + f.note">
@@ -206,7 +206,7 @@
                                                                 </tr>
                                                             </t>
                                                             <t t-if="!state.detail.financeRows.length">
-                                                                <tr><td colspan="4" class="sem-empty">Chưa có dữ liệu nợ và tạm ứng.</td></tr>
+                                                                <tr><td colspan="4" class="sem-empty" t-out="this._t('No debt/advance data available.')"/></tr>
                                                             </t>
                                                         </tbody>
                                                     </table>
@@ -218,7 +218,7 @@
                             </t>
 
                             <t t-if="!state.loading and !state.rows.length">
-                                <tr><td colspan="9" class="sem-empty">Không có dữ liệu nhân viên.</td></tr>
+                                <tr><td colspan="9" class="sem-empty" t-out="this._t('No employee data found.')"/></tr>
                             </t>
                         </tbody>
                     </table>
@@ -229,30 +229,34 @@
                 <div class="sem-modalBackdrop" t-on-click="closeCreate"/>
                 <div class="sem-modal">
                     <button class="sem-modalClose" t-on-click="closeCreate">×</button>
-                    <h3>Thêm mới nhân viên</h3>
+                    <h3 t-out="this._t('Add New Employee')"/>
                     <div class="sem-formGrid">
-                        <label>Chọn từ người dùng có sẵn</label>
+                        <label t-out="this._t('Select from existing users')"/>
                         <select t-att-value="state.createForm.userId" t-on-change="onSelectAvailableUser">
-                            <option value="">-- Tạo nhân viên mới --</option>
+                            <option value="" t-out="this._t('-- Create New Employee --')"/>
                             <t t-foreach="state.availableUsers" t-as="u" t-key="u.userId">
                                 <option t-att-value="u.userId"><t t-esc="u.name"/> (<t t-esc="u.login"/>)</option>
                             </t>
                         </select>
-                        <label>Tên nhân viên</label><input type="text" t-model="state.createForm.name"/>
-                        <label>Số điện thoại</label><input type="text" t-model="state.createForm.phone"/>
-                        <label>Số CMND/CCCD</label><input type="text" t-model="state.createForm.idNumber"/>
-                        <label>Ngày sinh</label><input type="date" t-model="state.createForm.birthDate"/>
-                        <label>Giới tính</label>
-                        <select t-model="state.createForm.gender"><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select>
-                        <label>Chi nhánh làm việc</label><input type="text" t-model="state.createForm.workBranch"/>
-                        <label>Chi nhánh trả lương</label><input type="text" t-model="state.createForm.payBranch"/>
-                        <label>Loại lương</label>
-                        <select t-model="state.createForm.salaryType"><option value="hour">Theo giờ làm việc</option><option value="shift">Theo ca làm việc</option><option value="month">Theo tháng</option></select>
-                        <label>Mức lương</label><input type="text" t-att-value="formatMoney(state.createForm.salaryAmount)" t-on-input="onCreateSalaryInput"/>
+                        <label t-out="this._t('Employee Name')"/><input type="text" t-model="state.createForm.name"/>
+                        <label t-out="this._t('Phone Number')"/><input type="text" t-model="state.createForm.phone"/>
+                        <label t-out="this._t('ID Number')"/><input type="text" t-model="state.createForm.idNumber"/>
+                        <label t-out="this._t('Birth Date')"/><input type="date" t-model="state.createForm.birthDate"/>
+                        <label t-out="this._t('Gender')"/>
+                        <select t-model="state.createForm.gender"><option value="">--</option><option value="male" t-out="this._t('Male')"/><option value="female" t-out="this._t('Female')"/></select>
+                        <label t-out="this._t('Work Branch')"/><input type="text" t-model="state.createForm.workBranch"/>
+                        <label t-out="this._t('Pay Branch')"/><input type="text" t-model="state.createForm.payBranch"/>
+                        <label t-out="this._t('Salary Type')"/>
+                        <select t-model="state.createForm.salaryType">
+                            <option value="hour" t-out="this._t('By working hour')"/>
+                            <option value="shift" t-out="this._t('By working shift')"/>
+                            <option value="month" t-out="this._t('By month')"/>
+                        </select>
+                        <label t-out="this._t('Salary Amount')"/><input type="text" t-att-value="formatMoney(state.createForm.salaryAmount)" t-on-input="onCreateSalaryInput"/>
                     </div>
                     <div class="sem-actionsRow">
-                        <button class="sem-lightBtn" t-on-click="closeCreate">Bỏ qua</button>
-                        <button class="sem-primaryBtn" t-on-click="saveCreate">Lưu</button>
+                        <button class="sem-lightBtn" t-on-click="closeCreate" t-out="this._t('Cancel')"/>
+                        <button class="sem-primaryBtn" t-on-click="saveCreate" t-out="this._t('Save')"/>
                     </div>
                 </div>
             </t>
@@ -261,16 +265,20 @@
                 <div class="sem-modalBackdrop" t-on-click="closeFinance"/>
                 <div class="sem-modal sem-small">
                     <button class="sem-modalClose" t-on-click="closeFinance">×</button>
-                    <h3>Thêm nợ và tạm ứng</h3>
+                    <h3 t-out="this._t('Add Debt and Advance')"/>
                     <div class="sem-formGrid">
-                        <label>Loại</label>
-                        <select t-model="state.financeForm.type"><option value="debt">Nợ</option><option value="advance">Tạm ứng</option><option value="payment">Thanh toán</option></select>
-                        <label>Số tiền</label><input type="number" t-model="state.financeForm.amount"/>
-                        <label>Ghi chú</label><input type="text" t-model="state.financeForm.note"/>
+                        <label t-out="this._t('Type')"/>
+                        <select t-model="state.financeForm.type">
+                            <option value="debt" t-out="this._t('Debt')"/>
+                            <option value="advance" t-out="this._t('Advance')"/>
+                            <option value="payment" t-out="this._t('Payment')"/>
+                        </select>
+                        <label t-out="this._t('Amount')"/><input type="number" t-model="state.financeForm.amount"/>
+                        <label t-out="this._t('Notes')"/><input type="text" t-model="state.financeForm.note"/>
                     </div>
                     <div class="sem-actionsRow">
-                        <button class="sem-lightBtn" t-on-click="closeFinance">Bỏ qua</button>
-                        <button class="sem-primaryBtn" t-on-click="saveFinance">Lưu</button>
+                        <button class="sem-lightBtn" t-on-click="closeFinance" t-out="this._t('Cancel')"/>
+                        <button class="sem-primaryBtn" t-on-click="saveFinance" t-out="this._t('Save')"/>
                     </div>
                 </div>
             </t>

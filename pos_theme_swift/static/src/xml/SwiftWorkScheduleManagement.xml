@@ -2,14 +2,14 @@
 <templates xml:space="preserve">
     <t t-name="pos_theme_swift.SwiftWorkScheduleManagement" owl="1">
         <div class="sws-page">
-            <div class="sws-headerTitle">THÊM LỊCH LÀM VIỆC</div>
+            <div class="sws-headerTitle" t-out="this._t('ADD WORK SCHEDULE')"/>
 
             <div class="sws-topbar">
-                <div class="sws-title">Lịch làm việc</div>
+                <div class="sws-title" t-out="this._t('Work Schedule')"/>
 
                 <div class="sws-searchWrap">
                     <i class="fa fa-search"/>
-                    <input type="text" placeholder="Tìm kiếm nhân viên" t-model="state.keyword" t-on-input="onSearchInput"/>
+                    <input type="text" t-att-placeholder="this._t('Search employee')" t-model="state.keyword" t-on-input="onSearchInput"/>
                     <i class="fa fa-caret-down"/>
                 </div>
 
@@ -19,12 +19,12 @@
                     <button t-on-click="nextWeek"><i class="fa fa-angle-right"/></button>
                 </div>
 
-                <button class="sws-lightBtn" t-on-click="goCurrentWeek">Tuần này</button>
+                <button class="sws-lightBtn" t-on-click="goCurrentWeek" t-out="this._t('This Week')"/>
 
                 <div class="sws-actions">
-                    <button class="sws-lightBtn"><i class="fa fa-user-o me-1"/> Xem theo nhân viên <i class="fa fa-caret-down ms-1"/></button>
-                    <button class="sws-lightBtn"><i class="fa fa-sign-in me-1"/> Import</button>
-                    <button class="sws-lightBtn"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                    <button class="sws-lightBtn"><i class="fa fa-user-o me-1"/> <t t-out="this._t('View by Employee')"/> <i class="fa fa-caret-down ms-1"/></button>
+                    <button class="sws-lightBtn"><i class="fa fa-sign-in me-1"/> <t t-out="this._t('Import')"/></button>
+                    <button class="sws-lightBtn"><i class="fa fa-share-square-o me-1"/> <t t-out="this._t('Export file')"/></button>
                 </div>
             </div>
 
@@ -32,11 +32,11 @@
                 <table class="sws-table">
                     <thead>
                         <tr>
-                            <th>Nhân viên</th>
+                            <th t-out="this._t('Employee')"/>
                             <t t-foreach="state.days" t-as="d" t-key="d.date">
                                 <th><t t-esc="d.label"/> <t t-esc="d.day"/></th>
                             </t>
-                            <th>Lương dự kiến <i class="fa fa-info-circle"/></th>
+                            <th t-out="this._t('Estimated Salary')"/><i class="fa fa-info-circle"/>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,7 +51,7 @@
                         </tr>
 
                         <t t-if="state.loading">
-                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty">Đang tải dữ liệu...</td></tr>
+                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty" t-out="this._t('Loading data...')"/></tr>
                         </t>
 
                         <t t-foreach="state.rows" t-as="r" t-key="r.userId">
@@ -72,7 +72,7 @@
                                         </t>
                                         <t t-else="">
                                             <a href="#" class="sws-addLink" t-on-click.prevent="() => openScheduleModal(r, d)">
-                                                + Thêm lịch
+                                                + <t t-out="this._t('Add schedule')"/>
                                             </a>
                                         </t>
                                     </td>
@@ -81,15 +81,15 @@
                                 <td class="sws-salaryCell">
                                     <t t-if="r.salaryConfigured">
                                         <div><t t-esc="formatMoney(r.estimatedSalary)"/></div>
-                                        <div class="sws-subInfo"><t t-esc="r.shiftCount"/> ca</div>
+                                        <div class="sws-subInfo"><t t-esc="r.shiftCount"/> <t t-out="this._t('shifts')"/></div>
                                     </t>
-                                    <t t-else="">Chưa thiết lập lương</t>
+                                    <t t-else="" t-out="this._t('Salary not configured')"/>
                                 </td>
                             </tr>
                         </t>
 
                         <t t-if="!state.loading and !state.rows.length">
-                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty">Không có dữ liệu nhân viên.</td></tr>
+                            <tr><td t-att-colspan="state.days.length + 2" class="sws-empty" t-out="this._t('No employee data found.')"/></tr>
                         </t>
                     </tbody>
                 </table>
@@ -99,14 +99,14 @@
                 <div class="sws-modalBackdrop" t-on-click="closeScheduleModal"/>
                 <div class="sws-modal">
                     <button class="sws-modalClose" t-on-click="closeScheduleModal">×</button>
-                    <h3>Thêm lịch làm việc</h3>
+                    <h3 t-out="this._t('Add Work Schedule')"/>
                     <div class="sws-modalSub">
                         <span><t t-esc="state.scheduleTarget.employeeName"/></span>
                         <span> - </span>
                         <span><t t-esc="state.scheduleTarget.date"/></span>
                     </div>
 
-                    <div class="sws-sectionTitle">Chọn ca làm việc <button class="sws-inlineBtn" t-on-click="openShiftModal">+</button></div>
+                    <div class="sws-sectionTitle"><t t-out="this._t('Select work shift')"/> <button class="sws-inlineBtn" t-on-click="openShiftModal">+</button></div>
                     <div class="sws-templateGrid">
                         <t t-foreach="state.templates" t-as="t" t-key="t.id">
                             <label class="sws-templateItem">
@@ -117,7 +117,7 @@
                         </t>
                     </div>
 
-                    <div class="sws-sectionTitle">Lặp lại hàng tuần <input type="checkbox" t-model="state.applyWeekly"/></div>
+                    <div class="sws-sectionTitle"><t t-out="this._t('Repeat weekly')"/> <input type="checkbox" t-model="state.applyWeekly"/></div>
                     <div class="sws-weekdayRow">
                         <t t-foreach="getWeekdayButtons()" t-as="w" t-key="w.idx">
                             <button t-att-class="'sws-weekdayBtn ' + (state.selectedWeekdays.includes(w.idx) ? 'is-active' : '')" t-on-click="() => toggleWeekday(w.idx)">
@@ -126,9 +126,9 @@
                         </t>
                     </div>
 
-                    <div class="sws-sectionTitle">Thêm lịch tương tự cho nhân viên khác <input type="checkbox" t-model="state.copyToOthers"/></div>
+                    <div class="sws-sectionTitle"><t t-out="this._t('Copy schedule to other employees')"/> <input type="checkbox" t-model="state.copyToOthers"/></div>
                     <t t-if="state.copyToOthers">
-                        <input class="sws-copySearch" type="text" placeholder="Tìm kiếm nhân viên" t-model="state.copyEmployeeKeyword"/>
+                        <input class="sws-copySearch" type="text" t-att-placeholder="this._t('Search employee')" t-model="state.copyEmployeeKeyword"/>
                         <div class="sws-copyList">
                             <t t-foreach="getFilteredCopyEmployees()" t-as="e" t-key="e.userId">
                                 <label class="sws-copyItem">
@@ -140,8 +140,8 @@
                     </t>
 
                     <div class="sws-modalActions">
-                        <button class="sws-lightBtn" t-on-click="closeScheduleModal">Bỏ qua</button>
-                        <button class="sws-primaryBtn" t-on-click="saveSchedule">Lưu</button>
+                        <button class="sws-lightBtn" t-on-click="closeScheduleModal" t-out="this._t('Cancel')"/>
+                        <button class="sws-primaryBtn" t-on-click="saveSchedule" t-out="this._t('Save')"/>
                     </div>
                 </div>
             </t>
@@ -150,32 +150,32 @@
                 <div class="sws-modalBackdrop"/>
                 <div class="sws-modal sws-smallModal">
                     <button class="sws-modalClose" t-on-click="closeShiftModal">×</button>
-                    <h3>Thêm ca làm việc</h3>
+                    <h3 t-out="this._t('Add Work Shift')"/>
 
                     <div class="sws-formRow">
-                        <label>Tên</label>
+                        <label t-out="this._t('Name')"/>
                         <input type="text" t-model="state.shiftForm.name"/>
                     </div>
                     <div class="sws-formRow">
-                        <label>Giờ làm việc</label>
+                        <label t-out="this._t('Working Hours')"/>
                         <input type="time" t-model="state.shiftForm.start_hour"/>
-                        <span>đến</span>
+                        <span t-out="this._t('to')"/>
                         <input type="time" t-model="state.shiftForm.end_hour"/>
                     </div>
                     <div class="sws-formRow">
-                        <label>Giờ cho phép chấm công</label>
+                        <label t-out="this._t('Check-in Hours')"/>
                         <input type="time" t-model="state.shiftForm.checkin_start_hour"/>
-                        <span>đến</span>
+                        <span t-out="this._t('to')"/>
                         <input type="time" t-model="state.shiftForm.checkin_end_hour"/>
                     </div>
                     <div class="sws-formRow">
-                        <label>Phạm vi áp dụng</label>
+                        <label t-out="this._t('Scope')"/>
                         <input type="text" t-model="state.shiftForm.branch_name"/>
                     </div>
 
                     <div class="sws-modalActions">
-                        <button class="sws-lightBtn" t-on-click="closeShiftModal">Bỏ qua</button>
-                        <button class="sws-primaryBtn" t-on-click="saveShiftTemplate">Lưu</button>
+                        <button class="sws-lightBtn" t-on-click="closeShiftModal" t-out="this._t('Cancel')"/>
+                        <button class="sws-primaryBtn" t-on-click="saveShiftTemplate" t-out="this._t('Save')"/>
                     </div>
                 </div>
             </t>

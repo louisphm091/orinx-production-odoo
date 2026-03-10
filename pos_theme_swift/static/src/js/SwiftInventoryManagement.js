@@ -6,11 +6,44 @@ import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { SwiftInventoryForm } from "./SwiftInventoryForm";
 
+
 export class SwiftInventory extends Component {
   static template = "pos_theme_swift.SwiftInventory";
   static components = { SwiftInventoryForm };
+  static _i18n_strings = [
+    _t("Inventory Voucher"),
+    _t("Search by voucher code"),
+    _t("Select branch"),
+    _t("Audit"),
+    _t("Export"),
+    _t("Columns"),
+    _t("Settings"),
+    _t("Loading data..."),
+    _t("Audit Code"),
+    _t("Time"),
+    _t("Balance Date"),
+    _t("Actual Qty"),
+    _t("Total Actual"),
+    _t("Total Diff"),
+    _t("Diff Inc"),
+    _t("Diff Dec"),
+    _t("Notes"),
+    _t("Status"),
+    _t("Draft"),
+    _t("Balanced"),
+    _t("No inventory vouchers for this branch"),
+    _t("Select a branch to view inventory vouchers"),
+    _t("Branch"),
+    _t("Please select a branch before creating an inventory voucher."),
+    _t("Notification"),
+    _t("Excel export function is under development."),
+    _t("PDF export function is under development."),
+    _t("Column options are under development."),
+    _t("Settings are under development."),
+  ];
 
   setup() {
+    this._t = _t;
     this.orm = useService("orm");
     this.action = useService("action");
     this.notification = useService("notification");
@@ -20,6 +53,8 @@ export class SwiftInventory extends Component {
       keyword: "",
       checkAll: false,
       records: [],
+      configs: [],
+      selectedConfigId: false,
       view: "list",
       editId: false,
       branchName: "",
@@ -37,9 +72,10 @@ export class SwiftInventory extends Component {
     this.onFormBack = this.onFormBack.bind(this);
     this.onFormSaved = this.onFormSaved.bind(this);
     this.onSearchInput = this.onSearchInput.bind(this);
+    this.onBranchChange = this.onBranchChange.bind(this);
 
     onMounted(async () => {
-      await this._loadBranch();
+      await this._loadBranches();
       await this.loadRecords();
     });
   }
@@ -84,13 +120,36 @@ export class SwiftInventory extends Component {
 
   // ─── branch name ─────────────────────────────────────────────
 
-  async _loadBranch() {
+  _getContextConfigId() {
+    const rawConfigId =
+      this.props?.action?.context?.pos_config_id ||
+      this.env?.config?.pos_config_id ||
+      false;
+    const configId = parseInt(rawConfigId, 10);
+    return Number.isInteger(configId) ? configId : false;
+  }
+
+  async _loadBranches() {
     try {
       const configs = await this.orm.searchRead(
-        "pos.config", [], ["name"], { limit: 1 }
+        "pos.config",
+        [["active", "=", true]],
+        ["name"],
+        { order: "name asc" }
       );
-      this.state.branchName = configs.length ? configs[0].name : _t("Branch");
+      this.state.configs = configs || [];
+
+      const contextConfigId = this._getContextConfigId();
+      const selected =
+        this.state.configs.find((config) => config.id === contextConfigId) ||
+        this.state.configs[0] ||
+        false;
+
+      this.state.selectedConfigId = selected ? selected.id : false;
+      this.state.branchName = selected ? selected.name : _t("Branch");
     } catch (_) {
+      this.state.configs = [];
+      this.state.selectedConfigId = false;
       this.state.branchName = _t("Branch");
     }
   }
@@ -109,7 +168,9 @@ export class SwiftInventory extends Component {
       let raw = [];
       try {
         raw = await this.orm.searchRead(
-          "swift.stock.inventory", [], fields,
+          "swift.stock.inventory",
+          this.state.selectedConfigId ? [["config_id", "=", this.state.selectedConfigId]] : [["id", "=", 0]],
+          fields,
           { order: "date desc", limit: 200 }
         );
       } catch (_) { raw = []; }
@@ -164,8 +225,23 @@ export class SwiftInventory extends Component {
   }
 
   onCreateInventory() {
+    if (!this.state.selectedConfigId) {
+      this.notification.add(_t("Please select a branch before creating an inventory voucher."), {
+        type: "warning",
+        title: _t("Notification"),
+      });
+      return;
+    }
     this.state.editId = false;
     this.state.view = "form";
+  }
+
+  async onBranchChange(ev) {
+    const selectedId = parseInt(ev.target.value, 10) || false;
+    this.state.selectedConfigId = selectedId;
+    const selected = this.state.configs.find((config) => config.id === selectedId);
+    this.state.branchName = selected ? selected.name : _t("Branch");
+    await this.loadRecords();
   }
 
   // ─── form callbacks ───────────────────────────────────────────
@@ -200,4 +276,3 @@ export class SwiftInventory extends Component {
 registry
   .category("actions")
   .add("pos_theme_swift.swift_pos_inventory_management", SwiftInventory);
-

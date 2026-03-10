@@ -9,10 +9,10 @@
 
         <!-- Top bar -->
         <div class="sif-left-topbar">
-          <button class="sif-backBtn" t-on-click="onBack" title="Back">
+          <button class="sif-backBtn" t-on-click="onBack" t-att-title="this._t('Back')">
             <i class="fa fa-arrow-left"/>
           </button>
-          <span class="sif-left-title">Inventory Count</span>
+          <span class="sif-left-title" t-out="this._t('Inventory Count')"/>
 
           <!-- Live product search -->
           <div class="sif-search" t-on-click.stop="">
@@ -21,14 +21,14 @@
               t-ref="searchInput"
               type="text"
               class="sif-searchInput"
-              placeholder="Search products by code or name (F3)"
+              t-att-placeholder="this._t('Search products by code or name (F3)')"
               t-att-value="state.searchKeyword"
               t-on-input="onProductSearchInput"
               t-on-keydown="onProductSearchKeydown"
               autocomplete="off"
             />
             <t t-if="state.searchKeyword">
-              <button class="sif-searchClear" t-on-click="clearSearch" title="Clear search">
+              <button class="sif-searchClear" t-on-click="clearSearch" t-att-title="this._t('Clear search')">
                 <i class="fa fa-times"/>
               </button>
             </t>
@@ -38,11 +38,11 @@
               <div class="sif-dropdown">
                 <t t-if="state.searchLoading">
                   <div class="sif-dropdown-loading">
-                    <i class="fa fa-spinner fa-spin"/> Searching...
+                    <i class="fa fa-spinner fa-spin"/> <t t-out="this._t('Searching...')"/>
                   </div>
                 </t>
                 <t t-elif="state.searchResults.length === 0">
-                  <div class="sif-dropdown-empty">Prouduct not found.</div>
+                  <div class="sif-dropdown-empty" t-out="this._t('Product not found.')"/>
                 </t>
                 <t t-else="">
                   <t t-foreach="state.searchResults" t-as="p" t-key="p.id">
@@ -52,7 +52,7 @@
                         <span class="sif-drop-barcode"><t t-esc="p.barcode || '—'"/></span>
                         <span class="sif-drop-uom"><t t-esc="p.uom"/></span>
                         <span class="sif-drop-stock">
-                          Stock: <b><t t-esc="p.qty_on_hand"/></b>
+                          <t t-out="this._t('Stock:')"/> <b><t t-esc="p.qty_on_hand"/></b>
                         </span>
                       </div>
                     </div>
@@ -64,30 +64,30 @@
 
           <!-- Icon toolbar -->
           <div class="sif-toolbar">
-            <button class="sif-iconBtn" title="Import from Excel" t-on-click="onChooseFile">
+            <button class="sif-iconBtn" t-att-title="this._t('Import from Excel')" t-on-click="onChooseFile">
               <i class="fa fa-upload"/>
             </button>
           </div>
           <div class="sif-toolbar sif-toolbarRight">
-            <button class="sif-iconBtn" title="Print"><i class="fa fa-print"/></button>
-            <button class="sif-iconBtn" title="Preview"><i class="fa fa-eye"/></button>
-            <button class="sif-iconBtn" title="More options"><i class="fa fa-ellipsis-v"/></button>
+            <button class="sif-iconBtn" t-att-title="this._t('Print')"><i class="fa fa-print"/></button>
+            <button class="sif-iconBtn" t-att-title="this._t('Preview')"><i class="fa fa-eye"/></button>
+            <button class="sif-iconBtn" t-att-title="this._t('More options')"><i class="fa fa-ellipsis-v"/></button>
           </div>
         </div>
 
         <!-- Tabs -->
         <div class="sif-tabs">
           <button t-att-class="state.tab === 'all' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('all')">
-            All (<t t-esc="tabCount('all')"/>)
+            <t t-out="this._t('All')"/> (<t t-esc="tabCount('all')"/>)
           </button>
           <button t-att-class="state.tab === 'match' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('match')">
-            Matched (<t t-esc="tabCount('match')"/>)
+            <t t-out="this._t('Matched')"/> (<t t-esc="tabCount('match')"/>)
           </button>
           <button t-att-class="state.tab === 'diff' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('diff')">
-            Discrepancy (<t t-esc="tabCount('diff')"/>)
+            <t t-out="this._t('Discrepancy')"/> (<t t-esc="tabCount('diff')"/>)
           </button>
           <button t-att-class="state.tab === 'unchecked' ? 'sif-tab active' : 'sif-tab'" t-on-click="() => setTab('unchecked')">
-            Unchecked (<t t-esc="tabCount('unchecked')"/>)
+            <t t-out="this._t('Unchecked')"/> (<t t-esc="tabCount('unchecked')"/>)
           </button>
 
           <!-- Inline filter (filters lines already in table) -->
@@ -97,7 +97,7 @@
               <input
                 type="text"
                 class="sif-filterInput"
-                placeholder="Filter in list..."
+                t-att-placeholder="this._t('Filter in list...')"
                 t-att-value="state.filterKeyword"
                 t-on-input="onFilterInput"
               />
@@ -109,7 +109,7 @@
         <t t-if="state.importing">
           <div class="sif-emptyState">
             <i class="fa fa-spinner fa-spin fa-2x" style="color:#2563eb"/>
-            <div class="sif-emptyTitle" style="margin-top:12px">Importing data...</div>
+            <div class="sif-emptyTitle" style="margin-top:12px" t-out="this._t('Importing data...')"/>
           </div>
         </t>
 
@@ -120,21 +120,21 @@
               <thead>
                 <tr>
                   <th class="col-del"></th>
-                  <th class="col-stt">No.</th>
-                  <th>Product Code</th>
-                  <th class="col-name">Product Name</th>
-                  <th>UOM</th>
-                  <th class="col-num">Stock</th>
-                  <th class="col-num col-actual">Actual</th>
-                  <th class="col-num">Diff</th>
-                  <th class="col-num">Diff Value</th>
+                  <th class="col-stt" t-out="this._t('No.')"/>
+                  <th t-out="this._t('Product Code')"/>
+                  <th class="col-name" t-out="this._t('Product Name')"/>
+                  <th t-out="this._t('UOM')"/>
+                  <th class="col-num" t-out="this._t('Stock')"/>
+                  <th class="col-num col-actual" t-out="this._t('Actual')"/>
+                  <th class="col-num" t-out="this._t('Diff')"/>
+                  <th class="col-num" t-out="this._t('Diff Value')"/>
                 </tr>
               </thead>
               <tbody>
                 <t t-foreach="state.filteredLines" t-as="line" t-key="line.id">
                   <tr>
                     <td class="col-del">
-                      <button class="sif-deleteBtn" t-on-click="() => deleteLine(line)" title="Delete row">
+                      <button class="sif-deleteBtn" t-on-click="() => deleteLine(line)" t-att-title="this._t('Delete row')">
                         <i class="fa fa-trash-o"/>
                       </button>
                     </td>
@@ -184,12 +184,10 @@
         <!-- Empty state -->
         <t t-else="">
           <div class="sif-emptyState">
-            <div class="sif-emptyTitle">Search or import file to add products</div>
-            <div class="sif-emptyHint">
-              Type name / barcode in search box, or upload file:
-            </div>
+            <div class="sif-emptyTitle" t-out="this._t('Search or import file to add products')"/>
+            <div class="sif-emptyHint" t-out="this._t('Type name / barcode in search box, or upload file:')"/>
             <button class="sif-chooseFileBtn" t-on-click="onChooseFile">
-              <i class="fa fa-upload me-1"/> Choose Excel / CSV file
+              <i class="fa fa-upload me-1"/> <t t-out="this._t('Choose Excel / CSV file')"/>
             </button>
           </div>
         </t>
@@ -212,7 +210,7 @@
         <div class="sif-right-header">
           <span class="sif-branchName">
             <i class="fa fa-map-marker me-1"/>
-            <t t-esc="props.branchName || 'Branch'"/>
+            <t t-esc="state.branchName || props.branchName || this._t('Branch')"/>
           </span>
           <span class="sif-rightDate"><t t-esc="state.now"/></span>
         </div>
@@ -220,21 +218,21 @@
         <!-- Fields -->
         <div class="sif-fields">
           <div class="sif-field sif-field--inline">
-            <label class="sif-fieldLabel">Inventory Code</label>
+            <label class="sif-fieldLabel" t-out="this._t('Inventory Code')"/>
             <div class="sif-fieldValue sif-autoCode"><t t-esc="state.autoCode"/></div>
           </div>
 
           <div class="sif-field sif-field--inline">
-            <label class="sif-fieldLabel">Status</label>
+            <label class="sif-fieldLabel" t-out="this._t('Status')"/>
             <div class="sif-fieldValue">
               <span t-att-class="state.status === 'done' ? 'swift-badge is-done' : 'swift-badge is-draft'">
-                <t t-esc="state.status === 'done' ? 'Balanced' : 'Draft'"/>
+                <t t-esc="this._t(state.status === 'done' ? 'Balanced' : 'Draft')"/>
               </span>
             </div>
           </div>
 
           <div class="sif-field sif-field--inline">
-            <label class="sif-fieldLabel">Total Actual Qty</label>
+            <label class="sif-fieldLabel" t-out="this._t('Total Actual Qty')"/>
             <div class="sif-fieldValue sif-totalQty">
               <t t-esc="_formatNumber(state.totalQtyActual)"/>
             </div>
@@ -243,7 +241,7 @@
           <div class="sif-field sif-field--note">
             <textarea
               class="sif-noteInput"
-              placeholder="✏ Note..."
+              t-att-placeholder="this._t('✏ Note...')"
               t-model="state.note"
               rows="2"
             />
@@ -252,7 +250,7 @@
 
         <!-- Session products (Kiểm gần đây) -->
         <div class="sif-recent">
-          <div class="sif-recentTitle">Recent Checks</div>
+          <div class="sif-recentTitle" t-out="this._t('Recent Checks')"/>
           <t t-if="state.sessionProducts.length > 0">
             <t t-foreach="state.sessionProducts" t-as="sp" t-key="sp.name">
               <div class="sif-recentItem">
@@ -265,7 +263,7 @@
             </t>
           </t>
           <t t-else="">
-            <div class="sif-recentEmpty">No products yet.</div>
+            <div class="sif-recentEmpty" t-out="this._t('No products yet.')"/>
           </t>
         </div>
 
@@ -273,11 +271,11 @@
         <div class="sif-footer">
           <button class="sif-btnSave" t-on-click="onSave" t-att-disabled="state.saving">
             <i class="fa fa-floppy-o me-1"/>
-            Save Draft
+            <t t-out="this._t('Save Draft')"/>
           </button>
           <button class="sif-btnComplete" t-on-click="onComplete" t-att-disabled="state.saving">
             <i class="fa fa-check me-1"/>
-            Complete
+            <t t-out="this._t('Complete')"/>
           </button>
         </div>
 
@@ -287,4 +285,3 @@
   </t>
 
 </templates>
-

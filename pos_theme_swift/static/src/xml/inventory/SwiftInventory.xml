@@ -9,38 +9,50 @@
 
         <!-- Top bar -->
         <div class="swift-inv-topbar">
-          <div class="swift-inv-title">Inventory Voucher</div>
+          <div class="swift-inv-title" t-out="this._t('Inventory Voucher')"/>
 
           <div class="swift-inv-search">
             <i class="fa fa-search swift-inv-searchIcon"/>
             <input
               type="text"
               class="swift-inv-searchInput"
-              placeholder="Search by voucher code"
+              t-att-placeholder="this._t('Search by voucher code')"
               t-model="state.keyword"
               t-on-input="onSearchInput"
             />
           </div>
 
+          <div class="swift-inv-branch">
+            <i class="fa fa-map-marker swift-inv-branchIcon"/>
+            <select class="swift-inv-branchSelect" t-on-change="onBranchChange">
+              <option value="" t-out="this._t('Select branch')"/>
+              <t t-foreach="state.configs" t-as="config" t-key="config.id">
+                <option t-att-value="config.id" t-att-selected="config.id === state.selectedConfigId">
+                  <t t-esc="config.name"/>
+                </option>
+              </t>
+            </select>
+          </div>
+
           <div class="swift-inv-actions">
             <button type="button" class="swift-btnPrimary" t-on-click="onCreateInventory">
-              <i class="fa fa-plus me-1"/> Audit
+              <i class="fa fa-plus me-1"/> <t t-out="this._t('Audit')"/>
             </button>
 
             <div class="dropdown">
               <button class="swift-btnLight dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fa fa-file-text-o me-1"/> Export
+                <i class="fa fa-file-text-o me-1"/> <t t-out="this._t('Export')"/>
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" t-on-click="exportExcel">Excel</a></li>
-                <li><a class="dropdown-item" t-on-click="exportPdf">PDF</a></li>
+                <li><a class="dropdown-item" t-on-click="exportExcel" t-out="this._t('Excel')"/></li>
+                <li><a class="dropdown-item" t-on-click="exportPdf" t-out="this._t('PDF')"/></li>
               </ul>
             </div>
 
-            <button type="button" class="swift-iconBtn" title="Columns" t-on-click="openColumns">
+            <button type="button" class="swift-iconBtn" t-att-title="this._t('Columns')" t-on-click="openColumns">
               <i class="fa fa-th-large"/>
             </button>
-            <button type="button" class="swift-iconBtn" title="Settings" t-on-click="openSettings">
+            <button type="button" class="swift-iconBtn" t-att-title="this._t('Settings')" t-on-click="openSettings">
               <i class="fa fa-cog"/>
             </button>
           </div>
@@ -48,7 +60,7 @@
 
         <!-- Loading -->
         <t t-if="state.loading">
-          <div class="swift-inv-loading">Loading data...</div>
+          <div class="swift-inv-loading" t-out="this._t('Loading data...')"/>
         </t>
 
         <!-- Table -->
@@ -62,18 +74,18 @@
                   </th>
                   <th class="col-star"></th>
 
-                  <th>Audit Code</th>
-                  <th>Time</th>
-                  <th>Balance Date</th>
+                  <th t-out="this._t('Audit Code')"/>
+                  <th t-out="this._t('Time')"/>
+                  <th t-out="this._t('Balance Date')"/>
 
-                  <th class="col-num">Actual Qty</th>
-                  <th class="col-num">Total Actual</th>
-                  <th class="col-num">Total Diff</th>
-                  <th class="col-num">Diff Inc</th>
-                  <th class="col-num">Diff Dec</th>
+                  <th class="col-num" t-out="this._t('Actual Qty')"/>
+                  <th class="col-num" t-out="this._t('Total Actual')"/>
+                  <th class="col-num" t-out="this._t('Total Diff')"/>
+                  <th class="col-num" t-out="this._t('Diff Inc')"/>
+                  <th class="col-num" t-out="this._t('Diff Dec')"/>
 
-                  <th>Notes</th>
-                  <th class="col-status">Status</th>
+                  <th t-out="this._t('Notes')"/>
+                  <th class="col-status" t-out="this._t('Status')"/>
                 </tr>
               </thead>
 
@@ -110,7 +122,7 @@
                           r.status === 'done' ? 'is-done' : ''
                         ].join(' ')"
                       >
-                        <t t-esc="r.status === 'draft' ? 'Draft' : 'Balanced'"/>
+                        <t t-esc="this._t(r.status === 'draft' ? 'Draft' : 'Balanced')"/>
                       </span>
                     </td>
                   </tr>
@@ -118,7 +130,9 @@
 
                 <t t-if="!state.records || state.records.length === 0">
                   <tr>
-                    <td colspan="12" class="swift-empty">No data</td>
+                    <td colspan="12" class="swift-empty">
+                      <t t-esc="this._t(state.selectedConfigId ? 'No inventory vouchers for this branch' : 'Select a branch to view inventory vouchers')"/>
+                    </td>
                   </tr>
                 </t>
               </tbody>
@@ -134,6 +148,7 @@
       <SwiftInventoryForm
         t-props="{
           inventoryId: state.editId,
+          configId: state.selectedConfigId,
           branchName: state.branchName,
           onBack: () => onFormBack(),
           onSaved: () => onFormSaved(),
@@ -144,4 +159,3 @@
   </t>
 
 </templates>
-

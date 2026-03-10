@@ -198,16 +198,35 @@ class SwiftZaloApiController(http.Controller):
         keyword = args.get("keyword", "")
         limit = int(args.get("limit", 100))
         offset = int(args.get("offset", 0))
+        config_id = args.get("config_id")
+        pos_config = False
+        if config_id:
+            pos_config = request.env["pos.config"].sudo().browse(int(config_id)).exists()
+        if not pos_config:
+            return self._ok({
+                "rows": [],
+                "pagination": {
+                    "total": 0,
+                    "limit": limit,
+                    "offset": offset,
+                },
+            })
 
         domain = [("available_in_pos", "=", True), ("sale_ok", "=", True), ("active", "=", True)]
+        domain.append(("product_tmpl_id.swift_branch_config_ids", "in", pos_config.ids))
+        if pos_config.limit_categories and pos_config.iface_available_categ_ids:
+            domain.append(("pos_categ_ids", "in", pos_config.iface_available_categ_ids.ids))
         if keyword:
             domain += ["|", "|", ("name", "ilike", keyword), ("default_code", "ilike", keyword), ("barcode", "ilike", keyword)]
 
         products = request.env["product.product"].sudo().search(domain, limit=limit, offset=offset, order="name asc")
         total = request.env["product.product"].sudo().search_count(domain)
 
+        quant_domain = [("product_id", "in", products.ids), ("location_id.usage", "=", "internal")]
+        if pos_config.picking_type_id.default_location_src_id:
+            quant_domain.append(("location_id", "child_of", pos_config.picking_type_id.default_location_src_id.id))
         qty_groups = request.env["stock.quant"].sudo()._read_group(
-            [("product_id", "in", products.ids), ("location_id.usage", "=", "internal")],
+            quant_domain,
             groupby=["product_id"],
             aggregates=["quantity:sum"],
         )

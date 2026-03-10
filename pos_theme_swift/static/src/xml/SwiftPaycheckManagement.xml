@@ -3,33 +3,33 @@
     <t t-name="pos_theme_swift.SwiftPaycheckManagement" owl="1">
         <div class="spc-page swift-inv-page">
             <div class="spc-topline">
-                <div class="spc-headline">Bảng lương</div>
+                <div class="spc-headline" t-out="this._t('Paychecks')"/>
                 <div class="spc-searchWrap">
                     <i class="fa fa-search"/>
-                    <input type="text" placeholder="Theo mã, tên bảng lương" t-model="state.paycheckSearch" t-on-input="onSearchInput"/>
+                    <input type="text" t-att-placeholder="this._t('By code, paycheck name')" t-model="state.paycheckSearch" t-on-input="onSearchInput"/>
                 </div>
                 <div class="spc-tools">
-                    <button class="spc-btnPrimary" t-on-click="createPaycheck"><i class="fa fa-plus me-1"/> Bảng tính lương</button>
-                    <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                    <button class="spc-btnPrimary" t-on-click="createPaycheck"><i class="fa fa-plus me-1"/> <t t-out="this._t('Payroll Table')"/></button>
+                    <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> <t t-out="this._t('Export file')"/></button>
                     <button class="spc-iconBtn"><i class="fa fa-list"/></button>
                 </div>
             </div>
 
             <div class="spc-content">
                 <aside class="spc-filter">
-                    <div class="spc-filterTitle">Chi nhánh</div>
-                    <div class="spc-chip">Chi nhánh trung tâm <span>×</span></div>
+                    <div class="spc-filterTitle" t-out="this._t('Branch')"/>
+                    <div class="spc-chip"><t t-out="this._t('Central Branch')"/> <span>×</span></div>
 
-                    <div class="spc-filterTitle mt">Kỳ hạn trả lương</div>
+                    <div class="spc-filterTitle mt" t-out="this._t('Pay Period')"/>
                     <select class="spc-select">
-                        <option>Chọn kỳ hạn trả lương</option>
+                        <option t-out="this._t('Select pay period')"/>
                     </select>
 
-                    <div class="spc-filterTitle mt">Trạng thái</div>
-                    <label><input type="checkbox" checked="checked"/> Đang tạo</label>
-                    <label><input type="checkbox" checked="checked"/> Tạm tính</label>
-                    <label><input type="checkbox" checked="checked"/> Đã chốt lương</label>
-                    <label><input type="checkbox"/> Đã hủy</label>
+                    <div class="spc-filterTitle mt" t-out="this._t('Status')"/>
+                    <label><input type="checkbox" checked="checked"/> <t t-out="this._t('Creating')"/></label>
+                    <label><input type="checkbox" checked="checked"/> <t t-out="this._t('Provisional')"/></label>
+                    <label><input type="checkbox" checked="checked"/> <t t-out="this._t('Finalized')"/></label>
+                    <label><input type="checkbox"/> <t t-out="this._t('Cancelled')"/></label>
                 </aside>
 
                 <section class="spc-grid">
@@ -37,15 +37,15 @@
                         <thead>
                             <tr>
                                 <th class="w-check"><input type="checkbox"/></th>
-                                <th>Mã</th>
-                                <th>Tên</th>
-                                <th>Kỳ hạn trả</th>
-                                <th>Kỳ làm việc</th>
-                                <th>Chi nhánh</th>
-                                <th class="text-right">Tổng lương</th>
-                                <th class="text-right">Đã trả nhân viên</th>
-                                <th class="text-right">Còn cần trả</th>
-                                <th>Trạng thái</th>
+                                <th t-out="this._t('Code')"/>
+                                <th t-out="this._t('Name')"/>
+                                <th t-out="this._t('Cycle')"/>
+                                <th t-out="this._t('Period')"/>
+                                <th t-out="this._t('Branch')"/>
+                                <th class="text-right" t-out="this._t('Total Salary')"/>
+                                <th class="text-right" t-out="this._t('Paid to Employee')"/>
+                                <th class="text-right" t-out="this._t('Remaining')"/>
+                                <th t-out="this._t('Status')"/>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,7 +60,7 @@
 
                             <t t-if="state.loading">
                                 <tr>
-                                    <td colspan="10" class="spc-empty">Đang tải dữ liệu...</td>
+                                    <td colspan="10" class="spc-empty" t-out="this._t('Loading data...')"/>
                                 </tr>
                             </t>
 
@@ -84,37 +84,37 @@
                                         <td colspan="9" class="spc-detailCell">
                                             <div class="spc-detailBox">
                                                 <div class="spc-tabs">
-                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'info' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('info')">Thông tin</button>
-                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'slip' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('slip')">Phiếu lương</button>
-                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'history' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('history')">Lịch sử thanh toán</button>
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'info' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('info')" t-out="this._t('Info')"/>
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'slip' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('slip')" t-out="this._t('Payslip')"/>
+                                                    <button t-att-class="'spc-tab ' + (state.paycheckTab === 'history' ? 'is-active' : '')" t-on-click="() => setPaycheckTab('history')" t-out="this._t('Payment History')"/>
                                                 </div>
 
                                                 <t t-if="state.paycheckTab === 'info'">
                                                     <div class="spc-infoGrid">
-                                                        <div><span>Mã:</span><strong><t t-esc="r.code"/></strong></div>
-                                                        <div><span>Tên:</span><strong><t t-esc="r.name"/></strong></div>
-                                                        <div><span>Kỳ hạn trả:</span><strong><t t-esc="r.cycle"/></strong></div>
-                                                        <div><span>Kỳ làm việc:</span><strong><t t-esc="r.period"/></strong></div>
-                                                        <div><span>Ngày tạo:</span><strong><t t-esc="r.createdAt || '-'"/></strong></div>
-                                                        <div><span>Người tạo:</span><strong><t t-esc="r.createdBy || '-'"/></strong></div>
-                                                        <div><span>Người lập bảng:</span><strong><t t-esc="r.preparedBy || '-'"/></strong></div>
-                                                        <div><span>Trạng thái:</span><strong><t t-esc="r.status"/></strong></div>
-                                                        <div><span>Tổng số nhân viên:</span><strong><t t-esc="r.employeeCount || 0"/></strong></div>
-                                                        <div><span>Tổng lương:</span><strong><t t-esc="formatMoney(r.totalSalary)"/></strong></div>
-                                                        <div><span>Đã trả nhân viên:</span><strong><t t-esc="formatMoney(r.paidToEmployee)"/></strong></div>
-                                                        <div><span>Còn cần trả:</span><strong><t t-esc="formatMoney(r.remaining)"/></strong></div>
-                                                        <div><span>Chi nhánh:</span><strong><t t-esc="r.branch"/></strong></div>
-                                                        <div><span>Phạm vi áp dụng:</span><strong><t t-esc="r.scope || '-'"/></strong></div>
-                                                        <div><span>Người chốt lương:</span><strong><t t-esc="r.finalizedBy || '-'"/></strong></div>
-                                                        <div><span>Ghi chú...</span><strong><t t-esc="r.note || ''"/></strong></div>
+                                                        <div><span t-out="this._t('Code:')"/><strong><t t-esc="r.code"/></strong></div>
+                                                        <div><span t-out="this._t('Name:')"/><strong><t t-esc="r.name"/></strong></div>
+                                                        <div><span t-out="this._t('Cycle:')"/><strong><t t-esc="r.cycle"/></strong></div>
+                                                        <div><span t-out="this._t('Period:')"/><strong><t t-esc="r.period"/></strong></div>
+                                                        <div><span t-out="this._t('Created At:')"/><strong><t t-esc="r.createdAt || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Created By:')"/><strong><t t-esc="r.createdBy || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Prepared By:')"/><strong><t t-esc="r.preparedBy || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Status:')"/><strong><t t-esc="r.status"/></strong></div>
+                                                        <div><span t-out="this._t('Total Employees:')"/><strong><t t-esc="r.employeeCount || 0"/></strong></div>
+                                                        <div><span t-out="this._t('Total Salary:')"/><strong><t t-esc="formatMoney(r.totalSalary)"/></strong></div>
+                                                        <div><span t-out="this._t('Paid to Employee:')"/><strong><t t-esc="formatMoney(r.paidToEmployee)"/></strong></div>
+                                                        <div><span t-out="this._t('Remaining:')"/><strong><t t-esc="formatMoney(r.remaining)"/></strong></div>
+                                                        <div><span t-out="this._t('Branch:')"/><strong><t t-esc="r.branch"/></strong></div>
+                                                        <div><span t-out="this._t('Scope:')"/><strong><t t-esc="r.scope || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Finalized By:')"/><strong><t t-esc="r.finalizedBy || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Notes:')"/><strong><t t-esc="r.note || ''"/></strong></div>
                                                     </div>
                                                     <div class="spc-detailFooter">
-                                                        <button class="spc-btnGhost"><i class="fa fa-trash-o me-1"/> Hủy bỏ</button>
-                                                        <div>Dữ liệu được cập nhật vào: <strong><t t-esc="r.lastUpdated || '-'"/></strong></div>
+                                                        <button class="spc-btnGhost"><i class="fa fa-trash-o me-1"/> <t t-out="this._t('Cancel')"/></button>
+                                                        <div><t t-out="this._t('Last updated at:')"/> <strong><t t-esc="r.lastUpdated || '-'"/></strong></div>
                                                         <div class="spc-footerActions">
-                                                            <button class="spc-btnLight" t-on-click="loadPaychecks"><i class="fa fa-refresh me-1"/> Tải lại dữ liệu</button>
-                                                            <button class="spc-btnPrimary"><i class="fa fa-check-square-o me-1"/> Xem bảng lương</button>
-                                                            <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> Xuất file</button>
+                                                            <button class="spc-btnLight" t-on-click="loadPaychecks"><i class="fa fa-refresh me-1"/> <t t-out="this._t('Refresh Data')"/></button>
+                                                            <button class="spc-btnPrimary"><i class="fa fa-check-square-o me-1"/> <t t-out="this._t('View Payroll')"/></button>
+                                                            <button class="spc-btnLight"><i class="fa fa-share-square-o me-1"/> <t t-out="this._t('Export file')"/></button>
                                                         </div>
                                                     </div>
                                                 </t>
@@ -125,11 +125,11 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th class="w-check"><input type="checkbox"/></th>
-                                                                    <th>Mã phiếu</th>
-                                                                    <th>Tên nhân viên</th>
-                                                                    <th class="text-right">Tổng lương</th>
-                                                                    <th class="text-right">Đã trả NV</th>
-                                                                    <th class="text-right">Còn cần trả</th>
+                                                                    <th t-out="this._t('Slip code')"/>
+                                                                    <th t-out="this._t('Employee Name')"/>
+                                                                    <th class="text-right" t-out="this._t('Total Salary')"/>
+                                                                    <th class="text-right" t-out="this._t('Paid to Employee')"/>
+                                                                    <th class="text-right" t-out="this._t('Remaining')"/>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -154,7 +154,7 @@
                                                         </table>
                                                     </div>
                                                     <div class="spc-slipFooter">
-                                                        <button class="spc-btnPrimary" t-on-click="openPaymentModal"><i class="fa fa-calculator me-1"/> Thanh toán</button>
+                                                        <button class="spc-btnPrimary" t-on-click="openPaymentModal"><i class="fa fa-calculator me-1"/> <t t-out="this._t('Payment')"/></button>
                                                     </div>
                                                 </t>
 
@@ -164,11 +164,11 @@
                                                             <table class="spc-slipTable">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Thời gian</th>
-                                                                        <th>Phương thức</th>
-                                                                        <th class="text-right">Số tiền</th>
-                                                                        <th>Người tạo</th>
-                                                                        <th>Ghi chú</th>
+                                                                        <th t-out="this._t('Time')"/>
+                                                                        <th t-out="this._t('Method')"/>
+                                                                        <th class="text-right" t-out="this._t('Amount')"/>
+                                                                        <th t-out="this._t('Created By')"/>
+                                                                        <th t-out="this._t('Notes')"/>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -185,7 +185,7 @@
                                                             </table>
                                                         </t>
                                                         <t t-else="">
-                                                            <div class="spc-empty">Chưa có lịch sử thanh toán.</div>
+                                                            <div class="spc-empty" t-out="this._t('No payment history.')"/>
                                                         </t>
                                                     </div>
                                                 </t>
@@ -197,7 +197,7 @@
 
                             <t t-if="!state.loading and !state.paycheckRecords.length">
                                 <tr>
-                                    <td colspan="10" class="spc-empty">Không có dữ liệu bảng lương.</td>
+                                    <td colspan="10" class="spc-empty" t-out="this._t('No payroll data found.')"/>
                                 </tr>
                             </t>
                         </tbody>
@@ -209,34 +209,34 @@
                 <div class="spc-modalBackdrop" t-on-click="closePaymentModal"/>
                 <div class="spc-modal">
                     <button class="spc-modalClose" t-on-click="closePaymentModal">×</button>
-                    <h3>Thanh toán bảng lương</h3>
+                    <h3 t-out="this._t('Payroll Payment')"/>
                     <div class="spc-modalSub">
                         <t t-if="getExpandedRecord()">
-                            <t t-esc="getExpandedRecord().name"/> | Kỳ làm việc: <t t-esc="getExpandedRecord().period"/> | Trạng thái: <t t-esc="getExpandedRecord().status"/>
+                            <t t-esc="getExpandedRecord().name"/> | <t t-out="this._t('Period:')"/> <t t-esc="getExpandedRecord().period"/> | <t t-out="this._t('Status:')"/> <t t-esc="getExpandedRecord().status"/>
                         </t>
                     </div>
 
                     <div class="spc-modalGrid">
-                        <div><label>Tiền trả nhân viên</label><strong><t t-esc="formatMoney(getExpandedRecord() ? getExpandedRecord().remaining : 0)"/></strong></div>
-                        <div><label>Thời gian</label><input type="text" t-model="state.paymentTime"/></div>
+                        <div><label t-out="this._t('Paid to Employee')"/><strong><t t-esc="formatMoney(getExpandedRecord() ? getExpandedRecord().remaining : 0)"/></strong></div>
+                        <div><label t-out="this._t('Time')"/><input type="text" t-model="state.paymentTime"/></div>
                         <div>
-                            <label>Phương thức</label>
+                            <label t-out="this._t('Method')"/>
                             <select t-model="state.paymentMethod">
-                                <option value="cash">Tiền mặt</option>
-                                <option value="bank">Chuyển khoản</option>
+                                <option value="cash" t-out="this._t('Cash')"/>
+                                <option value="bank" t-out="this._t('Bank Transfer')"/>
                             </select>
                         </div>
-                        <div><label>Ghi chú</label><input type="text" t-model="state.paymentNote"/></div>
+                        <div><label t-out="this._t('Notes')"/><input type="text" t-model="state.paymentNote"/></div>
                     </div>
 
                     <table class="spc-slipTable spc-modalTable" t-if="getExpandedRecord()">
                         <thead>
                             <tr>
-                                <th>Mã phiếu</th>
-                                <th>Nhân viên</th>
-                                <th class="text-right">Thành tiền</th>
-                                <th class="text-right">Đã trả nhân viên</th>
-                                <th class="text-right">Còn cần trả</th>
+                                <th t-out="this._t('Slip code')"/>
+                                <th t-out="this._t('Employee')"/>
+                                <th class="text-right" t-out="this._t('Total')"/>
+                                <th class="text-right" t-out="this._t('Paid to Employee')"/>
+                                <th class="text-right" t-out="this._t('Remaining')"/>
                             </tr>
                         </thead>
                         <tbody>
@@ -253,8 +253,8 @@
                     </table>
 
                     <div class="spc-modalActions">
-                        <button class="spc-btnGhost" t-on-click="closePaymentModal">Bỏ qua</button>
-                        <button class="spc-btnPrimary" t-on-click="createPaySlip">Tạo phiếu chi</button>
+                        <button class="spc-btnGhost" t-on-click="closePaymentModal" t-out="this._t('Cancel')"/>
+                        <button class="spc-btnPrimary" t-on-click="createPaySlip" t-out="this._t('Create Payment Slip')"/>
                     </div>
                 </div>
             </t>

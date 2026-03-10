@@ -9,6 +9,7 @@ export class SwiftEmployeeManagement extends Component {
     static template = "pos_theme_swift.SwiftEmployeeManagement";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -30,8 +31,8 @@ export class SwiftEmployeeManagement extends Component {
                 idNumber: "",
                 birthDate: "",
                 gender: "",
-                workBranch: "Chi nhánh trung tâm",
-                payBranch: "Chi nhánh trung tâm",
+                workBranch: _t("Central Branch"),
+                payBranch: _t("Central Branch"),
                 salaryType: "hour",
                 salaryAmount: 0,
                 advancedSetting: false,
@@ -145,8 +146,8 @@ export class SwiftEmployeeManagement extends Component {
             idNumber: "",
             birthDate: "",
             gender: "",
-            workBranch: "Chi nhánh trung tâm",
-            payBranch: "Chi nhánh trung tâm",
+            workBranch: _t("Central Branch"),
+            payBranch: _t("Central Branch"),
             salaryType: "hour",
             salaryAmount: 0,
             advancedSetting: false,

@@ -16,7 +16,7 @@
 /* ---------- Topbar ---------- */
 .swift-inv-topbar{
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(240px, 1fr) minmax(220px, 260px) auto;
   align-items: center;
   gap: 12px;
   padding: 6px 2px 12px;
@@ -59,6 +59,33 @@
 
 .swift-inv-searchInput::placeholder{
   color:#94a3b8;
+}
+
+.swift-inv-branch{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e6eaf2;
+  border-radius: 12px;
+  padding: 8px 12px;
+  height: 40px;
+  box-shadow: 0 1px 0 rgba(16,24,40,.02);
+}
+
+.swift-inv-branchIcon{
+  color:#94a3b8;
+  font-size: 14px;
+}
+
+.swift-inv-branchSelect{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color:#0f172a;
+  cursor: pointer;
 }
 
 /* Actions */
@@ -113,6 +140,17 @@
 }
 
 .swift-iconBtn:hover{ background:#f8fafc; }
+
+@media (max-width: 1200px){
+  .swift-inv-topbar{
+    grid-template-columns: 1fr;
+  }
+
+  .swift-inv-actions{
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
 
 /* ---------- Table wrapper ---------- */
 .swift-inv-tableWrap{

@@ -9,6 +9,7 @@ export class SwiftAttendanceManagement extends Component {
     static template = "pos_theme_swift.SwiftAttendanceManagement";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -41,11 +42,11 @@ export class SwiftAttendanceManagement extends Component {
     }
 
     formatHours(h) {
-        return `${Number(h || 0).toLocaleString("vi-VN")} giờ`;
+        return `${Number(h || 0).toLocaleString()} ${_t("hours")}`;
     }
 
     formatDays(d) {
-        return `${Number(d || 0).toLocaleString("vi-VN")} ngày`;
+        return `${Number(d || 0).toLocaleString()} ${_t("days")}`;
     }
 
     async loadOverview() {

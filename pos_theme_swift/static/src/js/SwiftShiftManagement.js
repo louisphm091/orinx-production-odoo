@@ -9,6 +9,7 @@ export class SwiftShiftManagement extends Component {
     static template = "pos_theme_swift.SwiftShiftManagement";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
 

@@ -9,6 +9,7 @@ export class SalePlanningDashboard extends Component {
     static template = "sale_planning.Dashboard";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
         this.action = useService("action");
@@ -57,6 +58,44 @@ export class SalePlanningDashboard extends Component {
             this._destroyAllCharts();
         });
     }
+
+    // List of strings used in XML for Odoo's translation harvester
+    static _i18n_strings = [
+        _t("Supply / Purchase Plan"),
+        _t("Plan and track purchase/supply plans based on demand and production plans for the fashion industry"),
+        _t("SKU / SKU Group"),
+        _t("Refresh"),
+        _t("Category"),
+        _t("All"),
+        _t("Warehouse"),
+        _t("Time"),
+        _t("Create Supply Plan"),
+        _t("Loading data..."),
+        _t("Total Supply Demand"),
+        _t("units"),
+        _t("vs previous period"),
+        _t("Planned Purchase"),
+        _t("of demand"),
+        _t("Out of Stock Risk"),
+        _t("SKUs"),
+        _t("Expected shortage in 14 days"),
+        _t("Waiting for Delivery"),
+        _t("orders"),
+        _t("Updated today"),
+        _t("Purchase Recommendations"),
+        _t("Updated:"),
+        _t("Inventory Forecast"),
+        _t("Forecast Revenue by Category"),
+        _t("No data"),
+        _t("System uses historical data to adjust revenue forecasts"),
+        _t("Purchase Suggestions (SKU)"),
+        _t("Create Purchase Recommendation"),
+        _t("No."),
+        _t("SKU"),
+        _t("Rec. Purchase"),
+        _t("Status"),
+        _t("Stable"),
+    ];
 
     async load() {
         try {

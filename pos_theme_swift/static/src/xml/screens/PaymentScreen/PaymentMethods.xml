@@ -12,12 +12,12 @@
       <div class="sapphire-methods-collapse-wrap mt-2" t-if="order">
         <details class="sapphire-methods-collapse">
           <summary class="sapphire-methods-summary">
-            <span class="sms-label">Payment Method</span>
+            <span class="sms-label" t-out="this._t('Payment Method')"/>
             <span class="sms-current">
               <t t-if="order.selected_paymentline and order.selected_paymentline.payment_method">
                 <t t-esc="order.selected_paymentline.payment_method.name"/>
               </t>
-              <t t-else="">Select...</t>
+              <t t-else="" t-out="this._t('Select...')"/>
             </span>
           </summary>
 

@@ -6,10 +6,12 @@ import { useService } from "@web/core/utils/hooks";
 
 import { _t } from "@web/core/l10n/translation";
 
+
 class AnalyticsDashboard extends Component {
   static template = "sale_planning.AnalyticsDashboard";
 
   setup() {
+    this._t = _t;
     this.orm = useService("orm");
     this.notification = useService("notification");
 
@@ -41,6 +43,39 @@ class AnalyticsDashboard extends Component {
     onMounted(() => this.renderAllCharts());
     onWillUnmount(() => this.destroyAllCharts());
   }
+
+  // String list for i18n harvester
+  static _i18n_strings = [
+      _t("ANALYTICS & REPORTS"),
+      _t("Aggregate business performance, user behavior and compare plan vs actual for the fashion industry"),
+      _t("Women's Fashion"),
+      _t("Products / SKU"),
+      _t("Time"),
+      _t("Month"),
+      _t("Online"),
+      _t("Export CSV"),
+      _t("Loading data..."),
+      _t("User Behavior"),
+      _t("vs previous period"),
+      _t("Revenue"),
+      _t("Growth"),
+      _t("Profit"),
+      _t("vs plan"),
+      _t("Categories exceeded KPI"),
+      _t("User Behavior Analysis"),
+      _t("Revenue by Category"),
+      _t("Full Price / Sale"),
+      _t("full price"),
+      _t("sale"),
+      _t("Plan / Actual"),
+      _t("Product"),
+      _t("PV"),
+      _t("UU"),
+      _t("Full Price"),
+      _t("Charts & Data Table"),
+      _t("Search"),
+      _t("Full Price"),
+  ];
 
   destroyAllCharts() {
     for (const c of [this.behaviorChart, this.revenueBarChart, this.donutChart]) {

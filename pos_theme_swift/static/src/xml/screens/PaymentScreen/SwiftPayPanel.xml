@@ -12,32 +12,32 @@
         <!-- Summary -->
         <div class="spp-summary">
           <div class="spp-row">
-            <div class="lbl">Subtotal</div>
+            <div class="lbl" t-out="this._t('Subtotal')"/>
             <div class="mid"><t t-esc="summary.items_count"/></div>
             <div class="val"><t t-esc="env.utils.formatCurrency(summary.total_items)"/></div>
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Discount</div>
+            <div class="lbl" t-out="this._t('Discount')"/>
             <div class="mid"/>
             <div class="val muted"><t t-esc="env.utils.formatCurrency(summary.discount_total)"/></div>
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Other Charges</div>
+            <div class="lbl" t-out="this._t('Other Charges')"/>
             <div class="mid"/>
             <div class="val muted"><t t-esc="env.utils.formatCurrency(summary.other_charges)"/></div>
           </div>
 
           <!-- Total Due = total - discount + other charges -->
           <div class="spp-row spp-strong">
-            <div class="lbl">Total Due</div>
+            <div class="lbl" t-out="this._t('Total Due')"/>
             <div class="mid"/>
             <div class="val primary"><t t-esc="env.utils.formatCurrency(summary.need_to_pay)"/></div>
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Paid</div>
+            <div class="lbl" t-out="this._t('Paid')"/>
             <div class="mid"/>
             <input type="text"
                    class="val spp-input"
@@ -51,7 +51,7 @@
           </div>
 
           <div class="spp-row">
-            <div class="lbl">Change</div>
+            <div class="lbl" t-out="this._t('Change')"/>
             <div class="mid"/>
             <div class="val"><t t-esc="env.utils.formatCurrency(summary.amount_paid - summary.need_to_pay)"/></div>
           </div>
@@ -79,9 +79,9 @@
             <img t-attf-src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=ORINX_TRANSFER_{{summary.amount_paid}}" class="spp-qr-img"/>
           </div>
           <div class="spp-qr-right">
-            <div class="spp-qr-label">Account Name</div>
+            <div class="spp-qr-label" t-out="this._t('Account Name')"/>
             <div class="spp-qr-val">ORINX TECH CO.</div>
-            <div class="spp-qr-label">Account Number</div>
+            <div class="spp-qr-label" t-out="this._t('Account Number')"/>
             <div class="spp-qr-val">99999999</div>
           </div>
         </div>
@@ -100,15 +100,13 @@
         <div class="spp-paybar">
           <button type="button"
                   class="spp-inbtn"
-                  t-on-click.stop.prevent="(ev) => this.onSapphirePrint(ev)">
-            PRINT
-          </button>
+                  t-on-click.stop.prevent="(ev) => this.onSapphirePrint(ev)"
+                  t-out="this._t('PRINT')"/>
 
           <button type="button"
                   class="spp-paybtn"
-                  t-on-click.stop.prevent="(ev) => this.onSapphirePay(ev)">
-            PAY
-          </button>
+                  t-on-click.stop.prevent="(ev) => this.onSapphirePay(ev)"
+                  t-out="this._t('PAY')"/>
         </div>
 
       </div>

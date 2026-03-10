@@ -6,4 +6,6 @@ from . import swift_shift
 from . import swift_paycheck
 from . import swift_work_schedule
 from . import swift_employee
+from . import swift_pos_config
 from . import swift_product_template
+from . import swift_branch_product_wizard

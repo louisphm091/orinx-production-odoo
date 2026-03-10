@@ -32,6 +32,7 @@ patch(PosOrder.prototype, {
 
 patch(PaymentScreen.prototype, {
   setup() {
+    this._t = _t;
     super.setup();
     // Force reset Odoo's internal buffer to prevent interference on refresh
     try {

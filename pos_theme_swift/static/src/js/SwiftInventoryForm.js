@@ -8,12 +8,14 @@ export class SwiftInventoryForm extends Component {
   static template = "pos_theme_swift.SwiftInventoryForm";
   static props = {
     inventoryId: { type: [Number, Boolean], optional: true },
+    configId: { type: [Number, Boolean], optional: true },
     branchName: { type: String, optional: true },
     onBack: { type: Function, optional: true },
     onSaved: { type: Function, optional: true },
   };
 
   setup() {
+    this._t = _t;
     this.orm = useService("orm");
     this.notification = useService("notification");
     this.fileRef = useRef("fileInput");
@@ -31,6 +33,8 @@ export class SwiftInventoryForm extends Component {
       showDropdown: false,
       note: "",
       status: "draft",
+      configId: this.props.configId || false,
+      branchName: this.props.branchName || _t("Branch"),
       autoCode: _t("Auto code"),
       totalQtyActual: 0,
       sessionProducts: [],
@@ -78,6 +82,8 @@ export class SwiftInventoryForm extends Component {
     try {
       const rec = await this.orm.call("pos.dashboard.swift", "get_inventory_detail", [id]);
       if (rec) {
+        this.state.configId = rec.config_id || this.state.configId;
+        this.state.branchName = rec.branch_name || this.state.branchName;
         this.state.autoCode = rec.name || _t("Auto code");
         this.state.status = rec.state || "draft";
         this.state.note = rec.note || "";
@@ -184,7 +190,7 @@ export class SwiftInventoryForm extends Component {
         const results = await this.orm.call(
           "pos.dashboard.swift",
           "get_inventory_products",
-          [val.trim()]
+          [val.trim(), this.state.configId || false]
         );
         this.state.searchResults = results || [];
       } catch (e) {
@@ -412,7 +418,7 @@ export class SwiftInventoryForm extends Component {
       products = await this.orm.call(
         "pos.dashboard.swift",
         "get_products_by_barcodes",
-        [barcodes]
+        [barcodes, this.state.configId || false]
       );
     } catch (e) {
       console.error("[SwiftInventoryForm] get_products_by_barcodes:", e);
@@ -481,6 +487,13 @@ export class SwiftInventoryForm extends Component {
 
   async _submit(state) {
     if (this.state.saving) return;
+    if (!this.state.configId) {
+      this.notification.add(_t("Please select a POS branch before saving inventory data."), {
+        type: "warning",
+        title: _t("Inventory"),
+      });
+      return;
+    }
     this.state.saving = true;
     try {
       const lines = this.state.lines.map((l) => ({
@@ -489,6 +502,7 @@ export class SwiftInventoryForm extends Component {
       }));
       const result = await this.orm.call("pos.dashboard.swift", "create_or_update_inventory", [{
         id: this.props.inventoryId || false,
+        config_id: this.state.configId,
         note: this.state.note || "",
         state,
         lines,
@@ -519,4 +533,3 @@ export class SwiftInventoryForm extends Component {
   }
 
 }
-

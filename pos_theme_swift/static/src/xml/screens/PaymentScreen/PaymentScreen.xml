@@ -10,7 +10,7 @@
             <input class="scp-search-input"
                    type="search"
                    t-att-value="pos.searchProductWord || ''"
-                   placeholder="Search products (F3)"
+                   t-att-placeholder="this._t('Search products (F3)')"
                    t-on-input="onSapphireSearchInput"
                    t-on-keydown="onSapphireSearchKeydown"/>
 
@@ -32,7 +32,7 @@
                 </div>
               </t>
               <t t-else="">
-                <div class="results-empty">Product not found</div>
+                <div class="results-empty" t-out="this._t('Product not found')"/>
               </t>
             </div>
           </div>
@@ -58,16 +58,16 @@
         <div class="nav-right">
           <button class="nav-btn"
                   t-on-click="() => pos.closePos()"
-                  title="Backend">
+                  t-att-title="this._t('Backend')">
             <i class="fa fa-pause nav-icon" />
-            <span class="nav-label">Backend</span>
+            <span class="nav-label" t-out="this._t('Backend')"/>
           </button>
 
           <button class="nav-btn danger"
                   t-on-click="closeSession"
-                  title="Logout">
+                  t-att-title="this._t('Logout')">
             <i class="fa fa-sign-out nav-icon" />
-            <span class="nav-label">Logout</span>
+            <span class="nav-label" t-out="this._t('Logout')"/>
           </button>
 
           <div class="nav-cashier">

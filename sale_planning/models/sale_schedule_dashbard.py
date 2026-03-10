@@ -1,6 +1,6 @@
 from odoo import api, fields, models, _
-import random
-from datetime import date
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class SaleScheduleDashboard(models.AbstractModel):
@@ -13,90 +13,125 @@ class SaleScheduleDashboard(models.AbstractModel):
         if not isinstance(filters, dict):
             filters = {}
 
-        # deterministic seed theo company
-        seed = (self.env.company.id or 1) * 1000 + (date.today().day)
-        random.seed(seed)
+        env = self.env
+        today = date.today()
+        first_day_month = today.replace(day=1)
 
-        # --- KPIs (mock) ---
+        # --- KPIs ---
+        SaleLine = env['sale.order.line']
+        this_month_rev = sum(SaleLine.search([
+            ('state', 'in', ['sale', 'done']),
+            ('order_id.date_order', '>=', str(first_day_month))
+        ]).mapped('price_subtotal'))
+
+        last_month_start = first_day_month - relativedelta(months=1)
+        last_month_rev = sum(SaleLine.search([
+            ('state', 'in', ['sale', 'done']),
+            ('order_id.date_order', '>=', str(last_month_start)),
+            ('order_id.date_order', '<', str(first_day_month))
+        ]).mapped('price_subtotal')) or 1
+
+        rev_delta = int((this_month_rev - last_month_rev) / last_month_rev * 100)
+
+        # Top products for timeline
+        top_lines = SaleLine.read_group(
+            [('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', str(today - timedelta(days=30)))],
+            ['product_id', 'price_subtotal'],
+            ['product_id'],
+            limit=5
+        )
+        product_ids = [l['product_id'][0] for l in top_lines if l['product_id']]
+        products = env['product.product'].browse(product_ids)
+
         kpis = {
-            "wave_count": 5,
-            "main_sku": _("Women's Jeans"),
-            "revenue": 820_000_000,
-            "revenue_delta": 10,
-            "risk_sku_count": 2,
-            "need_review_count": 1,
+            "wave_count": len(products),
+            "main_sku": products[0].display_name if products else "-",
+            "revenue": this_month_rev,
+            "revenue_delta": rev_delta,
+            "risk_sku_count": 0, # To be calculated
+            "need_review_count": 0,
         }
 
-        # --- timeline header (April) ---
-        cols = [_("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct")]
+        # --- timeline header (last 3, next 5 months) ---
+        cols = []
+        for i in range(-3, 6):
+            m_date = first_day_month + relativedelta(months=i)
+            cols.append(m_date.strftime("%b"))
+
         # timeline rows
-        rows = [
-            {
-                "key": "r1",
-                "sku": _("Women's Jeans"),
-                "campaign": _("Summer Sale"),
-                "stock": 1200,
-                "target": 420_000_000,
-                # bar position: 0..8 (for cols) + width in cols
-                "bars": [{"label": _("01 – 30 Apr"), "start": 2, "span": 7, "color": "green"}],
-            },
-            {
-                "key": "r2",
-                "sku": _("Men's T-shirt"),
-                "campaign": _("Regular Sale"),
-                "stock": 900,
-                "target": 260_000_000,
-                "bars": [{"label": _("01 – 26 Apr"), "start": 1, "span": 6, "color": "blue"}],
-            },
-            {
-                "key": "r3",
-                "sku": _("Office Dress"),
-                "campaign": "Clearance",
-                "stock": 400,
-                "target": 140_000_000,
-                "bars": [{"label": _("01 – 14 Apr"), "start": 0, "span": 4, "color": "yellow"}],
-            },
-        ]
+        rows = []
+        risk_sku_count = 0
+        for i, p in enumerate(products):
+            p_onhand = sum(env['stock.quant'].search([('product_id', '=', p.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
+            p_last_rev = sum(SaleLine.search([('product_id', '=', p.id), ('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', str(last_month_start)), ('order_id.date_order', '<', str(first_day_month))]).mapped('price_subtotal'))
 
-        # --- selected schedule detail (mock) ---
-        selected = {
-            "sku": _("Women's Jeans"),
-            "campaign": _("Summer Sale"),
-            "sku_code": "QJN-NU",
-            "date_from": "01/04",
-            "date_to": "30/04",
-            "target_revenue": 420_000_000,
-            "current_stock": 1200,
-            "status": _("On Sale"),
-        }
+            p_target = p_last_rev * 1.1 if p_last_rev else 10_000_000
 
-        inventory_link = {
-            "onhand": 1200,
-            "daily_sell": 40,
-            "out_of_stock_date": _("18 Apr"),
-            "out_of_stock_in_days": 12,
-        }
+            # Risk if stock is low vs sales
+            is_risk = p_onhand < 10 # Dummy threshold
+            if is_risk: risk_sku_count += 1
 
-        # --- performance card (mini chart data) ---
-        performance = {
-            "title": "Quần jean nữ – Sale hè",
-            "progress_percent": 92,
-            "days": 20,
-            "spark": [12, 18, 20, 28, 35, 40, 48, 55],  # mini columns
-        }
+            rows.append({
+                "key": f"r{p.id}",
+                "sku": p.display_name,
+                "campaign": _("Monthly Plan") if i % 2 == 0 else _("Seasonal Sales"),
+                "stock": int(p_onhand),
+                "target": p_target,
+                "bars": [{"label": _("Current Period"), "start": 3, "span": 2, "color": "green" if not is_risk else "yellow"}],
+            })
+
+        kpis["risk_sku_count"] = risk_sku_count
+
+        # --- selected schedule detail (first one) ---
+        selected = {}
+        inventory_link = {}
+        performance = {}
+        if products:
+            p = products[0]
+            p_onhand = sum(env['stock.quant'].search([('product_id', '=', p.id), ('location_id.usage', '=', 'internal')]).mapped('quantity'))
+
+            selected = {
+                "sku": p.display_name,
+                "campaign": _("Current Plan"),
+                "sku_code": p.default_code or "-",
+                "date_from": first_day_month.strftime("%d/%m"),
+                "date_to": (first_day_month + relativedelta(months=1) - timedelta(days=1)).strftime("%d/%m"),
+                "target_revenue": rows[0]["target"] if rows else 0,
+                "current_stock": int(p_onhand),
+                "status": _("Active"),
+            }
+
+            inventory_link = {
+                "onhand": int(p_onhand),
+                "daily_sell": int(sum(SaleLine.search([('product_id', '=', p.id), ('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', str(today - timedelta(days=30)))]).mapped('product_uom_qty')) / 30) or 1,
+                "out_of_stock_date": (today + timedelta(days=30)).strftime("%d %b"),
+                "out_of_stock_in_days": 30,
+            }
+
+            performance = {
+                "title": p.display_name,
+                "progress_percent": 85, # Dummy
+                "days": (today - first_day_month).days,
+                "spark": [12, 18, 20, 28, 35, 40, 48, 55],
+            }
 
         # --- risk alerts list ---
-        risk_alerts = [
-            {"key": "a1", "sku": _("Office Dress"), "message": _("Risk of shortage in 5 days"), "trend": "up"},
-            {"key": "a2", "sku": _("Men's T-shirt"), "message": _("Sales 16%% slower than plan"), "trend": "down"},
-        ]
+        risk_alerts = []
+        for r in rows:
+            if r["bars"][0]["color"] == "yellow":
+                risk_alerts.append({
+                    "key": f"a{r['key']}",
+                    "sku": r["sku"],
+                    "message": _("Low stock alert for current planning period"),
+                    "trend": "down"
+                })
 
         return {
             "kpis": kpis,
             "timeline": {
                 "cols": cols,
                 "rows": rows,
-                "view_mode": filters.get("view_mode") or "timeline",  # timeline | calendar
+                "view_mode": filters.get("view_mode") or "timeline",
             },
             "selected": selected,
             "inventory_link": inventory_link,
@@ -104,3 +139,4 @@ class SaleScheduleDashboard(models.AbstractModel):
             "risk_alerts": risk_alerts,
             "last_update": fields.Datetime.to_string(fields.Datetime.now()),
         }
+

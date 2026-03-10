@@ -111,7 +111,9 @@ class SwiftPaycheck(models.Model):
         else:
             end = date(today.year, today.month + 1, 1) - timedelta(days=1)
 
-        pos_config = self.env["pos.config"].search([], limit=1)
+        pos_config = self.env["pos.config"].browse()
+        if self.env.context.get("pos_config_id"):
+            pos_config = self.env["pos.config"].browse(int(self.env.context["pos_config_id"])).exists()
         branch = pos_config.name if pos_config else _("Main Branch")
 
         paycheck = self.create({

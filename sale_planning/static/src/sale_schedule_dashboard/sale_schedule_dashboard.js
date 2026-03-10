@@ -5,10 +5,12 @@ import { Component, onWillStart, onMounted, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
+
 export class SaleScheduleDashboard extends Component {
     static template = "sale_planning.SaleScheduleDashboard";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -38,6 +40,44 @@ export class SaleScheduleDashboard extends Component {
             // nothing heavy here
         });
     }
+
+    // String list for i18n harvester
+    static _i18n_strings = [
+        _t("SALE SCHEDULING"),
+        _t("SKU / SKU Group"),
+        _t("Week"),
+        _t("Fashion Industry"),
+        _t("By SKU"),
+        _t("By Campaign"),
+        _t("By Time"),
+        _t("Create Schedule"),
+        _t("Loading data..."),
+        _t("waves"),
+        _t("Main SKU: "),
+        _t("vs plan"),
+        _t("Schedule Risk"),
+        _t("SKUs at risk of shortage"),
+        _t("Schedules Needing Adjust."),
+        _t("schedules to review"),
+        _t("Sale Schedule Timeline by SKU"),
+        _t("Timeline"),
+        _t("Calendar"),
+        _t("Performance Tracking by Schedule"),
+        _t("Reached "),
+        _t(" of plan (after "),
+        _t(" days)"),
+        _t("Risk Alerts"),
+        _t("Schedule Details"),
+        _t("Linked to Inventory"),
+        _t("Current on hand: "),
+        _t(" units"),
+        _t("Expected daily sales: "),
+        _t("Expected out of stock date: "),
+        _t(" (in "),
+        _t("Adjust Schedule"),
+        _t("Pause Sale"),
+        _t("End Early"),
+    ];
 
     async load() {
         try {

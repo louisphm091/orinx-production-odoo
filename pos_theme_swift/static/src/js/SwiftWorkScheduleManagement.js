@@ -9,6 +9,7 @@ export class SwiftWorkScheduleManagement extends Component {
     static template = "pos_theme_swift.SwiftWorkScheduleManagement";
 
     setup() {
+        this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -37,7 +38,7 @@ export class SwiftWorkScheduleManagement extends Component {
                 end_hour: "11:00",
                 checkin_start_hour: "04:00",
                 checkin_end_hour: "14:00",
-                branch_name: "Chi nhánh trung tâm",
+                branch_name: _t("Central Branch"),
                 color: "blue",
             },
         });
@@ -81,13 +82,13 @@ export class SwiftWorkScheduleManagement extends Component {
 
     getWeekdayButtons() {
         return [
-            { idx: 0, label: "Thứ 2" },
-            { idx: 1, label: "Thứ 3" },
-            { idx: 2, label: "Thứ 4" },
-            { idx: 3, label: "Thứ 5" },
-            { idx: 4, label: "Thứ 6" },
-            { idx: 5, label: "Thứ 7" },
-            { idx: 6, label: "Chủ nhật" },
+            { idx: 0, label: _t("Mon") },
+            { idx: 1, label: _t("Tue") },
+            { idx: 2, label: _t("Wed") },
+            { idx: 3, label: _t("Thu") },
+            { idx: 4, label: _t("Fri") },
+            { idx: 5, label: _t("Sat") },
+            { idx: 6, label: _t("Sun") },
         ];
     }
 

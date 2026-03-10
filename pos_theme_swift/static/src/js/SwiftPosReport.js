@@ -5,12 +5,41 @@ import { Component, useState, onMounted, onPatched, onWillUnmount, useRef } from
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
+
 export class SwiftPosSalesDashboard extends Component {
   static template = "pos_theme_swift.SwiftPosSalesDashboard";
+  static _i18n_strings = [
+    _t("Today's Sales Results"),
+    _t("Refresh"),
+    _t("Today"),
+    _t("Yesterday"),
+    _t("This Week"),
+    _t("This Month"),
+    _t("Loading data..."),
+    _t("Revenue"),
+    _t("invoices"),
+    _t("Refunds"),
+    _t("Net Revenue"),
+    _t("Compared to yesterday"),
+    _t("Invoices"),
+    _t("View List"),
+    _t("By Day"),
+    _t("By Hour"),
+    _t("By Weekday"),
+    _t("Recent Activity"),
+    _t("just sold an order"),
+    _t("Top 10 Best Sellers"),
+    _t("By Revenue"),
+    _t("By Quantity"),
+    _t("Top 10 Top Customers"),
+    _t("You can add customer tables / charts here."),
+  ];
 
   setup() {
+    this._t = _t;
     this.orm = useService("orm");
     this.action = useService("action");
+    this.locale = this.getUserLocale();
 
     this.state = useState({
       loading: true,
@@ -47,16 +76,38 @@ export class SwiftPosSalesDashboard extends Component {
     onWillUnmount(() => this.destroyChart());
   }
 
+  getUserLocale() {
+    const lang = document.documentElement.lang || navigator.language || "en-US";
+    return lang.replace("_", "-");
+  }
+
   formatVND(v) {
     const n = Number(v || 0);
-    return `${n.toLocaleString("vi-VN")} đ`;
+    try {
+      return new Intl.NumberFormat(this.locale, {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 0,
+        currencyDisplay: this.locale.toLowerCase().startsWith("vi") ? "symbol" : "code",
+      }).format(n);
+    } catch {
+      return `${n.toLocaleString(this.locale)} VND`;
+    }
   }
 
   formatCompact(v) {
     const n = Number(v || 0);
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} M`;
-    if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
-    return `${n}`;
+    try {
+      return new Intl.NumberFormat(this.locale, {
+        notation: "compact",
+        compactDisplay: "short",
+        maximumFractionDigits: 1,
+      }).format(n);
+    } catch {
+      if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)} M`;
+      if (n >= 1_000) return `${Math.round(n / 1_000)}k`;
+      return `${n}`;
+    }
   }
 
   onRefresh() {
@@ -101,7 +152,7 @@ export class SwiftPosSalesDashboard extends Component {
   openOrders() {
     return this.action.doAction({
       type: "ir.actions.act_window",
-      name: "POS Orders",
+      name: _t("POS Orders"),
       res_model: "pos.order",
       views: [[false, "list"], [false, "form"]],
       target: "current",
@@ -182,4 +233,3 @@ export class SwiftPosSalesDashboard extends Component {
 
 // register client action tag
 registry.category("actions").add("pos_theme_swift.swift_pos_sales_dashboard", SwiftPosSalesDashboard);
-

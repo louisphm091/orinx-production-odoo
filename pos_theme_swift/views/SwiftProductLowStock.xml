@@ -6,11 +6,21 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="point_of_sale.product_template_search_view_pos"/>
             <field name="arch" type="xml">
+                <field name="pos_categ_ids" position="after">
+                    <field name="swift_branch_config_ids" string="Chi nhánh POS"/>
+                </field>
                 <filter name="filter_to_availabe_pos" position="after">
                     <filter
                         name="swift_filter_low_stock_10"
                         string="Low Stock &lt;= 10"
                         domain="[('is_storable', '=', True), ('qty_available', '&lt;=', 10)]"
+                    />
+                </filter>
+                <filter name="group_by_categ_id" position="after">
+                    <filter
+                        name="swift_group_by_pos_branch"
+                        string="Chi nhánh POS"
+                        context="{'group_by': 'swift_branch_config_ids'}"
                     />
                 </filter>
             </field>
@@ -21,6 +31,9 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="point_of_sale.product_template_tree_view_point_of_sale"/>
             <field name="arch" type="xml">
+                <field name="available_in_pos" position="after">
+                    <field name="swift_branch_config_ids" widget="many2many_tags" optional="show" string="Chi nhánh POS"/>
+                </field>
                 <xpath expr="//list" position="inside">
                     <header>
                         <button
@@ -32,10 +45,90 @@
                             context="{'swift_low_stock_mode': True}"
                             groups="stock.group_stock_user"
                         />
+                        <button
+                            name="action_open_swift_branch_assignment_wizard"
+                            type="object"
+                            string="Gán chi nhánh"
+                            class="btn btn-secondary"
+                            display="always"
+                            groups="point_of_sale.group_pos_manager"
+                        />
                     </header>
                 </xpath>
             </field>
         </record>
+
+        <record id="swift_product_template_form_view_branch_management" model="ir.ui.view">
+            <field name="name">product.template.form.pos.branch.management.swift</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="point_of_sale.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='pos']//group[@name='pos']" position="inside">
+                    <field
+                        name="swift_branch_config_ids"
+                        widget="many2many_tags"
+                        string="Chi nhánh POS"
+                        options="{'no_create': True}"
+                    />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_swift_pos_branch_management" model="ir.actions.act_window">
+            <field name="name">Quản Lý chi nhánh</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">list,form,kanban</field>
+            <field name="domain">[('available_in_pos', '=', True)]</field>
+            <field name="context">{'search_default_filter_to_availabe_pos': 1, 'default_available_in_pos': True, 'list_view_ref': 'point_of_sale.product_template_tree_view_point_of_sale'}</field>
+        </record>
+
+        <record id="view_swift_branch_product_wizard_form" model="ir.ui.view">
+            <field name="name">swift.branch.product.wizard.form</field>
+            <field name="model">swift.branch.product.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Gán sản phẩm theo chi nhánh">
+                    <sheet>
+                        <group>
+                            <field name="operation"/>
+                            <field name="branch_config_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="product_tmpl_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                        <group col="2">
+                            <field name="branch_count" readonly="1"/>
+                            <field name="product_count" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_apply" type="object" string="Áp dụng" class="btn btn-primary"/>
+                        <button string="Hủy" special="cancel" class="btn btn-secondary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_swift_branch_product_assignment_wizard" model="ir.actions.act_window">
+            <field name="name">Gán sản phẩm theo chi nhánh</field>
+            <field name="res_model">swift.branch.product.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem
+            id="menu_swift_pos_branch_management"
+            name="Quản Lý chi nhánh"
+            parent="point_of_sale.pos_config_menu_catalog"
+            action="action_swift_pos_branch_management"
+            sequence="7"
+        />
+
+        <menuitem
+            id="menu_swift_pos_branch_assignment_wizard"
+            name="Gán sản phẩm theo chi nhánh"
+            parent="point_of_sale.pos_config_menu_catalog"
+            action="action_swift_branch_product_assignment_wizard"
+            sequence="8"
+            groups="point_of_sale.group_pos_manager"
+        />
 
         <record id="swift_product_template_kanban_view_pos_import_goods" model="ir.ui.view">
             <field name="name">product.template.kanban.pos.import.goods.swift</field>

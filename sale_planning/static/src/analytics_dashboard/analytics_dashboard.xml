@@ -9,28 +9,26 @@
         <div>
           <div class="sp_title">
             <span class="sp_logo"><i class="fa fa-instagram"/></span>
-            ANALYTICS &amp; REPORTS
+            <t t-out="this._t('ANALYTICS &amp; REPORTS')"/>
           </div>
-          <div class="sp_subtitle">
-            Aggregate business performance, user behavior and compare plan vs actual for the fashion industry
-          </div>
+          <div class="sp_subtitle" t-out="this._t('Aggregate business performance, user behavior and compare plan vs actual for the fashion industry')"/>
         </div>
 
         <div class="d-flex gap-2 align-items-center flex-wrap sp_filters">
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-th-large me-1"/> Women's Fashion</button>
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-tag me-1"/> Products / SKU</button>
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-clock-o me-1"/> Time</button>
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-th-large me-1"/> <t t-out="this._t('Women\'s Fashion')"/></button>
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-tag me-1"/> <t t-out="this._t('Products / SKU')"/></button>
+          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-clock-o me-1"/> <t t-out="this._t('Time')"/></button>
           <div class="sp_actions d-flex gap-2">
-            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-calendar me-1"/> Month</button>
-            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-wifi me-1"/> Online</button>
-            <button class="btn btn-outline-secondary sp_pill" type="button"><i class="fa fa-download me-1"/> Export CSV</button>
+            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-calendar me-1"/> <t t-out="this._t('Month')"/></button>
+            <button class="btn btn-light sp_pill" type="button"><i class="fa fa-wifi me-1"/> <t t-out="this._t('Online')"/></button>
+            <button class="btn btn-outline-secondary sp_pill" type="button"><i class="fa fa-download me-1"/> <t t-out="this._t('Export CSV')"/></button>
           </div>
         </div>
       </div>
 
       <div class="mt-3">
         <t t-if="state.loading">
-          <div class="alert alert-info">Loading data...</div>
+          <div class="alert alert-info" t-out="this._t('Loading data...')"/>
         </t>
         <t t-elif="state.error">
           <div class="alert alert-danger"><t t-esc="state.error"/></div>
@@ -43,13 +41,13 @@
               <div class="card sp_card p-3">
                 <div class="d-flex justify-content-between">
                   <div>
-                    <div class="sp_card_title">User Behavior</div>
+                    <div class="sp_card_title" t-out="this._t('User Behavior')"/>
                     <div class="sp_card_value">
                       <t t-esc="fmtNumber(state.kpis.user_behavior.pv)"/> /
                       <t t-esc="fmtNumber(state.kpis.user_behavior.uu)"/>
                     </div>
                     <div class="sp_card_meta">
-                      <span class="text-success"><t t-esc="state.kpis.user_behavior.delta_percent"/></span> vs previous period
+                      <span class="text-success"><t t-esc="state.kpis.user_behavior.delta_percent"/></span> <t t-out="this._t('vs previous period')"/>
                     </div>
                   </div>
                   <div class="sp_card_icon"><i class="fa fa-users"/></div>
@@ -61,9 +59,9 @@
               <div class="card sp_card p-3">
                 <div class="d-flex justify-content-between">
                   <div>
-                    <div class="sp_card_title">Revenue</div>
+                    <div class="sp_card_title" t-out="this._t('Revenue')"/>
                     <div class="sp_card_value"><t t-esc="fmtMoneyVND(state.kpis.revenue.value)"/></div>
-                    <div class="sp_card_meta">Growth <t t-esc="state.kpis.revenue.growth_percent"/>%</div>
+                    <div class="sp_card_meta"><t t-out="this._t('Growth')"/> <t t-esc="state.kpis.revenue.growth_percent"/>%</div>
                   </div>
                   <div class="sp_card_icon"><i class="fa fa-line-chart"/></div>
                 </div>
@@ -74,9 +72,9 @@
               <div class="card sp_card p-3">
                 <div class="d-flex justify-content-between">
                   <div>
-                    <div class="sp_card_title">Profit</div>
+                    <div class="sp_card_title" t-out="this._t('Profit')"/>
                     <div class="sp_card_value"><t t-esc="fmtMoneyVND(state.kpis.profit.value)"/></div>
-                    <div class="sp_card_meta">Growth <t t-esc="state.kpis.profit.growth_percent"/>%</div>
+                    <div class="sp_card_meta"><t t-out="this._t('Growth')"/> <t t-esc="state.kpis.profit.growth_percent"/>%</div>
                   </div>
                   <div class="sp_card_icon"><i class="fa fa-database"/></div>
                 </div>
@@ -87,8 +85,8 @@
               <div class="card sp_card p-3">
                 <div class="d-flex justify-content-between">
                   <div>
-                    <div class="sp_card_title"><t t-esc="state.kpis.kpi_over.delta_percent"/> vs plan</div>
-                    <div class="sp_card_value">Categories exceeded KPI</div>
+                    <div class="sp_card_title"><t t-esc="state.kpis.kpi_over.delta_percent"/> <t t-out="this._t('vs plan')"/></div>
+                    <div class="sp_card_value" t-out="this._t('Categories exceeded KPI')"/>
                     <div class="sp_card_meta">—</div>
                   </div>
                   <div class="sp_card_icon"><i class="fa fa-bar-chart"/></div>
@@ -103,7 +101,7 @@
             <div class="col-12 col-lg-7">
               <div class="card sp_panel p-3 h-100">
                 <div class="sp_panel_head d-flex justify-content-between align-items-center">
-                  <div class="sp_panel_title">User Behavior Analysis</div>
+                  <div class="sp_panel_title" t-out="this._t('User Behavior Analysis')"/>
                   <i class="fa fa-ellipsis-h text-muted"/>
                 </div>
                 <div class="sp_chart_wrap" style="height:260px;">
@@ -116,7 +114,7 @@
             <div class="col-12 col-lg-3">
               <div class="card sp_panel p-3 h-100">
                 <div class="sp_panel_head d-flex justify-content-between align-items-center">
-                  <div class="sp_panel_title">Revenue by Category</div>
+                  <div class="sp_panel_title" t-out="this._t('Revenue by Category')"/>
                   <i class="fa fa-ellipsis-h text-muted"/>
                 </div>
 
@@ -146,17 +144,17 @@
             <div class="col-12 col-lg-2">
               <div class="card sp_panel p-3 h-100">
                 <div class="sp_panel_head d-flex justify-content-between align-items-center">
-                  <div class="sp_panel_title">Full Price / Sale</div>
+                  <div class="sp_panel_title" t-out="this._t('Full Price / Sale')"/>
                   <i class="fa fa-ellipsis-h text-muted"/>
                 </div>
 
                 <div class="mt-1">
                   <div class="sp_big_percent">
                     <t t-esc="state.pricing_mix.full_price"/>%
-                    <span class="text-muted">full price</span>
+                    <span class="text-muted" t-out="this._t('full price')"/>
                   </div>
                   <div class="text-muted small">
-                    <t t-esc="state.pricing_mix.sale"/>% sale
+                    <t t-esc="state.pricing_mix.sale"/>% <t t-out="this._t('sale')"/>
                   </div>
                 </div>
 
@@ -176,7 +174,7 @@
             <div class="col-12 col-lg-6">
               <div class="card sp_panel p-3">
                 <div class="sp_panel_head d-flex justify-content-between align-items-center">
-                  <div class="sp_panel_title">Plan / Actual</div>
+                  <div class="sp_panel_title" t-out="this._t('Plan / Actual')"/>
                   <i class="fa fa-ellipsis-h text-muted"/>
                 </div>
 
@@ -184,12 +182,12 @@
                   <table class="table table-sm align-middle mb-0 sp_table">
                     <thead class="text-muted">
                       <tr>
-                        <th>Product</th>
-                        <th>Category</th>
+                        <th t-out="this._t('Product')"/>
+                        <th t-out="this._t('Category')"/>
                         <th class="text-end">PV</th>
                         <th class="text-end">UU</th>
-                        <th class="text-end">Revenue</th>
-                        <th class="text-end">Full Price</th>
+                        <th class="text-end" t-out="this._t('Revenue')"/>
+                        <th class="text-end" t-out="this._t('Full Price')"/>
                       </tr>
                     </thead>
                     <tbody>
@@ -212,10 +210,10 @@
             <div class="col-12 col-lg-6">
               <div class="card sp_panel p-3">
                 <div class="sp_panel_head d-flex justify-content-between align-items-center">
-                  <div class="sp_panel_title">Charts &amp; Data Table</div>
+                  <div class="sp_panel_title" t-out="this._t('Charts &amp; Data Table')"/>
                   <div class="sp_search">
                     <i class="fa fa-search text-muted"/>
-                    <input class="form-control form-control-sm" placeholder="Search"
+                    <input class="form-control form-control-sm" t-att-placeholder="this._t('Search')"
                            t-model="state.search"/>
                   </div>
                 </div>
@@ -224,12 +222,12 @@
                   <table class="table table-sm align-middle mb-0 sp_table">
                     <thead class="text-muted">
                       <tr>
-                        <th>Product</th>
-                        <th>Category</th>
+                        <th t-out="this._t('Product')"/>
+                        <th t-out="this._t('Category')"/>
                         <th class="text-end">PV</th>
                         <th class="text-end">UU</th>
-                        <th class="text-end">Revenue</th>
-                        <th class="text-end">Sale</th>
+                        <th class="text-end" t-out="this._t('Revenue')"/>
+                        <th class="text-end" t-out="this._t('Sale')"/>
                       </tr>
                     </thead>
                     <tbody>

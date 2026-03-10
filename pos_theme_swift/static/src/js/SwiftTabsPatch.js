@@ -16,6 +16,10 @@ function stableKey(order) {
 }
 
 patch(ProductScreen.prototype, {
+  setup() {
+    this._t = _t;
+    super.setup(...arguments);
+  },
   getOrderTabs() {
     const orders = (this.pos.getOpenOrders?.() || [])
       .filter((o) => o && !o.table_id);

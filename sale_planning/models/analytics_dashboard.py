@@ -1,5 +1,6 @@
 from odoo import api, fields, models, _
-import random
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class SalePlanningAnalyticsDashboard(models.AbstractModel):
@@ -12,58 +13,185 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
         if not isinstance(filters, dict):
             filters = {}
 
-        random.seed(19)
+        env = self.env
+        today = date.today()
+        first_day_month = today.replace(day=1)
+        last_month_start = first_day_month - relativedelta(months=1)
 
-        # KPI top cards
+        # ---- KPIs ----
+        # PV: Total Orders this month
+        total_orders = env['sale.order'].search_count([
+            ('state', 'in', ['sale', 'done']),
+            ('date_order', '>=', str(first_day_month))
+        ])
+        last_month_orders = env['sale.order'].search_count([
+            ('state', 'in', ['sale', 'done']),
+            ('date_order', '>=', str(last_month_start)),
+            ('date_order', '<', str(first_day_month))
+        ])
+
+        order_delta = 0
+        if last_month_orders > 0:
+            order_delta = int((total_orders - last_month_orders) / last_month_orders * 100)
+
+        # UU: Unique Customers this month
+        unique_customers = len(env['sale.order'].read_group([
+            ('state', 'in', ['sale', 'done']),
+            ('date_order', '>=', str(first_day_month))
+        ], ['partner_id'], ['partner_id']))
+
+        # Revenue
+        revenue_data = env['sale.order'].read_group([
+            ('state', 'in', ['sale', 'done']),
+            ('date_order', '>=', str(first_day_month))
+        ], ['amount_total'], [])
+        revenue = revenue_data[0]['amount_total'] if revenue_data and revenue_data[0]['amount_total'] else 0
+
+        last_month_revenue_data = env['sale.order'].read_group([
+            ('state', 'in', ['sale', 'done']),
+            ('date_order', '>=', str(last_month_start)),
+            ('date_order', '<', str(first_day_month))
+        ], ['amount_total'], [])
+        last_month_revenue = last_month_revenue_data[0]['amount_total'] if last_month_revenue_data and last_month_revenue_data[0]['amount_total'] else 0
+
+        revenue_growth = 0
+        if last_month_revenue > 0:
+            revenue_growth = int((revenue - last_month_revenue) / last_month_revenue * 100)
+
+        # Profit estimate
+        order_lines = env['sale.order.line'].search([
+            ('state', 'in', ['sale', 'done']),
+            ('order_id.date_order', '>=', str(first_day_month))
+        ])
+        total_cost = sum(line.product_id.standard_price * line.product_uom_qty for line in order_lines)
+        profit = revenue - total_cost
+
         kpis = {
-            "user_behavior": {"pv": 120000, "uu": 35000, "delta_percent": "+15%"},
-            "revenue": {"value": 1250000000, "growth_percent": 12},
-            "profit": {"value": 1250000000, "growth_percent": 12},  # demo
+            "user_behavior": {
+                "pv": total_orders,
+                "uu": unique_customers,
+                "delta_percent": f"{'+' if order_delta >= 0 else ''}{order_delta}%"
+            },
+            "revenue": {"value": revenue, "growth_percent": revenue_growth},
+            "profit": {"value": profit, "growth_percent": revenue_growth},
             "kpi_over": {"delta_percent": "+8%", "subtitle": _("Category exceeding KPI")},
         }
 
-        # Line chart: PV/UU by month
-        months = [_("Jan"), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun")]
-        pv = [22000, 28000, 31000, 33500, 36000, 42000]
-        uu = [8200, 9800, 10500, 11200, 12800, 15000]
+        # ---- Line chart: Orders/Customers by month (last 6 months) ----
+        months_labels = []
+        pv_series = []
+        uu_series = []
+        for i in range(5, -1, -1):
+            m_start = first_day_month - relativedelta(months=i)
+            m_end = m_start + relativedelta(months=1) - timedelta(days=1)
+            months_labels.append(m_start.strftime("%b"))
+
+            m_orders = env['sale.order'].search_count([
+                ('state', 'in', ['sale', 'done']),
+                ('date_order', '>=', str(m_start)),
+                ('date_order', '<=', str(m_end))
+            ])
+            pv_series.append(m_orders)
+
+            m_customers = len(env['sale.order'].read_group([
+                ('state', 'in', ['sale', 'done']),
+                ('date_order', '>=', str(m_start)),
+                ('date_order', '<=', str(m_end))
+            ], ['partner_id'], ['partner_id']))
+            uu_series.append(m_customers)
 
         behavior_chart = {
-            "labels": months,
+            "labels": months_labels,
             "datasets": [
-                {"label": "PV", "data": pv},
-                {"label": "UU", "data": uu},
+                {"label": _("Orders"), "data": pv_series},
+                {"label": _("Customers"), "data": uu_series},
             ],
         }
 
-        # Bar chart: Revenue by category
-        revenue_by_category = [
-            {"key": "c1", "name": _("Women's Jeans"), "value": 420, "color": "rgba(16,185,129,0.9)"},
-            {"key": "c2", "name": _("Men's T-shirt"), "value": 310, "color": "rgba(59,130,246,0.85)"},
-            {"key": "c3", "name": _("Office Dress"), "value": 180, "color": "rgba(245,158,11,0.85)"},
-        ]
+        # ---- Revenue by category ----
+        cat_revenue_data = env['sale.order.line'].read_group(
+            [('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', str(first_day_month))],
+            ['price_subtotal', 'product_id', 'product_uom_qty', 'discount:avg'],
+            ['product_id']
+        )
+
+        cat_map = {}
+        for item in cat_revenue_data:
+            if not item['product_id']:
+                continue
+            product = env['product.product'].browse(item['product_id'][0])
+            cat_name = product.categ_id.name or _("Other")
+            cat_map[cat_name] = cat_map.get(cat_name, 0) + item['price_subtotal']
+
+        top_cats = sorted(cat_map.items(), key=lambda x: x[1], reverse=True)[:3]
+        palette = ["rgba(16,185,129,0.9)", "rgba(59,130,246,0.85)", "rgba(245,158,11,0.85)"]
+        revenue_by_category = []
+        for i, (name, val) in enumerate(top_cats):
+            revenue_by_category.append({
+                "key": f"c{i+1}",
+                "name": name,
+                "value": round(val / 1_000_000, 1),
+                "color": palette[i % len(palette)]
+            })
+
+        # Bar chart: revenue (last 3 months)
+        rev_bar_labels = months_labels[-3:]
+        rev_bar_values = []
+        for i in range(2, -1, -1):
+            m_start = first_day_month - relativedelta(months=i)
+            m_end = m_start + relativedelta(months=1) - timedelta(days=1)
+            m_rev_data = env['sale.order'].read_group([
+                ('state', 'in', ['sale', 'done']),
+                ('date_order', '>=', str(m_start)),
+                ('date_order', '<=', str(m_end))
+            ], ['amount_total'], [])
+            m_rev = m_rev_data[0]['amount_total'] if m_rev_data and m_rev_data[0]['amount_total'] else 0
+            rev_bar_values.append(int(m_rev / 1_000_000))
+
         revenue_bar = {
-            "labels": [_("Apr"), _("May"), _("Jun")],
-            "values": [280, 350, 420],
+            "labels": rev_bar_labels,
+            "values": rev_bar_values,
             "colors": ["rgba(16,185,129,0.35)", "rgba(16,185,129,0.6)", "rgba(16,185,129,0.9)"],
-            "headline": _("420 M"),
+            "headline": f"{rev_bar_values[-1]} M" if rev_bar_values else "0 M",
         }
 
-        # Donut: full price vs sale
-        pricing_mix = {"full_price": 68, "sale": 32, "note": _("Office dresses have a higher than average sale rate – price strategy needs review")}
+        # Pricing mix: Full Price vs Discounted
+        discount_lines = env['sale.order.line'].search_count([
+            ('state', 'in', ['sale', 'done']),
+            ('order_id.date_order', '>=', str(first_day_month)),
+            ('discount', '>', 0)
+        ])
+        total_lines = len(order_lines) or 1
+        sale_rate = int(discount_lines / total_lines * 100)
 
-        # Table: Plan vs Actual
-        plan_actual_rows = [
-            {"key": "p1", "name": _("Women's Jeans"), "category": _("Women's Fashion"), "pv": 28000, "uu": 3200, "revenue": _("420 M"), "full_price": "27.79%"},
-            {"key": "p2", "name": _("Men's T-shirt"), "category": _("Men's Fashion"), "pv": 18000, "uu": 6100, "revenue": _("310 M"), "full_price": "28.99%"},
-            {"key": "p3", "name": _("Office Dress"), "category": _("Women's Fashion"), "pv": 14000, "uu": 5300, "revenue": _("180 M"), "full_price": "27.89%"},
-        ]
+        pricing_mix = {
+            "full_price": 100 - sale_rate,
+            "sale": sale_rate,
+            "note": _("Discount rate: %s%% of total sale lines") % sale_rate
+        }
 
-        # Table: chart & data (search)
-        data_table_rows = [
-            {"key": "d1", "name": _("Women's Jeans"), "category": _("Women's Fashion"), "pv": 28000, "uu": 3200, "revenue": _("420 M"), "sale": 7.2},
-            {"key": "d2", "name": _("Men's T-shirt"), "category": _("Men's Fashion"), "pv": 18000, "uu": 6100, "revenue": _("310 M"), "sale": 6.5},
-            {"key": "d3", "name": _("Office Dress"), "category": _("Women's Fashion"), "pv": 14000, "uu": 5300, "revenue": _("180 M"), "sale": 4.8},
-        ]
+        # ---- Tables ----
+        # product_stats from read_group above
+        plan_actual_rows = []
+        data_table_rows = []
+        for i, item in enumerate(cat_revenue_data[:10]):
+            if not item['product_id']:
+                continue
+            product = env['product.product'].browse(item['product_id'][0])
+            row = {
+                "key": f"p{product.id}",
+                "name": product.display_name,
+                "category": product.categ_id.name or _("Other"),
+                "pv": int(item['product_uom_qty']),
+                "uu": 0, # N/A
+                "revenue": f"{round(item['price_subtotal'] / 1000000, 1)} M",
+                "full_price": f"{100 - round(item.get('discount', 0), 1)}%",
+                "sale": round(item.get('discount', 0), 1)
+            }
+            data_table_rows.append(row)
+            if i < 3:
+                plan_actual_rows.append(row)
+
 
         return {
             "kpis": kpis,
@@ -74,3 +202,4 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
             "plan_actual_rows": plan_actual_rows,
             "data_table_rows": data_table_rows,
         }
+

@@ -10,9 +10,9 @@
                     <div class="st-sidebar-content">
 
                         <div class="st-filter-section">
-                            <div class="st-filter-title">Outbound</div>
+                            <div class="st-filter-title" t-out="this._t('Outbound')"/>
                             <select class="st-select" t-on-change="(ev) => this.onFilterChange('loc_src', ev.target.value)">
-                                <option value="">Select branch</option>
+                                <option value="" t-out="this._t('Select branch')"/>
                                 <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
                                     <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
                                 </t>
@@ -20,9 +20,9 @@
                         </div>
 
                         <div class="st-filter-section">
-                            <div class="st-filter-title">Inbound</div>
+                            <div class="st-filter-title" t-out="this._t('Inbound')"/>
                             <select class="st-select" t-on-change="(ev) => this.onFilterChange('loc_dest', ev.target.value)">
-                                <option value="">Select branch</option>
+                                <option value="" t-out="this._t('Select branch')"/>
                                 <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
                                     <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
                                 </t>
@@ -30,40 +30,40 @@
                         </div>
 
                         <div class="st-filter-section">
-                            <div class="st-filter-title">Status</div>
+                            <div class="st-filter-title" t-out="this._t('Status')"/>
                             <div class="st-checkbox-group">
                                 <label class="st-checkbox-label">
                                     <input type="checkbox" t-att-checked="state.filters.states.includes('draft')" t-on-change="() => this.onFilterChange('state', 'draft')"/>
-                                    <span>Draft</span>
+                                    <span t-out="this._t('Draft')"/>
                                     <span class="st-badge is-draft">×</span>
                                 </label>
                                 <label class="st-checkbox-label">
                                     <input type="checkbox" t-att-checked="state.filters.states.includes('shipped')" t-on-change="() => this.onFilterChange('state', 'shipped')"/>
-                                    <span>Shipped</span>
+                                    <span t-out="this._t('Shipped')"/>
                                     <span class="st-badge is-shipped">×</span>
                                 </label>
                                 <label class="st-checkbox-label">
                                     <input type="checkbox" t-att-checked="state.filters.states.includes('done')" t-on-change="() => this.onFilterChange('state', 'done')"/>
-                                    <span>Received</span>
+                                    <span t-out="this._t('Received')"/>
                                     <span class="st-badge is-done">×</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="st-filter-section">
-                            <div class="st-filter-title">Time</div>
+                            <div class="st-filter-title" t-out="this._t('Time')"/>
                             <div class="st-radio-list">
                                 <label class="st-radio-label">
                                     <input type="radio" name="date_range" value="today" t-att-checked="state.filters.date_range === 'today'" t-on-change="() => this.onFilterChange('date_range', 'today')"/>
-                                    <span>Today</span>
+                                    <span t-out="this._t('Today')"/>
                                 </label>
                                 <label class="st-radio-label">
                                     <input type="radio" name="date_range" value="this_month" t-att-checked="state.filters.date_range === 'this_month'" t-on-change="() => this.onFilterChange('date_range', 'this_month')"/>
-                                    <span>This Month</span>
+                                    <span t-out="this._t('This Month')"/>
                                 </label>
                                 <label class="st-radio-label">
                                     <input type="radio" name="date_range" value="custom" t-att-checked="state.filters.date_range === 'custom'" t-on-change="() => this.onFilterChange('date_range', 'custom')"/>
-                                    <span>Custom</span>
+                                    <span t-out="this._t('Custom')"/>
                                     <i class="fa fa-calendar ms-auto text-muted"/>
                                 </label>
                             </div>
@@ -80,17 +80,17 @@
                 <div class="st-main">
                     <div class="st-navbar">
                         <div class="st-nav-left">
-                            <span class="st-nav-title">Stock Transfer</span>
+                            <span class="st-nav-title" t-out="this._t('Stock Transfer')"/>
                             <div class="st-nav-search">
                                 <i class="fa fa-search st-search-icon-left"/>
-                                <input type="text" placeholder="Search by transfer code" t-on-input="onSearchInput"/>
+                                <input type="text" t-att-placeholder="this._t('Search by transfer code')" t-on-input="onSearchInput"/>
                                 <i class="fa fa-exchange st-search-icon-right"/>
                             </div>
                         </div>
                         <div class="st-nav-actions">
-                            <button class="st-btn is-primary" t-on-click="createNewTransfer"><i class="fa fa-plus me-1"/> Transfer Goods</button>
-                            <button class="st-btn"><i class="fa fa-file-excel-o me-1"/> Import file</button>
-                            <button class="st-btn dropdown-toggle"><i class="fa fa-file-text-o me-1"/> Export file</button>
+                            <button class="st-btn is-primary" t-on-click="createNewTransfer"><i class="fa fa-plus me-1"/> <t t-out="this._t('Transfer Goods')"/></button>
+                            <button class="st-btn"><i class="fa fa-file-excel-o me-1"/> <t t-out="this._t('Import file')"/></button>
+                            <button class="st-btn dropdown-toggle"><i class="fa fa-file-text-o me-1"/> <t t-out="this._t('Export file')"/></button>
                             <button class="st-icon-btn"><i class="fa fa-th-large"/></button>
                             <button class="st-icon-btn"><i class="fa fa-cog"/></button>
                             <button class="st-icon-btn"><i class="fa fa-question-circle-o"/></button>
@@ -103,25 +103,31 @@
                                 <tr>
                                     <th class="col-check"><input type="checkbox"/></th>
                                     <th class="col-star"><i class="fa fa-star-o"/></th>
-                                    <th>Transfer Code</th>
-                                    <th>Transfer Date</th>
-                                    <th>Receive Date</th>
-                                    <th>From Branch</th>
-                                    <th>To Branch</th>
-                                    <th class="text-end">Transfer Value</th>
-                                    <th class="text-center">Status</th>
+                                    <th t-out="this._t('Transfer Code')"/>
+                                    <th t-out="this._t('Type')"/>
+                                    <th t-out="this._t('Transfer Date')"/>
+                                    <th t-out="this._t('Receive Date')"/>
+                                    <th t-out="this._t('From Branch')"/>
+                                    <th t-out="this._t('To Branch')"/>
+                                    <th class="text-end" t-out="this._t('Transfer Value')"/>
+                                    <th class="text-center" t-out="this._t('Status')"/>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-if="state.loading">
-                                    <tr><td colspan="9" class="text-center py-5">Loading data...</td></tr>
+                                    <tr><td colspan="10" class="text-center py-5" t-out="this._t('Loading data...')"/></tr>
                                 </t>
                                 <t t-else="">
-                                    <t t-foreach="state.records" t-as="r" t-key="r.id">
+                                    <t t-foreach="displayRecords" t-as="r" t-key="r.id">
                                         <tr t-on-click="() => this.openTransfer(r)">
                                             <td class="col-check"><input type="checkbox"/></td>
                                             <td class="col-star"><i class="fa fa-star-o"/></td>
                                             <td class="st-col-code"><t t-esc="r.name"/></td>
+                                            <td>
+                                                <span t-att-class="['st-direction-badge', r.direction === 'inbound' ? 'is-inbound' : 'is-outbound'].join(' ')">
+                                                    <t t-esc="this._t(r.direction === 'inbound' ? 'Inbound' : 'Outbound')"/>
+                                                </span>
+                                            </td>
                                             <td><t t-esc="r.date_transfer"/></td>
                                             <td><t t-esc="r.date_receive"/></td>
                                             <td><t t-esc="r.loc_src"/></td>
@@ -134,8 +140,8 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <t t-if="state.records.length === 0">
-                                        <tr><td colspan="9" class="text-center py-5 text-muted">No transfer records found</td></tr>
+                                    <t t-if="displayRecords.length === 0">
+                                        <tr><td colspan="10" class="text-center py-5 text-muted" t-out="this._t('No transfer records found')"/></tr>
                                     </t>
                                 </t>
                             </tbody>
@@ -152,13 +158,13 @@
                             <button class="st-btn-back" t-on-click="() => this.state.view = 'list'">
                                 <i class="fa fa-arrow-left"/>
                             </button>
-                            <span class="st-nav-title"><t t-esc="state.view === 'receive' ? 'Receive Details' : 'Stock Transfer'"/></span>
+                            <span class="st-nav-title"><t t-esc="this._t(state.view === 'receive' ? 'Receive Details' : 'Stock Transfer')"/></span>
 
                             <t t-if="state.view === 'form'">
                                 <div class="st-form-search-wrap">
                                     <div class="st-nav-search">
                                         <i class="fa fa-search st-search-icon-left"/>
-                                        <input type="text" placeholder="Type product name or code" t-att-value="state.searchProductKeyword" t-on-input="onProductSearch"/>
+                                        <input type="text" t-att-placeholder="this._t('Type product name or code')" t-att-value="state.searchProductKeyword" t-on-input="onProductSearch"/>
                                         <i class="fa fa-th st-search-icon-right"/>
                                     </div>
                                     <div t-if="state.showProductDropdown" class="st-result-dropdown">
@@ -168,7 +174,7 @@
                                                     <div class="st-ri-name"><t t-esc="p.name"/></div>
                                                     <div class="st-ri-sub">
                                                         <span class="st-ri-code"><t t-esc="p.barcode || '---'"/></span>
-                                                        <span class="st-ri-qty">On Hand: <t t-esc="p.qty_on_hand"/></span>
+                                                        <span class="st-ri-qty"><t t-out="this._t('On Hand:')"/> <t t-esc="p.qty_on_hand"/></span>
                                                         <span class="st-ri-price"><t t-esc="formatNumber(p.price)"/></span>
                                                     </div>
                                                 </div>
@@ -180,7 +186,7 @@
                             <t t-else="">
                                 <div class="st-nav-search">
                                     <i class="fa fa-search st-search-icon-left"/>
-                                    <input type="text" placeholder="Search products by code or name (F3)"/>
+                                    <input type="text" t-att-placeholder="this._t('Search products by code or name (F3)')"/>
                                     <i class="fa fa-th st-search-icon-right"/>
                                 </div>
                             </t>
@@ -199,10 +205,10 @@
 
                             <t t-if="state.view === 'receive'">
                                 <div class="st-tabs">
-                                    <button t-att-class="state.receiveTab === 'all' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'all'">All (<t t-esc="state.currentTransfer.lines.length"/>)</button>
-                                    <button t-att-class="state.receiveTab === 'match' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'match'">Matched</button>
-                                    <button t-att-class="state.receiveTab === 'mismatch' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'mismatch'">Mismatch</button>
-                                    <button t-att-class="state.receiveTab === 'unreceived' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'unreceived'">Unreceived</button>
+                                    <button t-att-class="state.receiveTab === 'all' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'all'"><t t-out="this._t('All')"/> (<t t-esc="state.currentTransfer.lines.length"/>)</button>
+                                    <button t-att-class="state.receiveTab === 'match' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'match'" t-out="this._t('Matched')"/>
+                                    <button t-att-class="state.receiveTab === 'mismatch' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'mismatch'" t-out="this._t('Mismatch')"/>
+                                    <button t-att-class="state.receiveTab === 'unreceived' ? 'is-active' : ''" t-on-click="() => this.state.receiveTab = 'unreceived'" t-out="this._t('Unreceived')"/>
                                 </div>
                             </t>
 
@@ -210,17 +216,17 @@
                                 <thead>
                                     <tr>
                                         <th t-if="state.view === 'form'" style="width: 40px;"></th>
-                                        <th style="width: 50px;">No.</th>
-                                        <th>Product Code</th>
-                                        <th>Product Name</th>
-                                        <th>UOM</th>
-                                        <th t-if="state.view === 'form'" class="text-end">Stock</th>
-                                        <th t-if="state.view === 'receive'" class="text-end">Stock</th>
-                                        <th t-if="state.view === 'form'" class="text-end">Dest Stock</th>
-                                        <th class="text-center" style="width: 120px;">Transfer Qty</th>
-                                        <th t-if="state.view === 'receive'" class="text-center" style="width: 120px;">Receive Qty</th>
-                                        <th class="text-end">Price<t t-if="state.view === 'receive'">/Receive</t></th>
-                                        <th class="text-end">Subtotal</th>
+                                        <th style="width: 50px;" t-out="this._t('No.')"/>
+                                        <th t-out="this._t('Product Code')"/>
+                                        <th t-out="this._t('Product Name')"/>
+                                        <th t-out="this._t('UOM')"/>
+                                        <th t-if="state.view === 'form'" class="text-end" t-out="this._t('Stock')"/>
+                                        <th t-if="state.view === 'receive'" class="text-end" t-out="this._t('Stock')"/>
+                                        <th t-if="state.view === 'form'" class="text-end" t-out="this._t('Dest Stock')"/>
+                                        <th class="text-center" style="width: 120px;" t-out="this._t('Transfer Qty')"/>
+                                        <th t-if="state.view === 'receive'" class="text-center" style="width: 120px;" t-out="this._t('Receive Qty')"/>
+                                        <th class="text-end"><t t-out="this._t('Price')"/><t t-if="state.view === 'receive'">/Receive</t></th>
+                                        <th class="text-end" t-out="this._t('Subtotal')"/>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -289,77 +295,92 @@
                             </div>
 
                             <div class="st-side-field">
-                                <label>Transfer Code</label>
-                                <input type="text" class="st-input" t-att-placeholder="state.currentTransfer.name || 'Auto code'" disabled="1"/>
+                                <label t-out="this._t('Transfer Code')"/>
+                                <input type="text" class="st-input" t-att-placeholder="state.currentTransfer.name || this._t('Auto code')" disabled="1"/>
                             </div>
 
                             <div class="st-side-field">
-                                <label>Status</label>
+                                <label t-out="this._t('Status')"/>
                                 <span class="st-val-status"><t t-esc="getStatusLabel(state.currentTransfer.state)"/></span>
                             </div>
 
-                            <div class="st-side-field" t-if="state.view === 'receive'">
-                                <label>From Branch</label>
-                                <span class="st-val-text"><t t-esc="state.currentTransfer.loc_src"/></span>
+                            <div class="st-side-field">
+                                <label t-out="this._t('From Branch')"/>
+                                <t t-if="state.view === 'form' and !state.currentTransfer.id">
+                                    <select class="st-select" t-att-value="state.currentTransfer.loc_src_config_id || ''" t-on-change="onSourceChange">
+                                        <option value="" t-out="this._t('Select branch')"/>
+                                        <t t-foreach="sourceLocations" t-as="loc" t-key="loc.id">
+                                            <option t-att-value="loc.config_id"><t t-esc="loc.name"/></option>
+                                        </t>
+                                    </select>
+                                </t>
+                                <t t-else="">
+                                    <span class="st-val-text"><t t-esc="state.currentTransfer.loc_src || state.currentBranchName"/></span>
+                                </t>
                             </div>
 
                             <div class="st-side-field" t-if="state.view === 'receive'">
-                                <label>Transfer Date</label>
+                                <label t-out="this._t('Transfer Date')"/>
                                 <span class="st-val-text"><t t-esc="state.currentTransfer.date_transfer"/></span>
                             </div>
 
                             <div t-if="state.view === 'form'" class="st-side-field">
-                                <label>To Branch</label>
+                                <label t-out="this._t('To Branch')"/>
                                 <t t-if="state.currentTransfer.id">
-                                     <span class="st-val-text"><t t-esc="state.currentTransfer.loc_dest"/></span>
+                                    <span class="st-val-text"><t t-esc="state.currentTransfer.loc_dest"/></span>
                                 </t>
                                 <t t-else="">
-                                    <select class="st-select" t-model="state.currentTransfer.loc_dest_id">
-                                        <option value="">Select branch</option>
-                                        <t t-foreach="state.locations" t-as="loc" t-key="loc.id">
+                                    <select class="st-select" t-att-value="state.currentTransfer.loc_dest_config_id || ''" t-on-change="onDestinationChange">
+                                        <option value="" t-out="this._t('Select branch')"/>
+                                        <t t-foreach="destinationLocations" t-as="loc" t-key="loc.id">
                                             <option t-att-value="loc.id"><t t-esc="loc.name"/></option>
                                         </t>
                                     </select>
                                 </t>
                             </div>
 
+                            <div class="st-side-field" t-if="state.view === 'receive'">
+                                <label t-out="this._t('To Branch')"/>
+                                <span class="st-val-text"><t t-esc="state.currentTransfer.loc_dest"/></span>
+                            </div>
+
                             <div class="st-side-field">
-                                <label>Total Transfer Qty</label>
+                                <label t-out="this._t('Total Transfer Qty')"/>
                                 <span class="st-val-qty"><t t-esc="state.currentTransfer.lines.reduce((a, b) => a + b.qty, 0)"/></span>
                             </div>
 
                             <div class="st-side-field" t-if="state.view === 'receive'">
-                                <label>Total Received Qty</label>
+                                <label t-out="this._t('Total Received Qty')"/>
                                 <span class="st-val-qty"><t t-esc="state.currentTransfer.lines.reduce((a, b) => a + (b.received_qty || 0), 0)"/></span>
                             </div>
 
                             <div class="st-side-field">
                                 <div class="st-note-box">
                                     <i class="fa fa-pencil me-2"/>
-                                    <textarea placeholder="Notes" t-model="state.currentTransfer.note"></textarea>
+                                    <textarea t-att-placeholder="this._t('Notes')" t-model="state.currentTransfer.note"></textarea>
                                 </div>
                             </div>
 
                             <div class="st-side-actions">
                                 <t t-if="state.currentTransfer.state === 'done'">
                                     <div class="alert alert-success w-100 text-center m-0">
-                                        <i class="fa fa-check-circle me-1"/> Transfer Completed
+                                        <i class="fa fa-check-circle me-1"/> <t t-out="this._t('Transfer Completed')"/>
                                     </div>
                                 </t>
                                 <t t-elif="state.view === 'form' and (state.currentTransfer.state === 'draft' or !state.currentTransfer.id)">
                                     <button class="st-action-btn is-blue" t-on-click="() => this.saveTransfer(false)">
-                                        <i class="fa fa-save me-2"/> Save Draft
+                                        <i class="fa fa-save me-2"/> <t t-out="this._t('Save Draft')"/>
                                     </button>
                                     <button class="st-action-btn is-green" t-on-click="() => this.saveTransfer(true)">
-                                        <i class="fa fa-check me-2"/> Complete
+                                        <i class="fa fa-check me-2"/> <t t-out="this._t('Complete')"/>
                                     </button>
                                 </t>
                                 <t t-elif="state.view === 'receive' and state.currentTransfer.state === 'shipped'">
                                     <button class="st-action-btn is-blue" t-on-click="() => this.saveTransfer(false)">
-                                        <i class="fa fa-save me-2"/> Save Draft
+                                        <i class="fa fa-save me-2"/> <t t-out="this._t('Save Draft')"/>
                                     </button>
                                     <button class="st-action-btn is-green" t-on-click="receiveTransfer">
-                                        <i class="fa fa-check me-2"/> Receive Goods
+                                        <i class="fa fa-check me-2"/> <t t-out="this._t('Receive Goods')"/>
                                     </button>
                                 </t>
                                 <t t-else="">
@@ -376,4 +397,3 @@
     </t>
 
 </templates>
-

@@ -14,11 +14,11 @@
             <thead>
               <tr>
                 <th class="col-idx">#</th>
-                <th class="col-name">Product</th>
-                <th class="col-unit">Unit Price</th>
-                <th class="col-uom">UoM</th>
-                <th class="col-qty">Qty</th>
-                <th class="col-total">Total</th>
+                <th class="col-name" t-out="this._t('Product')"/>
+                <th class="col-unit" t-out="this._t('Unit Price')"/>
+                <th class="col-uom" t-out="this._t('UoM')"/>
+                <th class="col-qty" t-out="this._t('Qty')"/>
+                <th class="col-total" t-out="this._t('Total')"/>
               </tr>
             </thead>
 
@@ -32,6 +32,7 @@
                       <button type="button"
                               class="idx-del"
                               title="Delete"
+                              t-att-title="this._t('Delete')"
                               t-on-click.stop="() => this.sppRemoveLine(line)">
                         <i class="fa fa-trash"/>
                       </button>
@@ -87,9 +88,7 @@
             </tbody>
           </table>
 
-          <div class="sit-empty" t-else="">
-            No products yet
-          </div>
+          <div class="sit-empty" t-else="" t-out="this._t('No products yet')"/>
         </div>
 
       </div>

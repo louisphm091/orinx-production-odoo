@@ -4,49 +4,53 @@
   <t t-name="sale_planning.ReplenishmentDashboard" owl="1">
     <div class="sp_rep o_action p-3">
 
-      <!-- HEADER -->
+            <!-- HEADER -->
       <div class="sp_rep_header d-flex justify-content-between align-items-start mb-3">
         <div>
-          <div class="sp_rep_title">REPLENISHMENT MANAGEMENT</div>
-          <div class="sp_rep_sub text-muted">
-            Track – Approve – Control replenishment suggestions based on forecast &amp; inventory
-          </div>
+          <div class="sp_rep_title" t-out="this._t('REPLENISHMENT MANAGEMENT')"/>
+          <div class="sp_rep_sub text-muted" t-out="this._t('Track – Approve – Control replenishment suggestions based on forecast &amp; inventory')"/>
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <button class="btn sp_pill" type="button">Women's Fashion <i class="fa fa-angle-down ms-1"/></button>
-          <button class="btn sp_pill" type="button">HCM Warehouse <i class="fa fa-angle-down ms-1"/></button>
-          <button class="btn sp_pill" type="button">Month <i class="fa fa-angle-down ms-1"/></button>
+          <label class="sp_pill sp_select_pill mb-0">
+            <select t-att-value="state.filters.pos_config_id || ''" t-on-change="updateStore">
+              <t t-foreach="state.storeOptions" t-as="store" t-key="store.id">
+                <option t-att-value="store.id"><t t-esc="store.name"/></option>
+              </t>
+            </select>
+          </label>
+          <button class="btn sp_pill" type="button"><t t-out="this._t('HCM Warehouse')"/> <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill" type="button"><t t-out="this._t('Month')"/> <i class="fa fa-angle-down ms-1"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-envelope-o"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-angle-down"/></button>
         </div>
       </div>
 
-      <!-- TOP ACTIONS -->
+            <!-- TOP ACTIONS -->
       <div class="d-flex justify-content-end gap-2 mb-3">
-        <button class="btn sp_pill" type="button"><i class="fa fa-search me-1"/> Article Page</button>
-        <button class="btn sp_pill" type="button"><i class="fa fa-cog me-1"/> Stock Threshold Settings</button>
-        <button class="btn sp_pill" type="button"><i class="fa fa-download me-1"/> Export CSV</button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-search me-1"/> <t t-out="this._t('Article Page')"/></button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-cog me-1"/> <t t-out="this._t('Stock Threshold Settings')"/></button>
+        <button class="btn sp_pill" type="button"><i class="fa fa-download me-1"/> <t t-out="this._t('Export CSV')"/></button>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info">Loading data...</div>
+        <div class="alert alert-info"><t t-out="this._t('Loading data...')"/></div>
       </t>
       <t t-elif="state.error">
         <div class="alert alert-danger"><t t-esc="state.error"/></div>
       </t>
       <t t-else="">
 
-        <!-- KPI ROW -->
-        <div class="row g-3 mb-3">
+                <!-- KPI ROW -->
+        <div class="row g-3 mb-3 align-items-stretch">
           <div class="col-12 col-lg-3">
-            <div class="card sp_card p-3">
+            <div class="card sp_card p-3 h-100 d-flex flex-column">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <div class="sp_kpi_label">Total Suggestions</div>
-                  <div class="sp_kpi_value"><t t-esc="state.kpis.total_suggestions"/> suggestions</div>
+                  <div class="sp_kpi_label" t-out="this._t('Total Suggestions')"/>
+                  <div class="sp_kpi_value"><t t-esc="state.kpis.total_suggestions"/> <t t-out="this._t('suggestions')"/></div>
                   <div class="sp_kpi_hint text-muted">
-                    <i class="fa fa-arrow-up text-success me-1"/><t t-esc="state.kpis.delta_vs_last_week"/> vs last week
+                    <i class="fa fa-arrow-up text-success me-1"/><t t-esc="state.kpis.delta_vs_last_week"/> <t t-out="this._t('vs last week')"/>
                   </div>
                 </div>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
@@ -60,76 +64,77 @@
           </div>
 
           <div class="col-12 col-lg-3">
-            <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label"><i class="fa fa-exclamation-triangle text-warning me-1"/>Out of Stock Risk</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.risk_skus"/> SKUs</div>
+            <div class="card sp_card p-3 sp_card_image h-100 d-flex flex-column">
+              <div class="sp_kpi_label"><i class="fa fa-exclamation-triangle text-warning me-1"/><t t-out="this._t('Out of Stock Risk')"/></div>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.risk_skus"/> <t t-out="this._t('SKUs')"/></div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.risk_hint"/></div>
-              <div class="sp_img_hint">🧺</div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
-            <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label">Pending Approval</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.pending"/> suggestions</div>
+            <div class="card sp_card p-3 sp_card_image h-100 d-flex flex-column">
+              <div class="sp_kpi_label" t-out="this._t('Pending Approval')"/>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.pending"/> <t t-out="this._t('suggestions')"/></div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.pending_hint"/></div>
-              <div class="sp_img_hint">🧾</div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
-            <div class="card sp_card p-3 sp_card_image">
-              <div class="sp_kpi_label">Ordered</div>
-              <div class="sp_kpi_value"><t t-esc="state.kpis.ordered"/> orders</div>
+            <div class="card sp_card p-3 sp_card_image h-100 d-flex flex-column">
+              <div class="sp_kpi_label" t-out="this._t('Ordered')"/>
+              <div class="sp_kpi_value"><t t-esc="state.kpis.ordered"/> <t t-out="this._t('orders')"/></div>
               <div class="sp_kpi_hint text-muted"><t t-esc="state.kpis.ordered_hint"/></div>
-              <div class="sp_img_hint">📦</div>
             </div>
           </div>
         </div>
 
-        <!-- MAIN: TABLE + DETAIL PANEL -->
+                <!-- MAIN: TABLE + DETAIL PANEL -->
         <div class="row g-3">
           <div class="col-12 col-lg-8">
             <div class="card sp_card p-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_section_title">Replenishment Suggestion List</div>
+                <div class="sp_section_title" t-out="this._t('Replenishment Suggestion List')"/>
 
-                <div class="d-flex align-items-center gap-2">
-                  <div class="sp_search">
-                    <i class="fa fa-search"/>
-                    <input t-model="state.search" placeholder="Search..." />
-                  </div>
-                  <button class="btn sp_pill" type="button">All <i class="fa fa-angle-down ms-1"/></button>
+              <div class="d-flex align-items-center gap-2">
+                <div class="sp_search">
+                  <i class="fa fa-search"/>
+                  <input
+                    t-att-value="state.filters.search"
+                    t-att-placeholder="this._t('Search...')"
+                    t-on-input="updateSearch"
+                  />
                 </div>
+                <button class="btn sp_pill" type="button"><t t-out="this._t('All')"/> <i class="fa fa-angle-down ms-1"/></button>
+              </div>
               </div>
 
               <div class="d-flex gap-2 mb-2">
-                <button class="btn sp_pill" type="button">Status: All <i class="fa fa-angle-down ms-1"/></button>
-                <button class="btn sp_pill" type="button">Filter <i class="fa fa-angle-down ms-1"/></button>
+                <button class="btn sp_pill" type="button"><t t-out="this._t('Status: All')"/> <i class="fa fa-angle-down ms-1"/></button>
+                <button class="btn sp_pill" type="button"><t t-out="this._t('Filter')"/> <i class="fa fa-angle-down ms-1"/></button>
               </div>
 
               <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0 sp_table">
                   <thead class="text-muted small">
                     <tr>
-                      <th>SKU / Product</th>
-                      <th>Category</th>
-                      <th>Warehouse</th>
-                      <th class="text-end">Current Stock</th>
-                      <th class="text-end">30-day Forecast</th>
-                      <th class="text-end">Sug. Rep. Qty</th>
-                      <th class="text-end">Status</th>
+                      <th t-out="this._t('SKU / Product')"/>
+                      <th t-out="this._t('Category')"/>
+                      <th t-out="this._t('Warehouse')"/>
+                      <th class="text-end" t-out="this._t('Current Stock')"/>
+                      <th class="text-end" t-out="this._t('Threshold')"/>
+                      <th class="text-end" t-out="this._t('Sug. Rep. Qty')"/>
+                      <th class="text-end" t-out="this._t('Status')"/>
                     </tr>
                   </thead>
                   <tbody>
-                    <t t-set="rows" t-value="filteredRows()"/>
+                    <t t-set="rows" t-value="paginatedRows()"/>
                     <t t-if="!rows.length">
-                      <tr><td colspan="7" class="text-muted">No data</td></tr>
+                      <tr><td colspan="7" class="text-muted" t-out="this._t('No data')"/></tr>
                     </t>
                     <t t-else="">
                       <t t-foreach="rows" t-as="r" t-key="r.key">
-                        <tr t-att-class="state.selected_key === r.key ? 'sp_row_active' : ''"
-                            t-on-click="() => selectRow(r.key)">
+                        <tr t-att-class="state.filters.selected_key === r.key ? 'sp_row_active' : ''"
+                            t-on-click="() => this.selectRow(r.key)">
                           <td class="fw-semibold">
                             <div class="d-flex align-items-center gap-2">
                               <div class="sp_thumb">👕</div>
@@ -141,10 +146,10 @@
                           <td><t t-esc="r.category"/></td>
                           <td><t t-esc="r.warehouse"/></td>
                           <td class="text-end"><t t-esc="r.onhand"/></td>
-                          <td class="text-end"><t t-esc="r.forecast_30d"/></td>
+                          <td class="text-end"><t t-esc="r.threshold"/></td>
                           <td class="text-end"><t t-esc="r.suggest_qty"/></td>
                           <td class="text-end">
-                            <span t-att-class="badgeClass(r.state)"><t t-esc="badgeText(r.state)"/></span>
+                            <span t-att-class="badgeClass(r.state)"><t t-esc="this._t(badgeText(r.state))"/></span>
                           </td>
                         </tr>
                       </t>
@@ -154,13 +159,19 @@
               </div>
 
               <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
-                <div>10 / page</div>
+                <div><t t-esc="state.pagination.currentPage"/> / <t t-esc="getTotalPages()"/> <t t-out="this._t('page')"/></div>
                 <div class="d-flex gap-1">
-                  <button class="btn btn-sm btn-light">‹</button>
-                  <button class="btn btn-sm btn-light">1</button>
-                  <button class="btn btn-sm btn-light">2</button>
-                  <button class="btn btn-sm btn-light">3</button>
-                  <button class="btn btn-sm btn-light">›</button>
+                  <button class="btn btn-sm btn-light" t-on-click="() => this.changePage(state.pagination.currentPage - 1)">‹</button>
+                  <t t-foreach="getPageNumbers()" t-as="page" t-key="page">
+                    <button
+                      class="btn btn-sm"
+                      t-att-class="state.pagination.currentPage === page ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-light'"
+                      t-on-click="() => this.changePage(page)"
+                    >
+                      <t t-esc="page"/>
+                    </button>
+                  </t>
+                  <button class="btn btn-sm btn-light" t-on-click="() => this.changePage(state.pagination.currentPage + 1)">›</button>
                 </div>
               </div>
             </div>
@@ -168,9 +179,9 @@
 
           <!-- DETAIL PANEL -->
           <div class="col-12 col-lg-4">
-            <div class="card sp_card p-3 h-100 sp_side">
+            <div class="card sp_card p-3 sp_side">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="text-muted small">Replenishment Suggestion</div>
+                <div class="text-muted small" t-out="this._t('Replenishment Suggestion')"/>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-times"/>
                 </button>
@@ -185,36 +196,50 @@
                   <div><t t-esc="state.detail.category"/></div>
                   <div><t t-esc="state.detail.season"/></div>
                 </div>
-                <div class="sp_side_img">🧺</div>
+                <div class="sp_side_img">
+                  <t t-if="state.detail.image_url">
+                    <img
+                      t-att-src="state.detail.image_url"
+                      t-att-alt="state.detail.title || 'Product image'"
+                    />
+                  </t>
+                  <t t-else=""><span class="sp_side_img_placeholder">🧺</span></t>
+                </div>
               </div>
 
-              <div class="sp_block_title">Proposal Analysis</div>
+              <div class="sp_block_title" t-out="this._t('Proposal Analysis')"/>
               <div class="sp_kv">
                 <div class="sp_kv_row">
-                  <div class="text-muted">Current Stock</div>
-                  <div class="fw-semibold"><t t-esc="state.detail.analysis.onhand"/></div>
+                  <div class="text-muted" t-out="this._t('Current Stock')"/>
+                  <div class="fw-semibold"><t t-if="state.detail.analysis" t-esc="state.detail.analysis.onhand || 0"/><t t-else="">0</t></div>
                 </div>
                 <div class="sp_kv_row">
-                  <div class="text-muted">30-day Sales Forecast</div>
-                  <div class="fw-semibold"><t t-esc="state.detail.analysis.forecast_30d"/></div>
+                  <div class="text-muted" t-out="this._t('Threshold')"/>
+                  <div class="fw-semibold"><t t-if="state.detail.analysis" t-esc="state.detail.analysis.reorder_point || 0"/><t t-else="">0</t></div>
                 </div>
                 <div class="sp_kv_row">
-                  <div class="text-muted">Reorder Point</div>
-                  <div class="sp_tag_plus">+<t t-esc="state.detail.analysis.reorder_point"/></div>
+                  <div class="text-muted" t-out="this._t('Suggested Replenishment')"/>
+                  <div class="sp_tag_plus">+<t t-if="state.detail.analysis" t-esc="state.detail.analysis.suggest_qty || 0"/><t t-else="">0</t></div>
                 </div>
               </div>
 
-              <div class="sp_block_title mt-3">Replenishment Reason</div>
+              <div class="sp_block_title mt-3" t-out="this._t('Replenishment Reason')"/>
               <div class="text-muted small">
                 <t t-esc="state.detail.reason"/>
               </div>
 
-              <div class="mt-auto pt-3 d-flex gap-2">
-                <button class="btn btn-success flex-fill" type="button">Approve</button>
-                <button class="btn btn-outline-secondary flex-fill" type="button">Edit Quantity</button>
+              <div class="pt-3 d-flex gap-2">
+                <button class="btn btn-success flex-fill" type="button" t-out="this._t('Approve')"/>
+                <button
+                  class="btn btn-outline-secondary flex-fill"
+                  type="button"
+                  t-att-disabled="!state.detail.product_id"
+                  t-on-click="editSelectedQuantity"
+                  t-out="this._t('Edit Quantity')"
+                />
               </div>
               <div class="text-end mt-2">
-                <button class="btn btn-link text-danger" type="button">Reject</button>
+                <button class="btn btn-link text-danger" type="button" t-out="this._t('Reject')"/>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import pytz
 import logging
@@ -223,20 +224,83 @@ class PosDashboardSwift(models.AbstractModel):
     # Inventory (Kiểm Kho) helpers
     # ──────────────────────────────────────────────────────────────
 
+    def _get_pos_config(self, config_id=False):
+        PosConfig = self.env['pos.config'].sudo()
+        if config_id:
+            return PosConfig.browse(int(config_id)).exists()
+        if self.env.context.get('pos_config_id'):
+            return PosConfig.browse(int(self.env.context['pos_config_id'])).exists()
+        return PosConfig.browse()
+
+    def _get_pos_stock_location(self, config=False):
+        config = config or self._get_pos_config()
+        if config and config.picking_type_id.default_location_src_id:
+            return config.picking_type_id.default_location_src_id
+        return False
+
+    def _get_pos_config_by_location(self, location):
+        if not location:
+            return self.env['pos.config'].browse()
+        return self.env['pos.config'].sudo().search([
+            ('active', '=', True),
+            ('picking_type_id.default_location_src_id', '=', location.id),
+        ], limit=1)
+
+    def _get_pos_branch_location_rows(self):
+        configs = self.env['pos.config'].sudo().search([('active', '=', True)])
+        rows = []
+        for config in configs:
+            location = config.picking_type_id.default_location_src_id
+            if not location:
+                continue
+            rows.append({
+                'id': config.id,
+                'config_id': config.id,
+                'name': config.name,
+                'location_id': location.id,
+                'location_name': location.display_name,
+            })
+        return rows
+
+    def _get_location_branch_name_map(self):
+        return {
+            row['location_id']: row['name']
+            for row in self._get_pos_branch_location_rows()
+        }
+
+    def _get_location_branch_label(self, location, branch_map=None):
+        if not location:
+            return ''
+        branch_map = branch_map or self._get_location_branch_name_map()
+        return branch_map.get(location.id, location.display_name)
+
     @api.model
-    def get_inventory_products(self, keyword=''):
+    def get_inventory_products(self, keyword='', config_id=False):
         """Return products with current on-hand quantity for inventory lines."""
-        domain = [('available_in_pos', '=', True)]
+        config = self._get_pos_config(config_id)
+        if not config:
+            return []
+
+        domain = [
+            ('available_in_pos', '=', True),
+            ('active', '=', True),
+            ('product_tmpl_id.swift_branch_config_ids', 'in', config.ids),
+        ]
+        if config.limit_categories and config.iface_available_categ_ids:
+            domain.append(('pos_categ_ids', 'in', config.iface_available_categ_ids.ids))
         if keyword:
             domain += ['|',
                 ('name', 'ilike', keyword),
                 ('barcode', 'ilike', keyword),
             ]
         products = self.env['product.product'].search(domain, limit=200)
+        location = self._get_pos_stock_location(config)
         res = []
         for p in products:
             # get stock for all warehouses
             quant_domain = [('product_id', '=', p.id), ('location_id.usage', '=', 'internal')]
+            if location:
+                quant_domain.append(('location_id', 'child_of', location.id))
             quants = self.env['stock.quant'].search(quant_domain)
             qty_on_hand = sum(quants.mapped('quantity'))
             res.append({
@@ -261,6 +325,8 @@ class PosDashboardSwift(models.AbstractModel):
                 res.append({
                     'id': r.id,
                     'name': r.name or str(r.id),
+                    'config_id': r.config_id.id if r.config_id else False,
+                    'branch_name': r.config_id.name if r.config_id else '',
                     'date': fields.Datetime.to_string(r.date) if r.date else '',
                     'status': r.state if r.state else 'draft',
                 })
@@ -269,21 +335,30 @@ class PosDashboardSwift(models.AbstractModel):
         return res
 
     @api.model
-    def get_products_by_barcodes(self, barcodes):
+    def get_products_by_barcodes(self, barcodes, config_id=False):
         """Look up products by barcode list, returning product info + stock qty."""
         if not barcodes:
             return []
         res = []
         try:
-            products = self.env['product.product'].search([
-                ('barcode', 'in', barcodes)
-            ])
+            config = self._get_pos_config(config_id)
+            if not config:
+                return []
+            domain = [
+                ('barcode', 'in', barcodes),
+                ('product_tmpl_id.swift_branch_config_ids', 'in', config.ids),
+            ]
+            products = self.env['product.product'].search(domain)
+            location = self._get_pos_stock_location(config)
             for p in products:
                 # Get internal stock
-                quants = self.env['stock.quant'].search([
+                quant_domain = [
                     ('product_id', '=', p.id),
                     ('location_id.usage', '=', 'internal'),
-                ])
+                ]
+                if location:
+                    quant_domain.append(('location_id', 'child_of', location.id))
+                quants = self.env['stock.quant'].search(quant_domain)
                 qty_on_hand = sum(quants.mapped('quantity'))
                 res.append({
                     'id': p.id,
@@ -312,10 +387,14 @@ class PosDashboardSwift(models.AbstractModel):
 
             # Pre-fetch current quant quantities for all products in one query.
             product_ids = inv.line_ids.mapped('product_id').ids
-            quants = self.env['stock.quant'].search([
+            quant_domain = [
                 ('product_id', 'in', product_ids),
                 ('location_id.usage', '=', 'internal'),
-            ])
+            ]
+            location = self._get_pos_stock_location(inv.config_id)
+            if location:
+                quant_domain.append(('location_id', 'child_of', location.id))
+            quants = self.env['stock.quant'].search(quant_domain)
             live_qty = {}
             for q in quants:
                 live_qty[q.product_id.id] = live_qty.get(q.product_id.id, 0.0) + q.quantity
@@ -337,6 +416,8 @@ class PosDashboardSwift(models.AbstractModel):
             return {
                 'id': inv.id,
                 'name': inv.name,
+                'config_id': inv.config_id.id if inv.config_id else False,
+                'branch_name': inv.config_id.name if inv.config_id else '',
                 'state': inv.state,
                 'note': inv.note or '',
                 'lines': lines,
@@ -350,11 +431,15 @@ class PosDashboardSwift(models.AbstractModel):
         """Create or update a swift.stock.inventory record."""
         try:
             inv_id   = vals.get('id', False)
+            config_id = vals.get('config_id', False)
             note     = vals.get('note', '')
             state    = vals.get('state', 'draft')
             lines_data = vals.get('lines', [])
 
             Inventory = self.env['swift.stock.inventory']
+            config = self._get_pos_config(config_id)
+            if not config:
+                raise UserError(_('Please select a POS branch before saving inventory data.'))
 
             if inv_id:
                 inv = Inventory.browse(inv_id)
@@ -362,23 +447,27 @@ class PosDashboardSwift(models.AbstractModel):
                     inv_id = False
 
             if not inv_id:
-                inv = Inventory.create({'note': note})
+                inv = Inventory.create({'note': note, 'config_id': config.id if config else False})
             else:
-                inv.write({'note': note})
+                inv.write({'note': note, 'config_id': config.id if config else False})
 
             # Update lines
             inv.line_ids.unlink()
             line_vals = []
+            location = self._get_pos_stock_location(config or inv.config_id)
             for ld in lines_data:
                 product = self.env['product.product'].browse(ld['product_id'])
                 if not product.exists():
                     continue
 
                 # Fetch current qty on hand for internal locations
-                quants = self.env['stock.quant'].search([
+                quant_domain = [
                     ('product_id', '=', product.id),
                     ('location_id.usage', '=', 'internal')
-                ])
+                ]
+                if location:
+                    quant_domain.append(('location_id', 'child_of', location.id))
+                quants = self.env['stock.quant'].search(quant_domain)
                 qty_on_hand = sum(quants.mapped('quantity'))
 
                 line_vals.append((0, 0, {
@@ -419,21 +508,52 @@ class PosDashboardSwift(models.AbstractModel):
         try:
             _logger.info('create_or_update_transfer: vals=%s', vals)
             transfer_id = vals.get('id', False)
+            config_id = vals.get('config_id', False)
+            dest_config_id = vals.get('dest_config_id', False)
             loc_dest_id = vals.get('loc_dest_id')
+            loc_src_id = vals.get('loc_src_id')
             note = vals.get('note', '')
             state = vals.get('state', 'draft')
             lines_data = vals.get('lines', [])
 
-            # Default source location (first internal)
-            loc_src = self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
+            config = self._get_pos_config(config_id)
+            dest_config = self._get_pos_config(dest_config_id)
+            if not config:
+                raise UserError(_('Please select a source branch.'))
+            if not dest_config:
+                raise UserError(_('Please select a destination branch.'))
+            if config.id == dest_config.id:
+                raise UserError(_('Source branch and destination branch must be different.'))
+            loc_src = False
+            if config:
+                loc_src = self._get_pos_stock_location(config)
+            if not loc_src and loc_src_id:
+                loc_src = self.env['stock.location'].browse(int(loc_src_id)).exists()
             if not loc_src:
-                raise ValueError("No internal source location found")
+                raise UserError(_("Source branch '%s' does not have a stock location configured.") % config.display_name)
+
+            loc_dest = False
+            if dest_config:
+                loc_dest = self._get_pos_stock_location(dest_config)
+            if not loc_dest and loc_dest_id:
+                loc_dest = self.env['stock.location'].browse(int(loc_dest_id)).exists()
+            if not loc_dest:
+                raise UserError(_("Destination branch '%s' does not have a stock location configured.") % dest_config.display_name)
+
+            if not config and loc_src:
+                config = self._get_pos_config_by_location(loc_src)
+            if not dest_config and loc_dest:
+                dest_config = self._get_pos_config_by_location(loc_dest)
+            if loc_src.id == loc_dest.id:
+                raise UserError(_('Source branch and destination branch cannot use the same stock location.'))
 
             Transfer = self.env['swift.stock.transfer']
 
             transfer_vals = {
+                'source_config_id': config.id if config else False,
+                'dest_config_id': dest_config.id if dest_config else False,
                 'location_id': loc_src.id,
-                'location_dest_id': int(loc_dest_id) if loc_dest_id else False,
+                'location_dest_id': loc_dest.id,
                 'note': str(note or ''),
                 'state': str(state or 'draft'),
             }
@@ -441,7 +561,7 @@ class PosDashboardSwift(models.AbstractModel):
 
             if transfer_id:
                 transfer = Transfer.browse(transfer_id)
-                if transfer.exists():
+                if transfer.exists() and transfer.state == 'draft':
                     transfer.write(transfer_vals)
                 else:
                     transfer = Transfer.create(transfer_vals)
@@ -468,20 +588,30 @@ class PosDashboardSwift(models.AbstractModel):
             if line_vals:
                 transfer.write({'line_ids': line_vals})
 
-            return transfer.id
+            return {
+                'id': transfer.id,
+                'name': transfer.name,
+                'state': transfer.state,
+            }
         except Exception as e:
             _logger.error('create_or_update_transfer: %s', e)
             raise
 
     @api.model
-    def get_transfer_detail(self, transfer_id):
+    def get_transfer_detail(self, transfer_id, config_id=False):
         """Fetch full details and lines for a stock transfer."""
         try:
             t = self.env['swift.stock.transfer'].browse(transfer_id)
             if not t.exists():
                 return False
+            current_config = self._get_pos_config(config_id)
+            current_location = self._get_pos_stock_location(current_config)
+            branch_map = self._get_location_branch_name_map()
             lines = []
             for l in t.line_ids:
+                received_qty = l.received_qty
+                if current_config and t.dest_config_id.id == current_config.id and t.state == 'shipped' and not received_qty:
+                    received_qty = l.qty
                 lines.append({
                     'id': l.id,
                     'product_id': l.product_id.id,
@@ -489,7 +619,7 @@ class PosDashboardSwift(models.AbstractModel):
                     'product_name': l.product_id.display_name,
                     'uom': l.product_id.uom_id.name if l.product_id.uom_id else '',
                     'qty': l.qty,
-                    'received_qty': l.received_qty,
+                    'received_qty': received_qty,
                     'price': l.price,
                 })
 
@@ -498,23 +628,58 @@ class PosDashboardSwift(models.AbstractModel):
             stock_src = self.get_location_stock(product_ids, t.location_id.id)
             stock_dest = self.get_location_stock(product_ids, t.location_dest_id.id)
 
-            # Map stock back to lines
+            direction = 'other'
+            can_receive = False
+            can_edit = t.state == 'draft'
+            is_dest_branch = False
+            is_source_branch = False
+            if current_config:
+                is_dest_branch = (
+                    t.dest_config_id.id == current_config.id or
+                    (current_location and t.location_dest_id.id == current_location.id)
+                )
+                is_source_branch = (
+                    t.source_config_id.id == current_config.id or
+                    (current_location and t.location_id.id == current_location.id)
+                )
+                if is_dest_branch:
+                    direction = 'inbound'
+                    can_receive = t.state == 'shipped'
+                    can_edit = False
+                elif is_source_branch:
+                    direction = 'outbound'
+
+            # Map stock back to lines based on the branch perspective used to open the transfer.
             for l in lines:
-                l['qty_on_hand'] = stock_src.get(l['product_id'], 0.0)
-                l['qty_dest'] = stock_dest.get(l['product_id'], 0.0)
+                qty_source = stock_src.get(l['product_id'], 0.0)
+                qty_destination = stock_dest.get(l['product_id'], 0.0)
+                l['qty_source'] = qty_source
+                l['qty_destination'] = qty_destination
+                l['qty_dest'] = qty_destination
+                if is_dest_branch:
+                    l['qty_on_hand'] = qty_destination
+                else:
+                    l['qty_on_hand'] = qty_source
 
             return {
                 'id': t.id,
                 'name': t.name,
                 'state': t.state,
                 'note': t.note or '',
-                'loc_src': t.location_id.display_name,
+                'loc_src': t.source_config_id.name or self._get_location_branch_label(t.location_id, branch_map),
                 'loc_src_id': t.location_id.id,
-                'loc_dest': t.location_dest_id.display_name,
+                'loc_src_config_id': t.source_config_id.id if t.source_config_id else False,
+                'loc_dest': t.dest_config_id.name or self._get_location_branch_label(t.location_dest_id, branch_map),
                 'loc_dest_id': t.location_dest_id.id,
+                'loc_dest_config_id': t.dest_config_id.id if t.dest_config_id else False,
                 'date_transfer': fields.Datetime.to_string(t.date_transfer),
+                'date_receive': fields.Datetime.to_string(t.date_receive) if t.date_receive else '',
                 'sender': t.create_uid.name,
+                'total_value': t.total_value,
                 'lines': lines,
+                'direction': direction,
+                'can_receive': can_receive,
+                'can_edit': can_edit,
             }
         except Exception as e:
             _logger.error('get_transfer_detail: %s', e)
@@ -526,19 +691,13 @@ class PosDashboardSwift(models.AbstractModel):
         try:
             t = self.env['swift.stock.transfer'].browse(transfer_id)
             if not t.exists():
-                return False
+                raise UserError(_('Stock transfer not found.'))
 
-            # Update line quantities
-            for ld in lines_data:
-                line = self.env['swift.stock.transfer.line'].browse(ld['id'])
-                if line.exists():
-                    line.write({'received_qty': ld['received_qty']})
-
-            t.action_done()
+            t.action_receive_goods(lines_data)
             return True
         except Exception as e:
             _logger.error('action_receive_transfer: %s', e)
-            return False
+            raise
 
     # ──────────────────────────────────────────────────────────────
     # Stock Transfer (Chuyển Hàng) helpers
@@ -547,41 +706,63 @@ class PosDashboardSwift(models.AbstractModel):
     @api.model
     def get_locations(self):
         """Return internal locations for filtering."""
-        locations = self.env['stock.location'].search([('usage', '=', 'internal')])
-        return [{'id': l.id, 'name': l.display_name} for l in locations]
+        return self._get_pos_branch_location_rows()
 
     @api.model
-    def get_stock_transfers(self, filters=None):
+    def get_stock_transfers(self, filters=None, config_id=False):
         """Fetch stock transfers based on sidebar filters."""
         domain = []
+        current_config = self._get_pos_config(config_id)
+        current_location = self._get_pos_stock_location(current_config)
+        user_tz = self.env.user.tz or 'UTC'
+        now_local = datetime.now(pytz.timezone(user_tz))
         if filters:
-            if filters.get('loc_src'):
-                domain.append(('location_id', '=', int(filters['loc_src'])))
-            if filters.get('loc_dest'):
-                domain.append(('location_dest_id', '=', int(filters['loc_dest'])))
             if filters.get('states'):
                 domain.append(('state', 'in', filters['states']))
 
             # Date filter (This Month, Today, etc.)
             if filters.get('date_range') == 'this_month':
-                start, end = self._get_date_range('this_month', datetime.now())
+                start, end = self._get_date_range('this_month', now_local)
                 domain += [('date_transfer', '>=', start), ('date_transfer', '<=', end)]
             elif filters.get('date_range') == 'today':
-                start, end = self._get_date_range('today', datetime.now())
+                start, end = self._get_date_range('today', now_local)
                 domain += [('date_transfer', '>=', start), ('date_transfer', '<=', end)]
 
         transfers = self.env['swift.stock.transfer'].search(domain, order='date_transfer desc')
+        branch_map = self._get_location_branch_name_map()
         res = []
         for t in transfers:
+            direction = 'other'
+            can_receive = False
+            if current_config:
+                is_dest_branch = (
+                    t.dest_config_id.id == current_config.id or
+                    (current_location and t.location_dest_id.id == current_location.id)
+                )
+                is_source_branch = (
+                    t.source_config_id.id == current_config.id or
+                    (current_location and t.location_id.id == current_location.id)
+                )
+                if is_dest_branch:
+                    direction = 'inbound'
+                    can_receive = t.state == 'shipped'
+                elif is_source_branch:
+                    direction = 'outbound'
             res.append({
                 'id': t.id,
                 'name': t.name,
                 'date_transfer': fields.Datetime.to_string(t.date_transfer) if t.date_transfer else '',
                 'date_receive': fields.Datetime.to_string(t.date_receive) if t.date_receive else '',
-                'loc_src': t.location_id.display_name,
-                'loc_dest': t.location_dest_id.display_name,
+                'loc_src': t.source_config_id.name or self._get_location_branch_label(t.location_id, branch_map),
+                'loc_src_id': t.location_id.id,
+                'loc_src_config_id': t.source_config_id.id if t.source_config_id else False,
+                'loc_dest': t.dest_config_id.name or self._get_location_branch_label(t.location_dest_id, branch_map),
+                'loc_dest_id': t.location_dest_id.id,
+                'loc_dest_config_id': t.dest_config_id.id if t.dest_config_id else False,
                 'total_value': t.total_value,
                 'state': t.state,
+                'direction': direction,
+                'can_receive': can_receive,
             })
         return res
 
@@ -593,7 +774,7 @@ class PosDashboardSwift(models.AbstractModel):
     def get_shift_init_data(self):
         """Return everything the client needs to start the shift management UI."""
         user = self.env.user
-        config = self.env['pos.config'].search([], limit=1)
+        config = self._get_pos_config()
 
         # Current status
         shift = self.env['swift.staff.shift'].search([
@@ -946,7 +1127,7 @@ class PosDashboardSwift(models.AbstractModel):
             start_dt = datetime.combine(start_date, datetime.min.time())
             end_dt = datetime.combine(end_date, datetime.max.time())
 
-            pos_config = self.env['pos.config'].sudo().search([], limit=1)
+            pos_config = self._get_pos_config()
             branch_name = pos_config.name if pos_config else _('Chi nhánh trung tâm')
 
             shifts = self.env['swift.staff.shift'].sudo().search([

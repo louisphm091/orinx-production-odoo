@@ -5,10 +5,12 @@ import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } fr
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
+
 export class SalePlanningDashboardProgress extends Component {
   static template = "sale_planning.DashboardProgress";
 
   setup() {
+    this._t = _t;
     this.orm = useService("orm");
     this.notification = useService("notification");
 
@@ -45,6 +47,31 @@ export class SalePlanningDashboardProgress extends Component {
       this.destroyCharts();
     });
   }
+
+  // String list for i18n harvester
+  static _i18n_strings = [
+      _t("EXECUTION PROGRESS TRACKING"),
+      _t("SKU / SKU Group"),
+      _t("Quarter"),
+      _t("Executive Dashboard"),
+      _t("Fashion Industry"),
+      _t("By Time"),
+      _t("Week"),
+      _t("Month"),
+      _t("Loading data..."),
+      _t("Achieved"),
+      _t("of plan"),
+      _t("SKUs at risk of shortage"),
+      _t("SKUs"),
+      _t("SKUs on / above plan"),
+      _t("Planned"),
+      _t("Actual"),
+      _t("Overall Execution Progress"),
+      _t("Alerts & Risks"),
+      _t("See All"),
+      _t("Progress by SKU / Order"),
+      _t("Execution History & Trends"),
+  ];
 
   async load() {
     try {

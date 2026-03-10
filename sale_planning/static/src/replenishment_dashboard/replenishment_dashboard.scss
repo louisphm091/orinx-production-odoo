@@ -20,6 +20,18 @@
   padding: 8px 12px;
 }
 
+.sp_select_pill {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sp_select_pill select {
+  border: none;
+  outline: none;
+  background: transparent;
+  min-width: 160px;
+}
+
 .sp_icon_btn {
   background: #0b7285;
   border: 1px solid #0b7285;
@@ -124,6 +136,24 @@
 }
 
 .sp_side_img {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 72px;
+}
+
+.sp_side_img img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  opacity: 1;
+}
+
+.sp_side_img_placeholder {
   font-size: 54px;
   opacity: 0.35;
 }

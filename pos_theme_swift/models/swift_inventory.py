@@ -14,6 +14,7 @@ class SwiftStockInventory(models.Model):
         ('draft', 'Draft'),
         ('done', 'Validated'),
     ], string='Status', default='draft', index=True, copy=False)
+    config_id = fields.Many2one('pos.config', string='POS Branch', ondelete='restrict')
     note = fields.Text(string='Note')
     line_ids = fields.One2many('swift.stock.inventory.line', 'inventory_id', string='Inventory Lines', copy=True)
 
@@ -39,7 +40,39 @@ class SwiftStockInventory(models.Model):
                 continue
             if vals.get('name', _('New')) == _('New'):
                 vals['name'] = self.env['ir.sequence'].next_by_code('swift.stock.inventory') or _('New')
+            if not vals.get('config_id'):
+                config = self._get_pos_config(vals.get('config_id'))
+                if config:
+                    vals['config_id'] = config.id
         return super(SwiftStockInventory, self).create(vals_list)
+
+    def _get_pos_config(self, config_id=None):
+        PosConfig = self.env['pos.config'].sudo()
+        if config_id:
+            return PosConfig.browse(int(config_id)).exists()
+        if self.env.context.get('pos_config_id'):
+            return PosConfig.browse(int(self.env.context['pos_config_id'])).exists()
+        if len(self) == 1 and self.config_id:
+            return self.config_id
+        configs = PosConfig.search([('active', '=', True)], limit=2)
+        return configs if len(configs) == 1 else PosConfig.browse()
+
+    def _get_inventory_location(self, config=None):
+        config = config or self._get_pos_config()
+        if config and config.picking_type_id.default_location_src_id:
+            return config.picking_type_id.default_location_src_id
+        return self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
+
+    def _get_branch_products(self, config):
+        Product = self.env['product.product'].sudo()
+        domain = [
+            ('available_in_pos', '=', True),
+            ('active', '=', True),
+            ('product_tmpl_id.swift_branch_config_ids', 'in', config.ids),
+        ]
+        if getattr(config, 'limit_categories', False) and config.iface_available_categ_ids:
+            domain.append(('pos_categ_ids', 'in', config.iface_available_categ_ids.ids))
+        return Product.search(domain)
 
     def action_validate(self):
         """Update real Odoo stock based on the inventory sheet.
@@ -52,11 +85,8 @@ class SwiftStockInventory(models.Model):
         _logger.info("action_validate: Starting for inventory id=%s", self.id)
 
         # Prefer the POS stock location; fall back to any internal location.
-        pos_config = self.env['pos.config'].search([], limit=1)
-        if pos_config and pos_config.picking_type_id.default_location_src_id:
-            location = pos_config.picking_type_id.default_location_src_id
-        else:
-            location = self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
+        pos_config = self._get_pos_config(self.config_id.id if self.config_id else None)
+        location = self._get_inventory_location(pos_config)
 
         if not location:
             _logger.error("action_validate: No internal stock location found — aborting.")
@@ -120,79 +150,85 @@ class SwiftStockInventory(models.Model):
                 )
                 continue
 
-        self.write({'state': 'done'})
+        self.write({'state': 'done', 'config_id': pos_config.id if pos_config else False})
         # Trigger low-stock checks immediately after stock is updated so users
         # don't need to wait for the cron interval.
-        self.cron_check_low_stock_alerts()
+        self.cron_check_low_stock_alerts(config_id=pos_config.id if pos_config else False)
         _logger.info("action_validate: Done. Inventory id=%s marked as done.", self.id)
         return True
 
     @api.model
-    def cron_check_low_stock_alerts(self):
+    def cron_check_low_stock_alerts(self, config_id=False):
         """Push admin notification when a POS product reaches low stock threshold."""
         threshold = 10.0
-        Product = self.env['product.product'].sudo()
         Quant = self.env['stock.quant'].sudo()
         Alert = self.env['swift.low.stock.alert'].sudo()
+        configs = self.env['pos.config'].sudo().browse()
+        if config_id:
+            configs = self.env['pos.config'].sudo().browse(int(config_id)).exists()
+        if not configs:
+            configs = self.env['pos.config'].sudo().search([('active', '=', True)])
 
-        products = Product.search([
-            ('available_in_pos', '=', True),
-            ('active', '=', True),
-        ])
-        if not products:
-            return True
+        for config in configs:
+            products = self._get_branch_products(config)
+            if not products:
+                continue
 
-        qty_map = {pid: 0.0 for pid in products.ids}
-        quants = Quant.search([
-            ('product_id', 'in', products.ids),
-            ('location_id.usage', '=', 'internal'),
-        ])
-        for quant in quants:
-            qty_map[quant.product_id.id] = qty_map.get(quant.product_id.id, 0.0) + quant.quantity
+            qty_map = {pid: 0.0 for pid in products.ids}
+            quant_domain = [
+                ('product_id', 'in', products.ids),
+                ('location_id.usage', '=', 'internal'),
+            ]
+            location = self._get_inventory_location(config)
+            if location:
+                quant_domain.append(('location_id', 'child_of', location.id))
+            quants = Quant.search(quant_domain)
+            for quant in quants:
+                qty_map[quant.product_id.id] = qty_map.get(quant.product_id.id, 0.0) + quant.quantity
 
-        active_alerts = Alert.search([('state', '=', 'active')])
-        alert_by_product = {a.product_id.id: a for a in active_alerts}
+            active_alerts = Alert.search([('state', '=', 'active'), ('config_id', '=', config.id)])
+            alert_by_product = {a.product_id.id: a for a in active_alerts}
 
-        for product in products:
-            qty_on_hand = qty_map.get(product.id, 0.0)
-            alert = alert_by_product.get(product.id)
-            if qty_on_hand <= threshold:
-                if not alert:
-                    alert = Alert.create({
-                        'product_id': product.id,
-                        'threshold': threshold,
-                        'qty_on_hand': qty_on_hand,
-                        'state': 'active',
-                        'last_notified_at': fields.Datetime.now(),
-                    })
-                    self._notify_low_stock_admins(product, qty_on_hand, threshold)
-                else:
-                    alert.write({'qty_on_hand': qty_on_hand})
-            else:
-                if alert:
-                    # Avoid unique conflict on (product_id, state) when a
-                    # resolved record already exists for this product.
-                    existing_resolved = Alert.search([
-                        ('product_id', '=', product.id),
-                        ('state', '=', 'resolved'),
-                        ('id', '!=', alert.id),
-                    ], limit=1)
-                    if existing_resolved:
-                        existing_resolved.write({
+            for product in products:
+                qty_on_hand = qty_map.get(product.id, 0.0)
+                alert = alert_by_product.get(product.id)
+                if qty_on_hand <= threshold:
+                    if not alert:
+                        alert = Alert.create({
+                            'product_id': product.id,
+                            'config_id': config.id,
+                            'threshold': threshold,
                             'qty_on_hand': qty_on_hand,
-                            'resolved_at': fields.Datetime.now(),
+                            'state': 'active',
+                            'last_notified_at': fields.Datetime.now(),
                         })
-                        alert.unlink()
+                        self._notify_low_stock_admins(product, qty_on_hand, threshold, config)
                     else:
-                        alert.write({
-                            'state': 'resolved',
-                            'resolved_at': fields.Datetime.now(),
-                            'qty_on_hand': qty_on_hand,
-                        })
+                        alert.write({'qty_on_hand': qty_on_hand})
+                else:
+                    if alert:
+                        existing_resolved = Alert.search([
+                            ('product_id', '=', product.id),
+                            ('config_id', '=', config.id),
+                            ('state', '=', 'resolved'),
+                            ('id', '!=', alert.id),
+                        ], limit=1)
+                        if existing_resolved:
+                            existing_resolved.write({
+                                'qty_on_hand': qty_on_hand,
+                                'resolved_at': fields.Datetime.now(),
+                            })
+                            alert.unlink()
+                        else:
+                            alert.write({
+                                'state': 'resolved',
+                                'resolved_at': fields.Datetime.now(),
+                                'qty_on_hand': qty_on_hand,
+                            })
         return True
 
     @api.model
-    def _notify_low_stock_admins(self, product, qty_on_hand, threshold):
+    def _notify_low_stock_admins(self, product, qty_on_hand, threshold, config=False):
         admin_group = self.env.ref('base.group_system', raise_if_not_found=False)
         pos_manager_group = self.env.ref('point_of_sale.group_pos_manager', raise_if_not_found=False)
         recipients = self.env['res.users'].sudo().browse()
@@ -205,8 +241,11 @@ class SwiftStockInventory(models.Model):
             return
 
         title = _("Low Stock Alert")
+        product_label = product.display_name
+        if config:
+            product_label = _("%s [%s]") % (product.display_name, config.name)
         message = _("Product '%s' has low stock: %s (threshold: %s).") % (
-            product.display_name,
+            product_label,
             qty_on_hand,
             int(threshold),
         )
@@ -262,6 +301,7 @@ class SwiftLowStockAlert(models.Model):
     _order = 'last_notified_at desc, id desc'
 
     product_id = fields.Many2one('product.product', required=True, index=True, ondelete='cascade')
+    config_id = fields.Many2one('pos.config', required=True, index=True, ondelete='cascade')
     threshold = fields.Float(default=10.0, required=True)
     qty_on_hand = fields.Float(default=0.0)
     state = fields.Selection([
@@ -272,5 +312,5 @@ class SwiftLowStockAlert(models.Model):
     resolved_at = fields.Datetime()
 
     _sql_constraints = [
-        ('swift_low_stock_alert_product_state_unique', 'unique(product_id, state)', 'Low stock alert already exists for this product/state.'),
+        ('swift_low_stock_alert_product_config_state_unique', 'unique(product_id, config_id, state)', 'Low stock alert already exists for this product/branch/state.'),
     ]

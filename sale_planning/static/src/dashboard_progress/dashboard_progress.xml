@@ -7,34 +7,34 @@
       <!-- HEADER -->
       <div class="sp_header mb-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-          <div class="sp_brand">EXECUTION PROGRESS TRACKING</div>
+          <div class="sp_brand" t-out="this._t('EXECUTION PROGRESS TRACKING')"/>
         </div>
 
         <div class="d-flex align-items-center gap-2">
           <button class="btn sp_pill" type="button">
-            SKU / SKU Group <i class="fa fa-angle-down ms-1"/>
+            <t t-out="this._t('SKU / SKU Group')"/> <i class="fa fa-angle-down ms-1"/>
           </button>
-          <button class="btn sp_pill sp_active" type="button">Week</button>
-          <button class="btn sp_pill" type="button">Quarter <i class="fa fa-angle-down ms-1"/></button>
+          <button class="btn sp_pill sp_active" type="button" t-out="this._t('Week')"/>
+          <button class="btn sp_pill" type="button"><t t-out="this._t('Quarter')"/> <i class="fa fa-angle-down ms-1"/></button>
         </div>
       </div>
 
       <div class="sp_subheader mb-3 d-flex justify-content-between align-items-center">
         <div class="text-muted">
-          Executive Dashboard · <b>Fashion Industry</b> · By Time
+          <t t-out="this._t('Executive Dashboard')"/> · <b><t t-out="this._t('Fashion Industry')"/></b> · <t t-out="this._t('By Time')"/>
         </div>
         <div class="d-flex gap-2">
           <button class="btn sp_pill" type="button">
-            <i class="fa fa-calendar-o me-1"/> Week <i class="fa fa-angle-down ms-1"/>
+            <i class="fa fa-calendar-o me-1"/> <t t-out="this._t('Week')"/> <i class="fa fa-angle-down ms-1"/>
           </button>
           <button class="btn sp_pill sp_active" type="button">
-            Month <i class="fa fa-angle-down ms-1"/>
+            <t t-out="this._t('Month')"/> <i class="fa fa-angle-down ms-1"/>
           </button>
         </div>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info">Loading data...</div>
+        <div class="alert alert-info" t-out="this._t('Loading data...')"/>
       </t>
       <t t-elif="state.error">
         <div class="alert alert-danger"><t t-esc="state.error"/></div>
@@ -45,30 +45,30 @@
         <div class="row g-3 mb-3">
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_yellow p-3">
-              <div class="sp_kpi_title">Achieved <b><t t-esc="state.kpis.progress_percent"/>%</b> of plan</div>
-              <div class="sp_kpi_hint text-muted">Range x width</div>
+              <div class="sp_kpi_title"><t t-out="this._t('Achieved')"/> <b><t t-esc="state.kpis.progress_percent"/>%</b> <t t-out="this._t('of plan')"/></div>
+              <div class="sp_kpi_hint text-muted">—</div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_red p-3">
-              <div class="sp_kpi_title">Late SKUs</div>
-              <div class="sp_kpi_big"><t t-esc="state.kpis.late_sku_count"/> SKUs</div>
+              <div class="sp_kpi_title" t-out="this._t('SKUs at risk of shortage')"/>
+              <div class="sp_kpi_big"><t t-esc="state.kpis.late_sku_count"/> <t t-out="this._t('SKUs')"/></div>
               <div class="text-muted small"><t t-esc="state.kpis.late_sku_names"/></div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_green p-3">
-              <div class="sp_kpi_title">SKUs on / above plan</div>
-              <div class="sp_kpi_big"><t t-esc="state.kpis.ontrack_sku_count"/> SKUs</div>
+              <div class="sp_kpi_title" t-out="this._t('SKUs on / above plan')"/>
+              <div class="sp_kpi_big"><t t-esc="state.kpis.ontrack_sku_count"/> <t t-out="this._t('SKUs')"/></div>
               <div class="text-muted small"><t t-esc="state.kpis.ontrack_sku_names"/></div>
             </div>
           </div>
 
           <div class="col-12 col-lg-3">
             <div class="card sp_kpi sp_kpi_pink p-3">
-              <div class="sp_kpi_title">Alerts needing handling</div>
+              <div class="sp_kpi_title" t-out="this._t('Alerts needing handling')"/>
               <div class="sp_kpi_big"><t t-esc="state.kpis.critical_count"/></div>
               <div class="text-muted small"><t t-esc="state.kpis.critical_hint"/></div>
             </div>
@@ -80,10 +80,10 @@
           <div class="col-12 col-lg-8">
             <div class="card p-3 sp_panel">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Overall Execution Progress</div>
+                <div class="sp_panel_title" t-out="this._t('Overall Execution Progress')"/>
                 <div class="d-flex align-items-center gap-3 text-muted small">
-                  <span><i class="fa fa-square me-1"/>Planned</span>
-                  <span><i class="fa fa-square me-1"/>Actual</span>
+                  <span><i class="fa fa-square me-1"/><t t-out="this._t('Planned')"/></span>
+                  <span><i class="fa fa-square me-1"/><t t-out="this._t('Actual')"/></span>
                 </div>
               </div>
 
@@ -96,7 +96,7 @@
           <div class="col-12 col-lg-4">
             <div class="card p-3 sp_panel h-100">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Alerts &amp; Risks</div>
+                <div class="sp_panel_title" t-out="this._t('Alerts &amp; Risks')"/>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-ellipsis-h"/>
                 </button>
@@ -118,7 +118,7 @@
 
               <div class="mt-auto pt-2">
                 <button class="btn sp_pill w-100" type="button">
-                  <i class="fa fa-tag me-1"/> See All <i class="fa fa-angle-down ms-1"/>
+                  <i class="fa fa-tag me-1"/> <t t-out="this._t('See All')"/> <i class="fa fa-angle-down ms-1"/>
                 </button>
               </div>
             </div>
@@ -130,7 +130,7 @@
           <div class="col-12 col-lg-8">
             <div class="card p-3 sp_panel">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Progress by SKU / Order</div>
+                <div class="sp_panel_title" t-out="this._t('Progress by SKU / Order')"/>
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-ellipsis-h"/>
                 </button>
@@ -186,8 +186,8 @@
           <div class="col-12 col-lg-4">
             <div class="card p-3 sp_panel h-100">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="sp_panel_title">Execution History &amp; Trends</div>
-                <button class="btn sp_pill" type="button">View Details <i class="fa fa-angle-down ms-1"/></button>
+                <div class="sp_panel_title" t-out="this._t('Execution History &amp; Trends')"/>
+                <button class="btn sp_pill" type="button"><t t-out="this._t('See All')"/> <i class="fa fa-angle-down ms-1"/></button>
               </div>
 
               <div class="position-relative mb-2" style="height: 170px;">

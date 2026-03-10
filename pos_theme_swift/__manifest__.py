@@ -1,6 +1,6 @@
 {
     'name': 'POS Theme Swift',
-    'version': '1.0.1',
+    'version': '1.0.2',
     'category': 'Themes/Backend',
     'summary': 'POS Theme Swift - Professional and Responsive POS Interface for Odoo 19',
     'description': '''
@@ -19,7 +19,7 @@ Developed and maintained by Orinx.
     'author': 'Orinx',
     'company': 'Orinx',
     'website': 'https://orinx.com.vn',
-    'depends': ['point_of_sale', 'stock'],
+    'depends': ['point_of_sale', 'stock', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',

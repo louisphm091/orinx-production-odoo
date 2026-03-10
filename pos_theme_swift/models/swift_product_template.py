@@ -1,10 +1,19 @@
-from odoo import _, models
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
+
+    swift_branch_config_ids = fields.Many2many(
+        "pos.config",
+        "swift_product_template_pos_config_rel",
+        "product_tmpl_id",
+        "config_id",
+        string="POS Branches",
+        help="Only products assigned to selected POS branches are available in those branches. Leave empty to keep the product hidden from branch-specific POS flows.",
+    )
 
     def action_swift_import_goods_filtered(self):
         """Import goods for all products in current filtered result (low stock <= 10)."""
@@ -28,8 +37,6 @@ class ProductTemplate(models.Model):
             raise UserError(_("No low-stock products (<= 10) found in current filter."))
 
         warehouse = self.env["stock.warehouse"].search([("company_id", "=", self.env.company.id)], limit=1)
-        if not warehouse:
-            warehouse = self.env["stock.warehouse"].search([], limit=1)
         if not warehouse or not warehouse.lot_stock_id:
             raise UserError(_("No warehouse stock location found."))
 
@@ -78,5 +85,25 @@ class ProductTemplate(models.Model):
                 "type": "success",
                 "sticky": False,
                 "next": {"type": "ir.actions.client", "tag": "reload"},
+            },
+        }
+
+    def action_open_swift_branch_assignment_wizard(self):
+        products = self
+        if not products:
+            active_ids = self.env.context.get("active_ids", [])
+            products = self.browse(active_ids)
+        products = products.filtered(lambda product: product.available_in_pos)
+        if not products:
+            raise UserError(_("Please select at least one POS product."))
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Gán chi nhánh POS"),
+            "res_model": "swift.branch.product.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_product_tmpl_ids": [(6, 0, products.ids)],
             },
         }
