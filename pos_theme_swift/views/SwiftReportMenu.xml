@@ -41,6 +41,10 @@
         <field name="active" eval="False" />
     </record>
 
+    <record id="point_of_sale.menu_point_root" model="ir.ui.menu">
+        <field name="name">Retail Planning Suite</field>
+    </record>
+
     <record id="point_of_sale.menu_pos_dashboard" model="ir.ui.menu">
         <field name="name">Dashboard</field>
     </record>

@@ -5,192 +5,208 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+
 #. module: pos_theme_swift
+#: model:ir.ui.menu,name:point_of_sale.menu_point_root
+msgid "Retail Planning Suite"
+msgstr "Retail Planning Suite"
+
+#. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.ui.menu,name:point_of_sale.menu_pos_dashboard
 msgid "Dashboard"
 msgstr "Bán Hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_report_client
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_report
 msgid "Reports"
 msgstr "Báo Cáo"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_inventory_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_goods
 msgid "Inventory"
 msgstr "Kho Hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_inventory
 msgid "Stock Count"
 msgstr "Kiểm Kho"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_stock_transfer
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_stock_transfer
 msgid "Stock Transfer"
 msgstr "Chuyển Hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_shift_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_shift
 msgid "Shift Management"
 msgstr "Quản Lý Nhân Viên"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_paycheck_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_paycheck
 msgid "Paycheck"
 msgstr "Bảng Lương"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_attendance_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_attendance
 msgid "Attendance"
 msgstr "Bảng Chấm Công"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_work_schedule_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_work_schedule
 msgid "Work Schedule"
 msgstr "Lịch Làm Việc"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_employee_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_employee
 msgid "Employee"
 msgstr "Nhân Viên"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Inventory Count"
 msgstr "Kiểm Kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Search products by code or name (F3)"
 msgstr "Tìm hàng hóa theo mã hoặc tên (F3)"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Searching..."
 msgstr "Đang tìm..."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Prouduct not found."
 msgstr "Không tìm thấy sản phẩm."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Stock:"
 msgstr "Tồn:"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Import from Excel"
 msgstr "Nhập từ Excel"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "All"
 msgstr "Tất cả"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Matched"
 msgstr "Khớp"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Discrepancy"
 msgstr "Lệch"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Unchecked"
 msgstr "Chưa kiểm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "No."
 msgstr "STT"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Product Code"
 msgstr "Mã hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Product Name"
 msgstr "Tên hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "UOM"
 msgstr "ĐVT"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Stock"
 msgstr "Tồn kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Actual"
 msgstr "Thực tế"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Diff"
 msgstr "SL lệch"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Diff Value"
 msgstr "Giá trị lệch"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Balanced"
 msgstr "Đã cân bằng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Draft"
 msgstr "Phiếu tạm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Save Draft"
 msgstr "Lưu tạm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Complete"
 msgstr "Hoàn thành"
@@ -202,13 +218,13 @@ msgid "Transfer"
 msgstr "Chuyển khoản"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Items Total"
 msgstr "Tổng tiền hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Amount Due"
 msgstr "Khách cần trả"
@@ -244,16 +260,19 @@ msgid "User is already in employee list"
 msgstr "Người dùng đã có trong danh sách nhân viên"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_product_template_search_view_pos_low_stock
 msgid "Low Stock <= 10"
 msgstr "Tồn kho thấp <= 10"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_product_template_tree_view_pos_import_goods
 msgid "Import Goods"
 msgstr "Nhập hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_product_template_tree_view_pos_import_goods
 #: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_product_template_kanban_view_pos_import_goods
 msgid "Nhập hàng"
@@ -290,91 +309,91 @@ msgid "Imported goods for %s product(s). Added %s units, target stock is 20."
 msgstr "Đã nhập hàng cho %s sản phẩm. Đã thêm %s đơn vị, tồn mục tiêu là 20."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "Refresh"
 msgstr "Làm mới"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "Hello,"
 msgstr "Xin chào,"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "ON SHIFT"
 msgstr "ĐANG TRONG CA"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "YOU ARE OFF SHIFT"
 msgstr "BẠN ĐANG NGOÀI CA"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "TOTAL TIME ON SHIFT"
 msgstr "THỜI GIAN LÀM VIỆC TRONG CA"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "Start:"
 msgstr "Bắt đầu:"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "NOTE / HANDOVER"
 msgstr "GHI CHÚ / BÀN GIAO"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "Enter notes or handover content..."
 msgstr "Nhập ghi chú hoặc nội dung bàn giao..."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "START SHIFT"
 msgstr "BẮT ĐẦU CA"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "END SHIFT"
 msgstr "KẾT THÚC CA"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "TIME STATISTICS"
 msgstr "THỐNG KÊ THỜI GIAN"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "Today"
 msgstr "Hôm nay"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "This Week"
 msgstr "Tuần này"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "RECENT HISTORY"
 msgstr "LỊCH SỬ GẦN ĐÂY"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftShiftManagement.xml:0
 msgid "No history"
 msgstr "Không có lịch sử"
@@ -542,749 +561,1911 @@ msgid "Debt/advance saved"
 msgstr "Đã lưu nợ và tạm ứng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Outbound"
 msgstr "Chuyển đi"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Select branch"
 msgstr "Chọn chi nhánh"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Inbound"
 msgstr "Nhận về"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Status"
 msgstr "Trạng thái"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Shipped"
 msgstr "Đang chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Received"
 msgstr "Đã nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Time"
 msgstr "Thời gian"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Search by transfer code"
 msgstr "Theo mã phiếu chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Goods"
 msgstr "Chuyển hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Code"
 msgstr "Mã chuyển hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Date"
 msgstr "Ngày chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Receive Date"
 msgstr "Ngày nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "From Branch"
 msgstr "Từ chi nhánh"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "To Branch"
 msgstr "Tới chi nhánh"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Value"
 msgstr "Giá trị chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "No transfer records found"
 msgstr "Không tìm thấy phiếu chuyển nào"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Receive Details"
 msgstr "Chi tiết nhận hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Type product name or code"
 msgstr "Gõ tên hoặc mã hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "On Hand:"
 msgstr "Tồn:"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Mismatch"
 msgstr "Lệch"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Unreceived"
 msgstr "Chưa nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Dest Stock"
 msgstr "Tồn kho nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Qty"
 msgstr "SL chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Receive Qty"
 msgstr "SL nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Price"
 msgstr "Giá chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Subtotal"
 msgstr "Thành tiền"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Auto code"
 msgstr "Mã phiếu tự động"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Total Transfer Qty"
 msgstr "Tổng số lượng chuyển"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Total Received Qty"
 msgstr "Tổng số lượng nhận"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Transfer Completed"
 msgstr "Phiếu đã hoàn thành"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
 msgid "Receive Goods"
 msgstr "Nhận hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Today's Sales Results"
 msgstr "Kết quả bán hàng hôm nay"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Yesterday"
 msgstr "Hôm qua"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Revenue"
 msgstr "Doanh thu"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "invoices"
 msgstr "hóa đơn"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Refunds"
 msgstr "Trả hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Net Revenue"
 msgstr "Doanh thu thuần"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Compared to yesterday"
 msgstr "So với hôm qua"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Invoices"
 msgstr "Hóa đơn"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "View List"
 msgstr "Xem danh sách"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "By Day"
 msgstr "Theo ngày"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "By Hour"
 msgstr "Theo giờ"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "By Weekday"
 msgstr "Theo thứ"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Recent Activity"
 msgstr "Hoạt động gần đây"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "just sold an order"
 msgstr "vừa bán đơn hàng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Top 10 Best Sellers"
 msgstr "Top 10 hàng bán chạy"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "By Revenue"
 msgstr "Theo doanh thu"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "By Quantity"
 msgstr "Theo số lượng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Top 10 Top Customers"
 msgstr "Top 10 khách mua nhiều nhất"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "You can add customer tables / charts here."
 msgstr "Bạn có thể bổ sung bảng / chart khách hàng ở đây."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Inventory Voucher"
 msgstr "Phiếu kiểm kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Search by voucher code"
 msgstr "Theo mã phiếu kiểm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Audit"
 msgstr "Kiểm kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Export"
 msgstr "Xuất file"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Columns"
 msgstr "Tùy chọn"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Audit Code"
 msgstr "Mã kiểm kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Balance Date"
 msgstr "Ngày cân bằng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Actual Qty"
 msgstr "SL thực tế"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Total Actual"
 msgstr "Tổng thực tế"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Total Diff"
 msgstr "Tổng chênh lệch"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Diff Inc"
 msgstr "SL lệch tăng"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "Diff Dec"
 msgstr "SL lệch giảm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
 msgid "No data"
 msgstr "Không có dữ liệu"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Branch"
 msgstr "Chi nhánh"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Excel export function is under development."
 msgstr "Chức năng xuất Excel đang được phát triển."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Notification"
 msgstr "Thông báo"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "PDF export function is under development."
 msgstr "Chức năng xuất PDF đang được phát triển."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Column options are under development."
 msgstr "Tùy chọn cột đang được phát triển."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Settings are under development."
 msgstr "Cài đặt đang được phát triển."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "File has no product data."
 msgstr "File không có dữ liệu hàng hóa."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Import file"
 msgstr "Nhập file"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Error reading file. Please check format."
 msgstr "Lỗi khi đọc file. Vui lòng kiểm tra định dạng."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Barcode column not found in file."
 msgstr "Không tìm thấy cột mã hàng trong file."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Cannot connect to server for product lookup."
 msgstr "Không thể kết nối server để tra cứu sản phẩm."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Imported %s products. %s codes not found in system."
 msgstr "Đã nhập %s sản phẩm. %s mã hàng không tìm thấy trong hệ thống."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Imported %s products successfully."
 msgstr "Đã nhập %s sản phẩm thành công."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Inventory completed."
 msgstr "Đã hoàn thành kiểm kho."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Draft voucher saved."
 msgstr "Đã lưu phiếu tạm."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Error saving inventory voucher."
 msgstr "Lỗi khi lưu phiếu kiểm kho."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
 msgid "Error"
 msgstr "Lỗi"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Inventory Code"
 msgstr "Mã kiểm kho"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Total Actual Qty"
 msgstr "Tổng SL thực tế"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Recent Checks"
 msgstr "Kiểm gần đây"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "No products yet."
 msgstr "Chưa có sản phẩm nào."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Search or import file to add products"
 msgstr "Tìm kiếm hoặc nhập file để thêm sản phẩm"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Type name / barcode in search box, or upload file:"
 msgstr "Gõ tên / mã vào ô tìm kiếm, hoặc tải file:"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Choose Excel / CSV file"
 msgstr "Chọn file Excel / CSV"
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Importing data..."
 msgstr "Đang nhập dữ liệu..."
 
 #. module: pos_theme_swift
-#. odoo-xml
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Filter in list..."
 msgstr "Lọc trong danh sách..."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/models/pos_dashboard.py:0
 msgid "%s days ago"
 msgstr "%s ngày trước"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/models/pos_dashboard.py:0
 msgid "%s hours ago"
 msgstr "%s giờ trước"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/models/pos_dashboard.py:0
 msgid "%s minutes ago"
 msgstr "%s phút trước"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/models/pos_dashboard.py:0
 msgid "just now"
 msgstr "vừa xong"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftShiftManagement.js:0
 msgid "loading..."
 msgstr "đang tải..."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftShiftManagement.js:0
 msgid "Shift started"
 msgstr "Đã bắt đầu ca làm việc"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftShiftManagement.js:0
 msgid "Shift ended"
 msgstr "Đã kết thúc ca làm việc"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftShiftManagement.js:0
 msgid "Error performing action"
 msgstr "Lỗi khi thực hiện thao tác"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Error loading stock transfer data"
 msgstr "Lỗi khi tải dữ liệu chuyển hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Please select receiving branch"
 msgstr "Vui lòng chọn chi nhánh nhận"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Please add products"
 msgstr "Vui lòng thêm sản phẩm"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Stock transfer request sent"
 msgstr "Đã gửi yêu cầu chuyển hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Draft saved"
 msgstr "Đã lưu tạm"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Error saving data"
 msgstr "Lỗi khi lưu dữ liệu"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Goods receipt completed"
 msgstr "Đã hoàn tất nhận hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Error receiving goods"
 msgstr "Lỗi khi nhận hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
 msgid "Shipping"
 msgstr "Đang chuyển"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentScreen.xml:0
 msgid "Search products (F3)"
 msgstr "Tìm hàng hóa (F3)"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentScreen.xml:0
 msgid "Product not found"
 msgstr "Không tìm thấy sản phẩm"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentItemCenters.xml:0
 msgid "Unit Price"
 msgstr "Đơn giá"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentItemCenters.xml:0
 msgid "UoM"
 msgstr "Đơn vị"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentMethods.xml:0
 msgid "Payment Method"
 msgstr "Phương thức"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/PaymentMethods.xml:0
 msgid "Select..."
 msgstr "Chọn..."
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Discount"
 msgstr "Giảm giá"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Other Charges"
 msgstr "Thu khác"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Total Due"
 msgstr "Khách cần trả"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Paid"
 msgstr "Đã thanh toán"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Change"
 msgstr "Tiền thừa"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Account Name"
 msgstr "Tên tài khoản"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "Account Number"
 msgstr "Số tài khoản"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "PRINT"
 msgstr "IN"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/PaymentScreen/SwiftPayPanel.xml:0
 msgid "PAY"
 msgstr "THANH TOÁN"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftTabsPatch.js:0
 #: code:addons/pos_theme_swift/static/src/js/PaymentSwiftPay.js:0
 msgid "Order %s"
 msgstr "Hóa đơn %s"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/screens/OrderTabs.xml:0
 msgid "Order"
 msgstr "Hóa đơn"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/PaymentSwiftPay.js:0
 msgid "Are you sure you want to close the sales session?"
 msgstr "Bạn có chắc chắn muốn đóng phiên bán hàng không?"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftBottomBar.js:0
 msgid "Walking Customer"
 msgstr "Khách lẻ"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/models/pos_dashboard.py:0
 msgid "Unknown"
 msgstr "Không xác định"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "Central Branch"
 msgstr "Chi nhánh trung tâm"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "Paychecks"
 msgstr "Bảng lương"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "Backend"
 msgstr "Quản trị"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "Register"
 msgstr "Bán hàng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "POS Orders"
 msgstr "Đơn bán POS"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "Logout"
 msgstr "Đăng xuất"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/js/SwiftPosReport.js:0
 msgid "By Qty"
 msgstr "Theo số lượng"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "This Month"
 msgstr "Tháng này"
 
 #. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/report/SwiftPosReport.xml:0
 msgid "Loading data..."
 msgstr "Đang tải dữ liệu..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Employee List"
+msgstr "Danh sách nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Search by code, employee name"
+msgstr "Tìm theo mã, tên nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Mark as Off"
+msgstr "Đánh dấu nghỉ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Approve Requests"
+msgstr "Duyệt yêu cầu"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Employee Status"
+msgstr "Trạng thái nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Working"
+msgstr "Đang làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Off"
+msgstr "Đã nghỉ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Work Branch"
+msgstr "Chi nhánh làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Pay Branch"
+msgstr "Chi nhánh trả lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Department"
+msgstr "Phòng ban"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Select department"
+msgstr "Chọn phòng ban"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Job Title"
+msgstr "Chức vụ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Select job title"
+msgstr "Chọn chức vụ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Image"
+msgstr "Ảnh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Employee Code"
+msgstr "Mã nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Attendance Code"
+msgstr "Mã chấm công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Employee Name"
+msgstr "Tên nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Phone Number"
+msgstr "Số điện thoại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "ID Number"
+msgstr "Số CCCD"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Debt/Advance"
+msgstr "Nợ/Tạm ứng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Notes"
+msgstr "Ghi chú"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Info"
+msgstr "Thông tin"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Schedule"
+msgstr "Lịch làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Salary Setup"
+msgstr "Thiết lập lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Payslip"
+msgstr "Phiếu lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Name"
+msgstr "Tên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Birth Date"
+msgstr "Ngày sinh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Gender"
+msgstr "Giới tính"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Shift"
+msgstr "Ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "No work schedule for this week."
+msgstr "Chưa có lịch làm việc cho tuần này."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Salary Type"
+msgstr "Loại lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "By working hour"
+msgstr "Theo giờ làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "By working shift"
+msgstr "Theo ca làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "By month"
+msgstr "Theo tháng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Salary Amount"
+msgstr "Mức lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "hour"
+msgstr "giờ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "shift"
+msgstr "ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "month"
+msgstr "tháng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Advanced Setting"
+msgstr "Cài đặt nâng cao"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Overtime Salary"
+msgstr "Lương ngoài giờ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Update"
+msgstr "Cập nhật"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Slip code"
+msgstr "Mã phiếu lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Period"
+msgstr "Kỳ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Total salary"
+msgstr "Tổng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Paid"
+msgstr "Đã trả"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Remaining"
+msgstr "Còn lại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Status"
+msgstr "Trạng thái"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "No payslips available."
+msgstr "Chưa có phiếu lương."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Debt/Advance Balance:"
+msgstr "Số dư Nợ/Tạm ứng:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Add Debt"
+msgstr "Thêm nợ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Add Advance"
+msgstr "Tạm ứng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Record Payment"
+msgstr "Ghi nhận thanh toán"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Date"
+msgstr "Ngày"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Type"
+msgstr "Loại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Amount"
+msgstr "Số tiền"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "No debt/advance data available."
+msgstr "Chưa có dữ liệu nợ/tạm ứng."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "No employee data found."
+msgstr "Không tìm thấy nhân viên."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Add New Employee"
+msgstr "Thêm nhân viên mới"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Select from existing users"
+msgstr "Chọn từ người dùng có sẵn"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "-- Create New Employee --"
+msgstr "-- Tạo nhân viên mới --"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Male"
+msgstr "Nam"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Female"
+msgstr "Nữ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Cancel"
+msgstr "Hủy"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Save"
+msgstr "Lưu"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Add Debt and Advance"
+msgstr "Thêm nợ và tạm ứng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Debt"
+msgstr "Nợ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Advance"
+msgstr "Tạm ứng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Payment"
+msgstr "Thanh toán"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Attendance List"
+msgstr "Bảng chấm công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Search employee"
+msgstr "Tìm nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "By Week"
+msgstr "Theo tuần"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "View by Employee"
+msgstr "Xem theo nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Approve Attendance"
+msgstr "Duyệt chấm công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Employee"
+msgstr "Nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Work"
+msgstr "Làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Off Work"
+msgstr "Nghỉ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Late In"
+msgstr "Đi muộn"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Early Out"
+msgstr "Về sớm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Overtime"
+msgstr "Ngoài giờ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftAttendanceManagement.js:0
+msgid "days"
+msgstr "ngày"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftAttendanceManagement.js:0
+msgid "hours"
+msgstr "giờ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "No attendance data for this employee"
+msgstr "Không có dữ liệu chấm công của nhân viên này"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Work Attendance"
+msgstr "Chấm công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Loading details..."
+msgstr "Đang tải chi tiết..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Day Type"
+msgstr "Loại ngày"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "All day types"
+msgstr "Tất cả loại ngày"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Work Shift"
+msgstr "Ca làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Branch"
+msgstr "Chi nhánh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Time Range"
+msgstr "Khung giờ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Actual Hours"
+msgstr "Giờ thực tế"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Actual Workday"
+msgstr "Ngày công thực tế"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "This employee has no attendance data for this week."
+msgstr "Nhân viên này không có dữ liệu chấm công cho tuần này."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "By code, paycheck name"
+msgstr "Theo mã, tên bảng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Payroll Table"
+msgstr "Bảng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Export file"
+msgstr "Xuất file"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Pay Period"
+msgstr "Kỳ lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Select pay period"
+msgstr "Chọn kỳ lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Creating"
+msgstr "Đang tạo"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Provisional"
+msgstr "Tạm tính"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Finalized"
+msgstr "Đã chốt"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Cancelled"
+msgstr "Đã hủy"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Code"
+msgstr "Mã"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Cycle"
+msgstr "Chu kỳ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Total Salary"
+msgstr "Tổng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Paid to Employee"
+msgstr "Đã trả nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Payment History"
+msgstr "Lịch sử thanh toán"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Code:"
+msgstr "Mã:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Name:"
+msgstr "Tên:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Cycle:"
+msgstr "Chu kỳ:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Period:"
+msgstr "Kỳ:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Created At:"
+msgstr "Ngày tạo:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Created By:"
+msgstr "Người tạo:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Prepared By:"
+msgstr "Người lập:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Status:"
+msgstr "Trạng thái:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Total Employees:"
+msgstr "Tổng nhân viên:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Total Salary:"
+msgstr "Tổng lương:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Paid to Employee:"
+msgstr "Đã trả nhân viên:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Remaining:"
+msgstr "Còn lại:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Branch:"
+msgstr "Chi nhánh:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Scope:"
+msgstr "Phạm vi:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Finalized By:"
+msgstr "Người chốt:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Notes:"
+msgstr "Ghi chú:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Last updated at:"
+msgstr "Cập nhật lần cuối:"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Refresh Data"
+msgstr "Làm mới dữ liệu"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "View Payroll"
+msgstr "Xem bảng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Created By"
+msgstr "Người tạo"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Method"
+msgstr "Phương thức"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "No payment history."
+msgstr "Chưa có lịch sử thanh toán."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "No payroll data found."
+msgstr "Không tìm thấy dữ liệu bảng lương."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Payroll Payment"
+msgstr "Trả lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Cash"
+msgstr "Tiền mặt"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Bank Transfer"
+msgstr "Chuyển khoản"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Total"
+msgstr "Tổng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Create Payment Slip"
+msgstr "Tạo phiếu chi"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "ADD WORK SCHEDULE"
+msgstr "THÊM LỊCH LÀM VIỆC"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Estimated Salary"
+msgstr "Lương dự tính"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Add schedule"
+msgstr "Thêm lịch"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "shifts"
+msgstr "ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Salary not configured"
+msgstr "Chưa thiết lập lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Add Work Schedule"
+msgstr "Thêm lịch làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Select work shift"
+msgstr "Chọn ca làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Repeat weekly"
+msgstr "Lặp lại hàng tuần"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Copy schedule to other employees"
+msgstr "Sao chép lịch cho nhân viên khác"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Add Work Shift"
+msgstr "Thêm ca làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Working Hours"
+msgstr "Giờ làm việc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "to"
+msgstr "đến"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Check-in Hours"
+msgstr "Giờ chấm công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Scope"
+msgstr "Phạm vi"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftWorkScheduleManagement.xml:0
+msgid "Import"
+msgstr "Nhập"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Mon"
+msgstr "T2"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Tue"
+msgstr "T3"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Wed"
+msgstr "T4"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Thu"
+msgstr "T5"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Fri"
+msgstr "T6"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Sat"
+msgstr "T7"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftWorkScheduleManagement.js:0
+msgid "Sun"
+msgstr "CN"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Back"
+msgstr "Quay lại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Clear search"
+msgstr "Xóa tìm kiếm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Print"
+msgstr "In"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Preview"
+msgstr "Xem trước"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "More options"
+msgstr "Tùy chọn khác"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Delete row"
+msgstr "Xóa dòng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "Product not found."
+msgstr "Không tìm thấy sản phẩm."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
+msgid "Excel"
+msgstr "Excel"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
+msgid "PDF"
+msgstr "PDF"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
+msgid "Settings"
+msgstr "Cài đặt"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
+msgid "No inventory vouchers for this branch"
+msgstr "Chưa có phiếu kiểm kho cho chi nhánh này"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml:0
+msgid "Select a branch to view inventory vouchers"
+msgstr "Chọn chi nhánh để xem phiếu kiểm kho"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
+msgid "✏ Note..."
+msgstr "✏ Ghi chú..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
+msgid "Custom"
+msgstr "Tùy chỉnh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Destination branch must be different from source branch."
+msgstr "Chi nhánh nhận phải khác chi nhánh gửi."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Please select source branch"
+msgstr "Vui lòng chọn chi nhánh gửi"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Save failed"
+msgstr "Lưu thất bại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Receive failed"
+msgstr "Nhận hàng thất bại"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Filter notice"
+msgstr "Thông báo lọc"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftStockTransfer.js:0
+msgid "Shipping"
+msgstr "Đang chuyển"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
+msgid "Order"
+msgstr "Đơn hàng"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftInventoryForm.js:0
+msgid "Please select a POS branch before saving inventory data."
+msgstr "Vui lòng chọn chi nhánh POS trước khi lưu dữ liệu kiểm kho."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Paychecks"
+msgstr "Bảng lương"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+#: code:addons/pos_theme_swift/static/src/xml/SwiftAttendanceManagement.xml:0
+msgid "Loading data..."
+msgstr "Đang tải dữ liệu..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftPaycheckManagement.xml:0
+msgid "Shift Management"
+msgstr "Quản lý ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftStockTransfer.xml:0
+msgid "No."
+msgstr "STT"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
+msgid "Please select a branch before creating an inventory voucher."
+msgstr "Vui lòng chọn chi nhánh trước khi tạo phiếu kiểm kho."
