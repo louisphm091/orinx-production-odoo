@@ -5,11 +5,11 @@
     <div class="o_swift_pos_report">
       <!-- Header -->
       <div class="swift-pageHead">
-        <h2 class="swift-pageTitle" t-out="this._t(`Today's Sales Results`)"/>
+        <h2 class="swift-pageTitle" t-esc="labels.title"/>
 
         <div class="swift-headActions">
           <button type="button" class="btn btn-light swift-btn" t-on-click="onRefresh">
-            <i class="fa fa-refresh me-1"/> <t t-out="this._t('Refresh')"/>
+            <i class="fa fa-refresh me-1"/> <t t-esc="labels.refresh"/>
           </button>
 
           <div class="dropdown">
@@ -17,17 +17,17 @@
               <t t-esc="state.filterLabel"/>
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" t-on-click="setFilterToday" t-out="this._t('Today')"/></li>
-              <li><a class="dropdown-item" t-on-click="setFilterYesterday" t-out="this._t('Yesterday')"/></li>
-              <li><a class="dropdown-item" t-on-click="setFilterThisWeek" t-out="this._t('This Week')"/></li>
-              <li><a class="dropdown-item" t-on-click="setFilterThisMonth" t-out="this._t('This Month')"/></li>
+              <li><a class="dropdown-item" t-on-click="setFilterToday" t-esc="labels.today"/></li>
+              <li><a class="dropdown-item" t-on-click="setFilterYesterday" t-esc="labels.yesterday"/></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisWeek" t-esc="labels.thisWeek"/></li>
+              <li><a class="dropdown-item" t-on-click="setFilterThisMonth" t-esc="labels.thisMonth"/></li>
             </ul>
           </div>
         </div>
       </div>
 
       <t t-if="state.loading">
-        <div class="alert alert-info m-0" t-out="this._t('Loading data...')"/>
+        <div class="alert alert-info m-0" t-esc="labels.loading"/>
       </t>
 
       <t t-if="!state.loading">
@@ -36,16 +36,16 @@
           <div class="swift-kpiCard">
               <div class="swift-kpiTop">
                 <div class="swift-kpiIcon is-blue"><i class="fa fa-usd"/></div>
-                <div class="swift-kpiTitle" t-out="this._t('Revenue')"/>
+                <div class="swift-kpiTitle" t-esc="labels.revenue"/>
               </div>
               <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.revenue)"/></div>
-              <div class="swift-kpiSub"><t t-esc="state.kpi.orders"/> <t t-out="this._t('invoices')"/></div>
+              <div class="swift-kpiSub"><t t-esc="state.kpi.orders"/> <t t-esc="labels.invoicesLower"/></div>
             </div>
 
           <div class="swift-kpiCard">
               <div class="swift-kpiTop">
                 <div class="swift-kpiIcon is-orange"><i class="fa fa-undo"/></div>
-                <div class="swift-kpiTitle" t-out="this._t('Refunds')"/>
+                <div class="swift-kpiTitle" t-esc="labels.refunds"/>
               </div>
             <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.refund)"/></div>
             <div class="swift-kpiSub"> </div>
@@ -54,19 +54,19 @@
           <div class="swift-kpiCard">
               <div class="swift-kpiTop">
                 <div class="swift-kpiIcon is-red"><i class="fa fa-arrow-down"/></div>
-                <div class="swift-kpiTitle" t-out="this._t('Net Revenue')"/>
+                <div class="swift-kpiTitle" t-esc="labels.netRevenue"/>
               </div>
               <div class="swift-kpiValue"><t t-esc="formatVND(state.kpi.net)"/></div>
-              <div class="swift-kpiSub" t-out="this._t('Compared to yesterday')"/>
+              <div class="swift-kpiSub" t-esc="labels.comparedYesterday"/>
             </div>
 
           <div class="swift-kpiCard">
               <div class="swift-kpiTop">
                 <div class="swift-kpiIcon is-gray"><i class="fa fa-file-text-o"/></div>
-                <div class="swift-kpiTitle" t-out="this._t('Invoices')"/>
+                <div class="swift-kpiTitle" t-esc="labels.invoices"/>
               </div>
               <div class="swift-kpiValue"><t t-esc="state.kpi.orders"/></div>
-              <a href="#" class="swift-link" t-on-click.prevent="openOrders" t-out="this._t('View List')"/>
+              <a href="#" class="swift-link" t-on-click.prevent="openOrders" t-esc="labels.viewList"/>
             </div>
         </div>
 
@@ -76,14 +76,14 @@
           <div class="swift-card swift-card--net">
             <div class="swift-cardHead">
               <div>
-                <div class="swift-cardTitle" t-out="this._t('Net Revenue')"/>
+                <div class="swift-cardTitle" t-esc="labels.netRevenue"/>
                 <div class="swift-cardBig"><t t-esc="formatVND(state.kpi.net)"/></div>
               </div>
 
               <div class="swift-tabs">
-                <button type="button" t-att-class="state.tab==='day' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabDay" t-out="this._t('By Day')"/>
-                <button type="button" t-att-class="state.tab==='hour' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabHour" t-out="this._t('By Hour')"/>
-                <button type="button" t-att-class="state.tab==='weekday' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabWeekday" t-out="this._t('By Weekday')"/>
+                <button type="button" t-att-class="state.tab==='day' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabDay" t-esc="labels.byDay"/>
+                <button type="button" t-att-class="state.tab==='hour' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabHour" t-esc="labels.byHour"/>
+                <button type="button" t-att-class="state.tab==='weekday' ? 'swift-tab is-active' : 'swift-tab'" t-on-click="setTabWeekday" t-esc="labels.byWeekday"/>
               </div>
             </div>
 
@@ -97,14 +97,14 @@
           <!-- Recent activity -->
           <div class="swift-card swift-card--activity">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle" t-out="this._t('Recent Activity')"/>
+              <div class="swift-cardTitle" t-esc="labels.recentActivity"/>
             </div>
             <div class="swift-cardBody swift-activityList">
               <t t-foreach="state.recent_orders" t-as="o" t-key="o.id">
                 <div class="swift-activityItem">
                   <div class="swift-activityLeft">
                     <div class="swift-activityName"><t t-esc="o.partner"/></div>
-                    <div class="swift-activitySub" t-out="this._t('just sold an order')"/>
+                    <div class="swift-activitySub" t-esc="labels.justSoldOrder"/>
                   </div>
                   <div class="swift-activityRight">
                     <div class="swift-activityAmt"><t t-esc="formatVND(o.amount_total)"/></div>
@@ -121,16 +121,16 @@
           <!-- Top products -->
           <div class="swift-card swift-card--topprod">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle" t-out="this._t('Top 10 Best Sellers')"/>
+              <div class="swift-cardTitle" t-esc="labels.topBestSellers"/>
               <div class="swift-selects">
                 <select class="form-select form-select-sm" t-model="state.topProductsMode" t-on-change="onTopModeChanged">
-                  <option value="revenue" t-out="this._t('By Revenue')"/>
-                  <option value="qty" t-out="this._t('By Quantity')"/>
+                  <option value="revenue" t-esc="labels.byRevenue"/>
+                  <option value="qty" t-esc="labels.byQuantity"/>
                 </select>
                 <select class="form-select form-select-sm" t-model="state.topProductsRange" t-on-change="onTopRangeChanged">
-                  <option value="this_month" t-out="this._t('This Month')"/>
-                  <option value="this_week" t-out="this._t('This Week')"/>
-                  <option value="today" t-out="this._t('Today')"/>
+                  <option value="this_month" t-esc="labels.thisMonth"/>
+                  <option value="this_week" t-esc="labels.thisWeek"/>
+                  <option value="today" t-esc="labels.today"/>
                 </select>
               </div>
             </div>
@@ -151,11 +151,11 @@
           <!-- Placeholder customers -->
           <div class="swift-card swift-card--customers">
             <div class="swift-cardHead">
-              <div class="swift-cardTitle" t-out="this._t('Top 10 Top Customers')"/>
-              <span class="swift-pill" t-out="this._t('Yesterday')"/>
+              <div class="swift-cardTitle" t-esc="labels.topCustomers"/>
+              <span class="swift-pill" t-esc="labels.yesterday"/>
             </div>
             <div class="swift-cardBody">
-              <div class="text-muted" t-out="this._t('You can add customer tables / charts here.')"/>
+              <div class="text-muted" t-esc="labels.customerPlaceholder"/>
             </div>
           </div>
         </div>

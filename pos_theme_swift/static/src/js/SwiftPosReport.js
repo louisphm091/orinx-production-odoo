@@ -40,11 +40,38 @@ export class SwiftPosSalesDashboard extends Component {
     this.orm = useService("orm");
     this.action = useService("action");
     this.locale = this.getUserLocale();
+    this.labels = {
+      title: _t("Today's Sales Results"),
+      refresh: _t("Refresh"),
+      today: _t("Today"),
+      yesterday: _t("Yesterday"),
+      thisWeek: _t("This Week"),
+      thisMonth: _t("This Month"),
+      loading: _t("Loading data..."),
+      revenue: _t("Revenue"),
+      invoicesLower: _t("invoices"),
+      refunds: _t("Refunds"),
+      netRevenue: _t("Net Revenue"),
+      comparedYesterday: _t("Compared to yesterday"),
+      invoices: _t("Invoices"),
+      viewList: _t("View List"),
+      byDay: _t("By Day"),
+      byHour: _t("By Hour"),
+      byWeekday: _t("By Weekday"),
+      recentActivity: _t("Recent Activity"),
+      justSoldOrder: _t("just sold an order"),
+      topBestSellers: _t("Top 10 Best Sellers"),
+      byRevenue: _t("By Revenue"),
+      byQuantity: _t("By Quantity"),
+      topCustomers: _t("Top 10 Top Customers"),
+      customerPlaceholder: _t("You can add customer tables / charts here."),
+      posOrders: _t("POS Orders"),
+    };
 
     this.state = useState({
       loading: true,
       filter: "today",
-      filterLabel: _t("Today"),
+      filterLabel: this.labels.today,
       tab: "day",
 
       kpi: { revenue: 0, refund: 0, net: 0, orders: 0 },
@@ -118,10 +145,10 @@ export class SwiftPosSalesDashboard extends Component {
 
   setFilter(key) {
     const labels = {
-      today: _t("Today"),
-      yesterday: _t("Yesterday"),
-      this_week: _t("This Week"),
-      this_month: _t("This Month"),
+      today: this.labels.today,
+      yesterday: this.labels.yesterday,
+      this_week: this.labels.thisWeek,
+      this_month: this.labels.thisMonth,
     };
     this._setFilter(key, labels[key] || key);
   }
@@ -152,7 +179,7 @@ export class SwiftPosSalesDashboard extends Component {
   openOrders() {
     return this.action.doAction({
       type: "ir.actions.act_window",
-      name: _t("POS Orders"),
+      name: this.labels.posOrders,
       res_model: "pos.order",
       views: [[false, "list"], [false, "form"]],
       target: "current",
