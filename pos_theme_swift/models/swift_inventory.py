@@ -160,7 +160,6 @@ class SwiftStockInventory(models.Model):
     @api.model
     def cron_check_low_stock_alerts(self, config_id=False):
         """Push admin notification when a POS product reaches low stock threshold."""
-        threshold = 10.0
         Quant = self.env['stock.quant'].sudo()
         Alert = self.env['swift.low.stock.alert'].sudo()
         configs = self.env['pos.config'].sudo().browse()
@@ -170,6 +169,7 @@ class SwiftStockInventory(models.Model):
             configs = self.env['pos.config'].sudo().search([('active', '=', True)])
 
         for config in configs:
+            threshold = float(getattr(config, "swift_low_stock_threshold", 10.0) or 10.0)
             products = self._get_branch_products(config)
             if not products:
                 continue
@@ -204,7 +204,7 @@ class SwiftStockInventory(models.Model):
                         })
                         self._notify_low_stock_admins(product, qty_on_hand, threshold, config)
                     else:
-                        alert.write({'qty_on_hand': qty_on_hand})
+                        alert.write({'qty_on_hand': qty_on_hand, 'threshold': threshold})
                 else:
                     if alert:
                         existing_resolved = Alert.search([

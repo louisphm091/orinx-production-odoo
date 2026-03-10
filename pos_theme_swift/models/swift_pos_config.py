@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
-from odoo import _, api, models
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
 class PosConfig(models.Model):
     _inherit = "pos.config"
+
+    swift_low_stock_threshold = fields.Float(
+        string="Low Stock Threshold",
+        default=10.0,
+        help="Send low stock alerts when on hand quantity is less than or equal to this value.",
+    )
 
     @api.constrains("active", "picking_type_id")
     def _check_swift_branch_source_location(self):

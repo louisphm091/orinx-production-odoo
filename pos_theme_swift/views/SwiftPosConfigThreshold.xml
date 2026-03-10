@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="swift_pos_config_view_form_low_stock_threshold" model="ir.ui.view">
+        <field name="name">pos.config.form.low.stock.threshold.swift</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[contains(@class, 'o_settings_container')][@invisible=&quot;context.get('pos_config_create_mode', False)&quot;]" position="inside">
+                <setting
+                    string="Low Stock Threshold"
+                    help="Send low stock alerts when on hand quantity is less than or equal to this value.">
+                    <field name="swift_low_stock_threshold"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

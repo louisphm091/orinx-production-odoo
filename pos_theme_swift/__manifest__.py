@@ -19,12 +19,13 @@ Developed and maintained by Orinx.
     'author': 'Orinx',
     'company': 'Orinx',
     'website': 'https://orinx.com.vn',
-    'depends': ['point_of_sale', 'stock', 'web'],
+    'depends': ['point_of_sale', 'stock', 'purchase', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
         'data/stock_alert_cron.xml',
         'views/SwiftReportMenu.xml',
+        'views/SwiftPosConfigThreshold.xml',
         'views/SwiftProductLowStock.xml',
     ],
     'assets': {

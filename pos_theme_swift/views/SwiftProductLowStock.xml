@@ -12,8 +12,8 @@
                 <filter name="filter_to_availabe_pos" position="after">
                     <filter
                         name="swift_filter_low_stock_10"
-                        string="Low Stock &lt;= 10"
-                        domain="[('is_storable', '=', True), ('qty_available', '&lt;=', 10)]"
+                        string="Tồn kho thấp"
+                        domain="[('swift_is_low_stock', '=', True)]"
                     />
                 </filter>
                 <filter name="group_by_categ_id" position="after">
@@ -43,7 +43,7 @@
                             class="btn btn-primary"
                             display="always"
                             context="{'swift_low_stock_mode': True}"
-                            groups="stock.group_stock_user"
+                            groups="purchase.group_purchase_user"
                         />
                         <button
                             name="action_open_swift_branch_assignment_wizard"
@@ -144,7 +144,7 @@
                             class="btn btn-primary"
                             display="always"
                             context="{'swift_low_stock_mode': True}"
-                            groups="stock.group_stock_user"
+                            groups="purchase.group_purchase_user"
                         />
                     </header>
                 </xpath>
