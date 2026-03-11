@@ -19,8 +19,8 @@ msgstr ""
 
 #. module: sale_planning
 #: model:ir.ui.menu,name:sale_planning.menu_sale_planning_root
-msgid "Sale Planning"
-msgstr "Kế hoạch bán hàng"
+msgid "Demand & Supply Planning"
+msgstr "Hoạch định Nhu cầu & Cung ứng"
 
 #. module: sale_planning
 #: model:ir.actions.client,name:sale_planning.action_sale_planning_dashboard

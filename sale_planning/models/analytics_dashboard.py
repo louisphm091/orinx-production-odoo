@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 class SalePlanningAnalyticsDashboard(models.AbstractModel):
     _name = "sale.planning.analytics.dashboard"
-    _description = "Sale Planning - Analytics Dashboard Service"
+    _description = "Demand & Supply Planning - Analytics Dashboard Service"
 
     @api.model
     def get_dashboard_data(self, **kwargs):
@@ -202,4 +202,3 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
             "plan_actual_rows": plan_actual_rows,
             "data_table_rows": data_table_rows,
         }
-

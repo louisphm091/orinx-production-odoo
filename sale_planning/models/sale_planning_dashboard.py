@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class SalePlanningDashboard(models.AbstractModel):
     _name = "sale.planning.dashboard"
-    _description = "Sale Planning Dashboard Service"
+    _description = "Demand & Supply Planning Dashboard Service"
 
     @api.model
     def get_dashboard_data(self, **kwargs):

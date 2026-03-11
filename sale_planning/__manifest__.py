@@ -1,14 +1,15 @@
 {
-    'name': "Sale Planning",
+    'name': "Demand & Supply Planning",
 
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
+    'summary': "Plan and balance demand with supply across sales, inventory, and purchasing",
 
     'description': """
-Long description of module's purpose
+Demand & Supply Planning provides dashboards and analytics to plan,
+track, and balance demand against supply. Developed by https://group.orinx.com.vn.
     """,
 
     'author': "Orinx",
-    'website': "https://erp.orinx.com.vn",
+    'website': "https://group.orinx.com.vn",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
@@ -47,4 +48,3 @@ Long description of module's purpose
     "installable": True,
     "license": "LGPL-3",
 }
-

@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 class SalePlanningDashboardProgressService(models.AbstractModel):
     _name = "sale.planning.dashboard.progress"
-    _description = "Sale Planning - Dashboard Progress Service"
+    _description = "Demand & Supply Planning - Dashboard Progress Service"
 
     @api.model
     def get_dashboard_data(self, **kwargs):
@@ -155,4 +155,3 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
             },
             "last_update": fields.Datetime.now(),
         }
-

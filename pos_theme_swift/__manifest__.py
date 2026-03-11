@@ -14,11 +14,11 @@ This theme enhances the POS user experience with:
 - Streamlined POS screen structure
 - Responsive layout for multiple devices
 
-Developed and maintained by Orinx.
+Developed and maintained by https://group.orinx.com.vn.
 ''',
     'author': 'Orinx',
-    'company': 'Orinx',
-    'website': 'https://orinx.com.vn',
+    'company': 'https://group.orinx.com.vn',
+    'website': 'https://group.orinx.com.vn',
     'depends': ['point_of_sale', 'stock', 'purchase', 'web'],
     'data': [
         'security/ir.model.access.csv',

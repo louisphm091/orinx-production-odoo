@@ -27,7 +27,7 @@
         <field name="tag">sale_planning.replenishment</field>
     </record>
 
-    <menuitem id="menu_sale_planning_root" name="Sale Planning" sequence="10"/>
+    <menuitem id="menu_sale_planning_root" name="Demand &amp; Supply Planning" sequence="10"/>
 
     <record id="menu_sale_schedule_dashboard" model="ir.ui.menu">
       <field name="name">Sales Scheduling</field>
@@ -62,4 +62,3 @@
               sequence="30"/>
   </data>
 </odoo>
-

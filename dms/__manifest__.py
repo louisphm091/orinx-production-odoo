@@ -5,10 +5,14 @@
 {
     "name": "Document Management System",
     "summary": """Document Management System for Odoo""",
+    "description": """
+Document Management System for Odoo.
+Maintained by https://group.orinx.com.vn.
+    """,
     "version": "19.0.1.0.0",
     "category": "Document Management",
     "license": "LGPL-3",
-    "website": "https://github.com/OCA/dms",
+    "website": "https://group.orinx.com.vn",
     "author": "MuK IT, Tecnativa, Odoo Community Association (OCA)",
     "depends": [
         "mail",
