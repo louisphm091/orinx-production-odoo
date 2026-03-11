@@ -6,11 +6,47 @@
         <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[contains(@class, 'o_settings_container')][@invisible=&quot;context.get('pos_config_create_mode', False)&quot;]" position="inside">
-                <setting
-                    string="Low Stock Threshold"
-                    help="Send low stock alerts when on hand quantity is less than or equal to this value.">
+                <setting>
                     <field name="swift_low_stock_threshold"/>
                 </setting>
+                <setting>
+                    <field name="swift_high_stock_threshold"/>
+                </setting>
+                <setting>
+                    <field name="swift_warehouse_id"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_pos_config_kanban_swift" model="ir.ui.view">
+        <field name="name">pos.config.kanban.view.swift</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_config_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="swift_warehouse_id"/>
+                <field name="swift_branch_address"/>
+                <field name="swift_branch_phone"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="name" class="fw-bold fs-4 d-block mb-1"/>
+                <div class="swift-branch-info">
+                    <div t-if="record.swift_warehouse_id.value" class="swift-info-item">
+                        <i class="fa fa-university" title="Warehouse"/>
+                        <field name="swift_warehouse_id"/>
+                    </div>
+                    <div t-if="record.swift_branch_address.value" class="swift-info-item">
+                        <i class="fa fa-map-marker" title="Address"/>
+                        <field name="swift_branch_address"/>
+                    </div>
+                    <div t-if="record.swift_branch_phone.value" class="swift-info-item">
+                        <i class="fa fa-phone" title="Phone"/>
+                        <field name="swift_branch_phone"/>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='card_title']" position="attributes">
+                <attribute name="class" add="swift-card-titleContainer" separator=" "/>
             </xpath>
         </field>
     </record>

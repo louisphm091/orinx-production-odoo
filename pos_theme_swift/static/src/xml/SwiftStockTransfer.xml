@@ -289,7 +289,7 @@
                             <div class="st-side-header">
                                 <div class="st-side-brand">
                                     <i class="fa fa-user-circle me-2"/>
-                                    <b><t t-esc="state.currentTransfer.sender || 'E FRESH MART'"/></b>
+                                    <b><t t-esc="state.currentTransfer.sender || state.appName"/></b>
                                     <span class="ms-auto text-muted small"><t t-esc="state.currentTransfer.date_transfer"/></span>
                                 </div>
                             </div>

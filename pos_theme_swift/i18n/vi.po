@@ -9,19 +9,51 @@ msgstr ""
 #. module: pos_theme_swift
 #: model:ir.ui.menu,name:point_of_sale.menu_point_root
 msgid "Retail Planning Suite"
-msgstr "Retail Planning Suite"
+msgstr "Hệ thống Bán Lẻ"
+
+#. module: point_of_sale
+#: model:ir.actions.act_window,name:point_of_sale.action_pos_config_tree
+msgid "Branches"
+msgstr "Danh sách Chi Nhánh"
+
+#. module: point_of_sale
+msgid "Branches"
+msgstr "Danh sách Chi Nhánh"
+
+#. module: point_of_sale
+msgid "Point of Sale"
+msgstr "Chi Nhánh"
+
+#. module: point_of_sale
+#: model:ir.actions.act_window,name:point_of_sale.action_pos_config_kanban
+msgid "Point of Sale"
+msgstr "Chi Nhánh"
+
+#. module: point_of_sale
+#: model:ir.ui.menu,name:point_of_sale.menu_point_of_sale_list
+msgid "Point of Sales"
+msgstr "Quản Lý Chi Nhánh"
+
+#. module: point_of_sale
+msgid "Point Of Sale"
+msgstr "Chi Nhánh"
+
+#. module: point_of_sale
+msgid "Point of Sale"
+msgstr "Chi Nhánh"
+
 
 #. module: pos_theme_swift
 #. odoo-javascript
 #: model:ir.ui.menu,name:point_of_sale.menu_pos_dashboard
-msgid "Dashboard"
-msgstr "Bán Hàng"
+msgid "Branches"
+msgstr "Chi Nhánh"
 
 #. module: pos_theme_swift
 #. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_report_client
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_report
-msgid "Reports"
+msgid "Dashboard"
 msgstr "Báo Cáo"
 
 #. module: pos_theme_swift
@@ -2493,3 +2525,67 @@ msgstr "STT"
 #: code:addons/pos_theme_swift/static/src/js/SwiftInventoryManagement.js:0
 msgid "Please select a branch before creating an inventory voucher."
 msgstr "Vui lòng chọn chi nhánh trước khi tạo phiếu kiểm kho."
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,field_description:pos_theme_swift.field_pos_config__swift_low_stock_threshold
+#: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_pos_config_view_form_low_stock_threshold
+msgid "Low Stock Threshold"
+msgstr "Ngưỡng tồn kho thấp"
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,help:pos_theme_swift.field_pos_config__swift_low_stock_threshold
+msgid "Send low stock alerts when on hand quantity is less than or equal to this value."
+msgstr "Gửi cảnh báo tồn kho thấp khi số lượng tồn kho nhỏ hơn hoặc bằng giá trị này."
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,field_description:pos_theme_swift.field_pos_config__swift_high_stock_threshold
+#: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_pos_config_view_form_low_stock_threshold
+msgid "High Stock Threshold"
+msgstr "Ngưỡng tồn kho tối đa"
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,help:pos_theme_swift.field_pos_config__swift_high_stock_threshold
+msgid "Maximum desired stock level for this POS branch."
+msgstr "Mức tồn kho tối đa mong muốn cho chi nhánh POS này."
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,field_description:pos_theme_swift.field_pos_config__swift_warehouse_id
+#: model_terms:ir.ui.view,arch_db:pos_theme_swift.swift_pos_config_view_form_low_stock_threshold
+msgid "Warehouse (Swift)"
+msgstr "Kho hàng (Swift)"
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,help:pos_theme_swift.field_pos_config__swift_warehouse_id
+msgid "The warehouse associated with this POS branch for inventory management."
+msgstr "Kho hàng liên kết với chi nhánh POS này để quản lý tồn kho."
+
+#. module: pos_theme_swift
+msgid "Send low stock alerts when on hand quantity is less than or equal to this value."
+msgstr "Gửi cảnh báo tồn kho thấp khi số lượng tồn kho nhỏ hơn hoặc bằng giá trị này."
+
+#. module: pos_theme_swift
+msgid "Maximum desired stock level for this POS branch."
+msgstr "Mức tồn kho tối đa mong muốn cho chi nhánh POS này."
+
+#. module: pos_theme_swift
+msgid "The warehouse associated with this POS branch for inventory management."
+msgstr "Kho hàng liên kết với chi nhánh POS này để quản lý tồn kho."
+
+#. module: pos_theme_swift
+#: model:ir.model.fields,field_description:pos_theme_swift.field_product_template__swift_is_high_stock
+msgid "High Stock (Swift)"
+msgstr "Tồn kho cao (Swift)"
+
+#. module: pos_theme_swift
+msgid "Tồn kho cao (Overstock)"
+msgstr "Tồn kho cao (Overstock)"
+
+#. module: pos_theme_swift
+#: code:addons/pos_theme_swift/models/swift_stock_move.py:0
+msgid "Cannot move goods to branch '%s'. Product '%s' would exceed the maximum stock threshold (Current: %s, Max: %s)."
+msgstr "Không thể chuyển hàng tới chi nhánh '%s'. Sản phẩm '%s' sẽ vượt quá ngưỡng tồn kho tối đa (Hiện tại: %s, Tối đa: %s)."
+
+#. module: pos_theme_swift
+#: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_warehouse_list
+msgid "Warehouse List"
+msgstr "Danh Sách Kho"

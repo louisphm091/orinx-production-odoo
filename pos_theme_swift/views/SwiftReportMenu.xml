@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="action_swift_pos_report_client" model="ir.actions.client">
-        <field name="name">Reports</field>
+        <field name="name">Dashboard</field>
         <field name="tag">pos_theme_swift.swift_pos_sales_dashboard</field>
     </record>
 
@@ -42,26 +42,39 @@
     </record>
 
     <record id="point_of_sale.menu_point_root" model="ir.ui.menu">
-        <field name="name">Retail Planning Suite</field>
+        <field name="name">Point of Sale</field>
+    </record>
+
+    <record id="point_of_sale.action_pos_config_kanban" model="ir.actions.act_window">
+        <field name="name">Branches</field>
+    </record>
+
+    <record id="point_of_sale.action_pos_config_tree" model="ir.actions.act_window">
+        <field name="name">Branches</field>
+    </record>
+
+    <record id="point_of_sale.menu_point_of_sale_list" model="ir.ui.menu">
+        <field name="name">Branches</field>
     </record>
 
     <record id="point_of_sale.menu_pos_dashboard" model="ir.ui.menu">
-        <field name="name">Dashboard</field>
+        <field name="name">Branches</field>
+        <field name="sequence" eval="2"/>
     </record>
 
     <menuitem
         id="menu_swift_pos_report"
-        name="Reports"
+        name="Dashboard"
         parent="point_of_sale.menu_point_root"
         action="pos_theme_swift.action_swift_pos_report_client"
-        sequence="110"
+        sequence="1"
         groups="point_of_sale.group_pos_manager"
     />
 
     <menuitem
         id="menu_swift_pos_goods"
         name="Inventory"
-        parent="point_of_sale.menu_point_root"
+        parent="stock.menu_stock_root"
         sequence="115"
     />
 
@@ -71,6 +84,14 @@
         parent="menu_swift_pos_goods"
         action="pos_theme_swift.action_swift_pos_inventory_management"
         sequence="10"
+    />
+
+    <menuitem
+        id="menu_swift_pos_warehouse_list"
+        name="Warehouse List"
+        parent="menu_swift_pos_goods"
+        action="stock.action_warehouse_form"
+        sequence="15"
     />
 
     <menuitem

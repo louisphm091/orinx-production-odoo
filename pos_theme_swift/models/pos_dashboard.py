@@ -234,13 +234,25 @@ class PosDashboardSwift(models.AbstractModel):
 
     def _get_pos_stock_location(self, config=False):
         config = config or self._get_pos_config()
-        if config and config.picking_type_id.default_location_src_id:
+        if not config:
+            return False
+        if config.swift_warehouse_id and config.swift_warehouse_id.lot_stock_id:
+            return config.swift_warehouse_id.lot_stock_id
+        if config.picking_type_id.default_location_src_id:
             return config.picking_type_id.default_location_src_id
         return False
 
     def _get_pos_config_by_location(self, location):
         if not location:
             return self.env['pos.config'].browse()
+        # 1. Search by warehouse lot_stock_id
+        config = self.env['pos.config'].sudo().search([
+            ('active', '=', True),
+            ('swift_warehouse_id.lot_stock_id', '=', location.id),
+        ], limit=1)
+        if config:
+            return config
+        # 2. Fallback to picking type
         return self.env['pos.config'].sudo().search([
             ('active', '=', True),
             ('picking_type_id.default_location_src_id', '=', location.id),
@@ -250,7 +262,7 @@ class PosDashboardSwift(models.AbstractModel):
         configs = self.env['pos.config'].sudo().search([('active', '=', True)])
         rows = []
         for config in configs:
-            location = config.picking_type_id.default_location_src_id
+            location = self._get_pos_stock_location(config)
             if not location:
                 continue
             rows.append({

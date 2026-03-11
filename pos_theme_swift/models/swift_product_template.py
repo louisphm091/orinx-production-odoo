@@ -11,6 +11,11 @@ class ProductTemplate(models.Model):
         search="_search_swift_is_low_stock",
     )
 
+    swift_is_high_stock = fields.Boolean(
+        string="High Stock (Swift)",
+        search="_search_swift_is_high_stock",
+    )
+
     swift_branch_config_ids = fields.Many2many(
         "pos.config",
         "swift_product_template_pos_config_rel",
@@ -65,11 +70,28 @@ class ProductTemplate(models.Model):
         )
         thresholds = [t for t in thresholds if t is not None]
         return float(min(thresholds)) if thresholds else 10.0
+    def _swift_get_high_stock_threshold(self, config=False):
+        config = config or self._swift_get_threshold_config()
+        if config:
+            return float(getattr(config, "swift_high_stock_threshold", 100.0) or 100.0)
+
+        # Fallback: use the maximum threshold among active POS configs.
+        thresholds = (
+            self.env["pos.config"]
+            .sudo()
+            .search([("active", "=", True), ("company_id", "=", self.env.company.id)])
+            .mapped("swift_high_stock_threshold")
+        )
+        thresholds = [t for t in thresholds if t is not None]
+        return float(max(thresholds)) if thresholds else 100.0
 
     def _swift_get_inventory_location(self, config=False):
         config = config or self._swift_get_threshold_config()
-        if config and config.picking_type_id and config.picking_type_id.default_location_src_id:
-            return config.picking_type_id.default_location_src_id
+        if config:
+            if getattr(config, "swift_warehouse_id", False) and config.swift_warehouse_id.lot_stock_id:
+                return config.swift_warehouse_id.lot_stock_id
+            if config.picking_type_id and config.picking_type_id.default_location_src_id:
+                return config.picking_type_id.default_location_src_id
         return self.env["stock.location"].sudo().search([("usage", "=", "internal")], limit=1)
 
     @api.model
@@ -120,6 +142,53 @@ class ProductTemplate(models.Model):
 
         low_tmpl_ids = [tmpl_id for tmpl_id, qty in qty_by_template.items() if qty <= threshold]
         return [("id", "in", low_tmpl_ids)] if want_low else [("id", "not in", low_tmpl_ids)]
+
+    @api.model
+    def _search_swift_is_high_stock(self, operator, value):
+        if operator not in ("=", "!="):
+            raise UserError(_("Unsupported operator for high stock filter."))
+        want_high = bool(value)
+        if operator == "!=":
+            want_high = not want_high
+
+        config = self._swift_get_threshold_config()
+        threshold = self._swift_get_high_stock_threshold(config=config)
+        location = self._swift_get_inventory_location(config=config)
+
+        Product = self.env["product.product"].sudo()
+        product_domain = [
+            ("available_in_pos", "=", True),
+            ("active", "=", True),
+            ("is_storable", "=", True),
+        ]
+        if config:
+            product_domain.append(("product_tmpl_id.swift_branch_config_ids", "in", config.ids))
+
+        products = Product.search(product_domain)
+        if not products:
+            return [("id", "=", 0)] if want_high else []
+
+        quant_domain = [
+            ("product_id", "in", products.ids),
+            ("location_id.usage", "=", "internal"),
+        ]
+        if location:
+            quant_domain.append(("location_id", "child_of", location.id))
+
+        quant_groups = self.env["stock.quant"].sudo().read_group(
+            quant_domain,
+            ["quantity:sum", "product_id"],
+            ["product_id"],
+        )
+        qty_by_product = {g["product_id"][0]: g["quantity"] for g in quant_groups if g.get("product_id")}
+
+        qty_by_template = {}
+        for product in products:
+            qty = qty_by_product.get(product.id, 0.0)
+            qty_by_template[product.product_tmpl_id.id] = qty_by_template.get(product.product_tmpl_id.id, 0.0) + qty
+
+        high_tmpl_ids = [tmpl_id for tmpl_id, qty in qty_by_template.items() if qty > threshold]
+        return [("id", "in", high_tmpl_ids)] if want_high else [("id", "not in", high_tmpl_ids)]
 
     def action_swift_import_goods_filtered(self):
         """Create purchase RFQs for low-stock products in current filter."""
@@ -270,3 +339,9 @@ class ProductTemplate(models.Model):
                 "default_product_tmpl_ids": [(6, 0, products.ids)],
             },
         }
+
+class ProductProduct(models.Model):
+    _inherit = "product.product"
+
+    def action_open_swift_branch_assignment_wizard(self):
+        return self.product_tmpl_id.action_open_swift_branch_assignment_wizard()

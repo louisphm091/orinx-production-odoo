@@ -1,0 +1,103 @@
+/* POS Dashboard Swift - Clean Odoo Aesthetics */
+
+.o_pos_kanban .o_kanban_record {
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 4px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.o_pos_kanban .o_kanban_record:hover {
+    border-color: #875A7B !important; /* Odoo Default Purple */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Branch Name Header */
+.o_pos_kanban .o_kanban_record span[name="name"],
+.o_pos_kanban .o_kanban_record .fw-bold.fs-4 {
+    color: #4c4c4c !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 8px !important;
+}
+
+/* Info Row Styling */
+.swift-branch-info {
+    border-top: 1px solid #eeeeee;
+    padding-top: 10px;
+    margin-bottom: 12px;
+}
+
+.swift-info-item {
+    display: flex;
+    align-items: center;
+    color: #666666 !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 4px;
+}
+
+.swift-info-item i {
+    color: #875A7B !important; /* Odoo Default Purple */
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    font-size: 0.8rem;
+}
+
+/* Status Badges */
+.o_pos_kanban .badge {
+    border-radius: 3px !important;
+    font-weight: 500 !important;
+}
+
+/* Control Buttons - back to Odoo standard primary */
+.o_pos_kanban .btn-primary {
+    background-color: #875A7B !important;
+    border-color: #875A7B !important;
+    color: #ffffff !important;
+}
+
+.o_pos_kanban .btn-primary:hover {
+    background-color: #694660 !important;
+    border-color: #694660 !important;
+}
+
+/* Statistics Area */
+.o_pos_kanban .col-12.col-md-6:last-child {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 6px 10px !important;
+    margin-top: auto;
+}
+
+.o_pos_kanban .col-12.col-md-6:last-child .row {
+    margin-bottom: 2px !important;
+}
+
+.o_pos_kanban .col-5 span {
+    color: #777777 !important;
+    font-size: 0.75rem !important;
+    font-weight: normal;
+}
+
+.o_pos_kanban .col-7,
+.o_pos_kanban field[name="last_session_closing_date"],
+.o_pos_kanban span[name="opening_cash"],
+.o_pos_kanban span[name="paid_orders"],
+.o_pos_kanban span[name="draft_orders"] {
+    color: #444444 !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+}
+
+/* Hide Odoo Kanban Ghost elements */
+.o_pos_kanban .o_kanban_ghost {
+    display: none !important;
+}

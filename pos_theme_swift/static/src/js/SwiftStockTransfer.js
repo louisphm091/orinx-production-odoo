@@ -1,9 +1,10 @@
 /** @odoo-module **/
 
 import { Component, useState, onMounted } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
+import { useBus, useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
+import { user, userBus } from "@web/core/user";
 
 
 export class StockTransfer extends Component {
@@ -90,9 +91,15 @@ export class StockTransfer extends Component {
 
             // Receiver View specific
             receiveTab: 'all', // 'all', 'match', 'mismatch', 'unreceived'
+            appName: user.activeCompany?.name || user.defaultCompany?.name || "",
+        });
+
+        useBus(userBus, "ACTIVE_COMPANIES_CHANGED", () => {
+            this._syncActiveCompanyName();
         });
 
         onMounted(async () => {
+            this._syncActiveCompanyName();
             await this.loadCurrentConfig();
             await this.loadLocations();
             await this.loadTransfers();
@@ -100,6 +107,22 @@ export class StockTransfer extends Component {
     }
 
     // ─── data loading ─────────────────────────────────────────────
+
+    _syncActiveCompanyName() {
+        const companyName = user.activeCompany?.name || user.defaultCompany?.name || "";
+        if (companyName) {
+            this.state.appName = companyName;
+        }
+    }
+
+    _getActiveCompanyContext() {
+        const ctx = user.context || {};
+        const activeCompanyId = user.activeCompany?.id;
+        if (!activeCompanyId) {
+            return ctx;
+        }
+        return { ...ctx, allowed_company_ids: [activeCompanyId] };
+    }
 
     _getContextConfigId() {
         const rawConfigId =
@@ -115,8 +138,8 @@ export class StockTransfer extends Component {
             const configs = await this.orm.searchRead(
                 "pos.config",
                 [["active", "=", true]],
-                ["name"],
-                { order: "name asc", limit: 200 }
+                ["name", "company_id"],
+                { order: "name asc", limit: 200, context: this._getActiveCompanyContext() }
             );
             const contextConfigId = this._getContextConfigId();
             const selected =
@@ -135,7 +158,12 @@ export class StockTransfer extends Component {
 
     async loadLocations() {
         try {
-            this.state.locations = await this.orm.call("pos.dashboard.swift", "get_locations", []);
+            this.state.locations = await this.orm.call(
+                "pos.dashboard.swift",
+                "get_locations",
+                [],
+                { context: this._getActiveCompanyContext() }
+            );
             const currentLocation = this.state.locations.find((loc) => loc.config_id === this.state.currentConfigId);
             this.state.currentLocationId = currentLocation ? currentLocation.location_id : false;
             if (currentLocation) {
@@ -153,7 +181,12 @@ export class StockTransfer extends Component {
                 states: this.state.filters.states,
                 date_range: this.state.filters.date_range,
             };
-            this.state.records = await this.orm.call("pos.dashboard.swift", "get_stock_transfers", [filters, false]);
+            this.state.records = await this.orm.call(
+                "pos.dashboard.swift",
+                "get_stock_transfers",
+                [filters, false],
+                { context: this._getActiveCompanyContext() }
+            );
         } catch (e) {
             console.error("Failed to load transfers", e);
             this.notification.add(_t("Error loading stock transfer data"), { type: "danger" });
@@ -264,7 +297,8 @@ export class StockTransfer extends Component {
             const detail = await this.orm.call(
                 "pos.dashboard.swift",
                 "get_transfer_detail",
-                [record.id, this.getPerspectiveConfigId(record)]
+                [record.id, this.getPerspectiveConfigId(record)],
+                { context: this._getActiveCompanyContext() }
             );
             if (detail) {
                 this.state.currentTransfer = detail;
@@ -295,6 +329,10 @@ export class StockTransfer extends Component {
             state: 'draft',
             date_transfer: new Date().toLocaleString('vi-VN'),
         };
+        this.state.productSearchResults = [];
+        this.state.searchProductKeyword = "";
+        this.state.showProductDropdown = false;
+        this.state.receiveTab = "all";
         this.state.view = 'form';
     }
 
@@ -345,7 +383,12 @@ export class StockTransfer extends Component {
             return;
         }
         const productIds = this.state.currentTransfer.lines.map((line) => line.product_id);
-        const stockByProduct = await this.orm.call("pos.dashboard.swift", "get_location_stock", [productIds, sourceLocationId]);
+        const stockByProduct = await this.orm.call(
+            "pos.dashboard.swift",
+            "get_location_stock",
+            [productIds, sourceLocationId],
+            { context: this._getActiveCompanyContext() }
+        );
         for (const line of this.state.currentTransfer.lines) {
             line.qty_on_hand = stockByProduct[line.product_id] || 0;
         }
@@ -363,7 +406,12 @@ export class StockTransfer extends Component {
             return;
         }
         const productIds = this.state.currentTransfer.lines.map((line) => line.product_id);
-        const stock = await this.orm.call("pos.dashboard.swift", "get_location_stock", [productIds, locationId]);
+        const stock = await this.orm.call(
+            "pos.dashboard.swift",
+            "get_location_stock",
+            [productIds, locationId],
+            { context: this._getActiveCompanyContext() }
+        );
         for (const line of this.state.currentTransfer.lines) {
             line.qty_dest = stock[line.product_id] || 0;
         }
@@ -385,7 +433,12 @@ export class StockTransfer extends Component {
                 this.state.showProductDropdown = false;
                 return;
             }
-            const results = await this.orm.call("pos.dashboard.swift", "get_inventory_products", [keyword, sourceConfigId]);
+            const results = await this.orm.call(
+                "pos.dashboard.swift",
+                "get_inventory_products",
+                [keyword, sourceConfigId],
+                { context: this._getActiveCompanyContext() }
+            );
             this.state.productSearchResults = results;
             this.state.showProductDropdown = true;
         } catch (e) {
@@ -398,19 +451,13 @@ export class StockTransfer extends Component {
         if (existing) {
             existing.qty += 1;
         } else {
-            let qty_dest = 0;
-            if (this.state.currentTransfer.loc_dest_id) {
-                const stock = await this.orm.call("pos.dashboard.swift", "get_location_stock", [[product.id], this.state.currentTransfer.loc_dest_id]);
-                qty_dest = stock[product.id] || 0;
-            }
-
             this.state.currentTransfer.lines.push({
                 product_id: product.id,
                 product_code: product.barcode || product.id,
                 product_name: product.name,
                 uom: product.uom,
-                qty_on_hand: product.qty_on_hand,
-                qty_dest: qty_dest,
+                qty_on_hand: 0,
+                qty_dest: 0,
                 qty: 1,
                 received_qty: 0,
                 price: product.price || 0,
@@ -418,6 +465,12 @@ export class StockTransfer extends Component {
         }
         this.state.showProductDropdown = false;
         this.state.searchProductKeyword = "";
+        try {
+            await this.refreshSourceStock();
+            await this._refreshDestinationStock();
+        } catch (e) {
+            console.error("Failed to refresh stock after adding product", e);
+        }
     }
 
     removeLine(idx) {
@@ -457,7 +510,12 @@ export class StockTransfer extends Component {
                     price: parseFloat(l.price) || 0,
                 })),
             };
-            const result = await this.orm.call("pos.dashboard.swift", "create_or_update_transfer", [vals]);
+            const result = await this.orm.call(
+                "pos.dashboard.swift",
+                "create_or_update_transfer",
+                [vals],
+                { context: this._getActiveCompanyContext() }
+            );
             this.state.view = 'list';
             await this.loadTransfers();
             const createdId = result?.id || false;
@@ -471,7 +529,8 @@ export class StockTransfer extends Component {
                 const hiddenDetail = await this.orm.call(
                     "pos.dashboard.swift",
                     "get_transfer_detail",
-                    [createdId, this.state.currentConfigId || false]
+                    [createdId, this.state.currentConfigId || false],
+                    { context: this._getActiveCompanyContext() }
                 );
                 if (hiddenDetail && !this.state.records.some((record) => record.id === createdId)) {
                     this.state.records.unshift(this._buildRecordFromDetail(hiddenDetail));
@@ -511,7 +570,12 @@ export class StockTransfer extends Component {
                 id: l.id,
                 received_qty: l.received_qty,
             }));
-            await this.orm.call("pos.dashboard.swift", "action_receive_transfer", [this.state.currentTransfer.id, lines]);
+            await this.orm.call(
+                "pos.dashboard.swift",
+                "action_receive_transfer",
+                [this.state.currentTransfer.id, lines],
+                { context: this._getActiveCompanyContext() }
+            );
             this.notification.add(_t("Goods receipt completed"), { type: "success" });
             this.state.view = 'list';
             await this.loadTransfers();

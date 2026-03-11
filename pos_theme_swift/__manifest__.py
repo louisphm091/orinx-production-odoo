@@ -35,6 +35,7 @@ Developed and maintained by Orinx.
             'pos_theme_swift/static/src/js/SwiftPosReport.js',
             'pos_theme_swift/static/src/xml/report/SwiftPosReport.xml',
             'pos_theme_swift/static/src/css/SwiftReport.css',
+            'pos_theme_swift/static/src/css/SwiftPosDashboard.css',
             'pos_theme_swift/static/src/css/SwiftInventory.css',
             'pos_theme_swift/static/src/xml/inventory/SwiftInventory.xml',
             'pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml',
@@ -58,6 +59,7 @@ Developed and maintained by Orinx.
             'pos_theme_swift/static/src/js/SwiftEmployeeManagement.js',
             'pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml',
             'pos_theme_swift/static/src/css/SwiftEmployeeManagement.css',
+            'pos_theme_swift/static/src/css/list_view_center.css',
         ],
         'point_of_sale._assets_pos': [
             'pos_theme_swift/static/src/js/PosAppPatch.js',

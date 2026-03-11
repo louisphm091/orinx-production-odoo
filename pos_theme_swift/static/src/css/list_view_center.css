@@ -1,0 +1,6 @@
+.o_list_view th[data-name="swift_branch_config_ids"] {
+    text-align: center !important;
+}
+.o_list_view th[data-name="swift_branch_config_ids"] > div {
+    justify-content: center !important;
+}

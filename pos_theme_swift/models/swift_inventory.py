@@ -59,8 +59,11 @@ class SwiftStockInventory(models.Model):
 
     def _get_inventory_location(self, config=None):
         config = config or self._get_pos_config()
-        if config and config.picking_type_id.default_location_src_id:
-            return config.picking_type_id.default_location_src_id
+        if config:
+            if config.swift_warehouse_id and config.swift_warehouse_id.lot_stock_id:
+                return config.swift_warehouse_id.lot_stock_id
+            if config.picking_type_id.default_location_src_id:
+                return config.picking_type_id.default_location_src_id
         return self.env['stock.location'].search([('usage', '=', 'internal')], limit=1)
 
     def _get_branch_products(self, config):
