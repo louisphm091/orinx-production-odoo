@@ -27,6 +27,7 @@ Developed and maintained by https://group.orinx.com.vn.
         'views/SwiftReportMenu.xml',
         'views/SwiftPosConfigThreshold.xml',
         'views/SwiftProductLowStock.xml',
+        'views/SwiftProductBranchQty.xml',
     ],
     'assets': {
         'web.assets_backend': [

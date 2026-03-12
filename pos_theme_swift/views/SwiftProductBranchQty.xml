@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="swift_product_template_form_branch_qty" model="ir.ui.view">
+            <field name="name">product.template.form.branch.qty.swift</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="stock.view_template_property_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@class='o_row'][field[@name='qty_available']]" position="after">
+                    <label for="swift_branch_qty_html" class="oe_inline"
+                           invisible="not is_storable or not swift_branch_qty_html"
+                           groups="stock.group_stock_user"/>
+                    <div class="o_row" invisible="not is_storable or not swift_branch_qty_html" groups="stock.group_stock_user">
+                        <field name="swift_branch_qty_html" widget="html" readonly="1" nolabel="1"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

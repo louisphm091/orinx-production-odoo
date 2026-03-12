@@ -25,6 +25,64 @@ class ProductTemplate(models.Model):
         help="Only products assigned to selected POS branches are available in those branches. Leave empty to keep the product hidden from branch-specific POS flows.",
     )
 
+    swift_branch_qty_html = fields.Html(
+        string="Số lượng theo chi nhánh",
+        compute="_compute_swift_branch_qty_html",
+    )
+
+    def _swift_get_branch_configs(self):
+        """Return POS configs to use for branch stock breakdown."""
+        if self.swift_branch_config_ids:
+            return self.swift_branch_config_ids.filtered(lambda c: c.active)
+        return self.env["pos.config"].sudo().search(
+            [("active", "=", True), ("company_id", "=", self.env.company.id)],
+            order="name asc",
+        )
+
+    def _swift_get_branch_location(self, config):
+        if not config:
+            return False
+        if config.swift_warehouse_id and config.swift_warehouse_id.lot_stock_id:
+            return config.swift_warehouse_id.lot_stock_id
+        if config.picking_type_id and config.picking_type_id.default_location_src_id:
+            return config.picking_type_id.default_location_src_id
+        return False
+
+    @api.depends(
+        "product_variant_ids",
+        "product_variant_ids.qty_available",
+        "swift_branch_config_ids",
+    )
+    def _compute_swift_branch_qty_html(self):
+        for template in self:
+            if not template.is_storable:
+                template.swift_branch_qty_html = ""
+                continue
+            branches = template._swift_get_branch_configs()
+            if not branches:
+                template.swift_branch_qty_html = ""
+                continue
+
+            rows = []
+            for config in branches:
+                location = template._swift_get_branch_location(config)
+                if not location:
+                    continue
+                qty = template.with_context(location=location.id).qty_available
+                rows.append((config.name or location.display_name, qty))
+
+            if not rows:
+                template.swift_branch_qty_html = ""
+                continue
+
+            rows.sort(key=lambda r: (r[0] or "").lower())
+            items = "".join(
+                "<li>%s: <strong>%s</strong></li>"
+                % (name, ("%0.2f" % qty).rstrip("0").rstrip("."))
+                for name, qty in rows
+            )
+            template.swift_branch_qty_html = "<ul class='o_swift_branch_qty'>%s</ul>" % items
+
     def _swift_get_threshold_config(self):
         """Pick a POS config for threshold/location context.
 
