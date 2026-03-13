@@ -53,7 +53,14 @@
                     <t t-esc="env.utils.formatCurrency(this.sppLineUnitPrice(line))"/>
                   </td>
                   <td class="col-uom">
-                    <t t-esc="this.sppLineUom(line)"/>
+                    <select class="sapphire-uom-select"
+                            t-on-change="(ev) => this.sppOnUomChange(line, ev)">
+                      <t t-foreach="this.sppGetLineUoms(line)" t-as="uom" t-key="uom.id">
+                        <option t-att-value="uom.id" t-att-selected="uom.id == this.sppLineUomId(line)">
+                          <t t-esc="uom.name"/>
+                        </option>
+                      </t>
+                    </select>
                   </td>
 
                   <!-- 4) Qty control -->

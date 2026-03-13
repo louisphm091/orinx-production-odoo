@@ -25,6 +25,13 @@ class ProductTemplate(models.Model):
         help="Only products assigned to selected POS branches are available in those branches. Leave empty to keep the product hidden from branch-specific POS flows.",
     )
 
+    @api.model
+    def _load_pos_data_fields(self, config):
+        fields = super()._load_pos_data_fields(config)
+        if 'uom_ids' not in fields:
+            fields.append('uom_ids')
+        return fields
+
     swift_branch_qty_html = fields.Html(
         string="Số lượng theo chi nhánh",
         compute="_compute_swift_branch_qty_html",
@@ -481,3 +488,10 @@ class ProductProduct(models.Model):
 
     def action_open_swift_branch_assignment_wizard(self):
         return self.product_tmpl_id.action_open_swift_branch_assignment_wizard()
+
+    @api.model
+    def _load_pos_data_fields(self, config):
+        fields = super()._load_pos_data_fields(config)
+        if 'uom_ids' not in fields:
+            fields.append('uom_ids')
+        return fields

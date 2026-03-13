@@ -57,7 +57,7 @@
         </div>
         <div class="nav-right">
           <button class="nav-btn"
-                  t-on-click="() => pos.closePos()"
+                  t-on-click="onSapphireBackend"
                   t-att-title="this._t('Backend')">
             <i class="fa fa-pause nav-icon" />
             <span class="nav-label" t-out="this._t('Backend')"/>

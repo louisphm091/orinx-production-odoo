@@ -816,6 +816,10 @@ patch(PaymentScreen.prototype, {
     // Navigate back to backend regardless of RPC result
     window.location.href = "/odoo/point-of-sale";
   },
+  onSapphireBackend() {
+    // Direct navigation to backend dashboard, bypassing Odoo's closing validation
+    window.location.href = "/odoo/point-of-sale";
+  },
   async onSapphireAddOrder() {
     const pos = this.pos;
     if (typeof pos.add_new_order === "function") {
@@ -837,16 +841,157 @@ patch(PaymentScreen.prototype, {
   },
   sppLineUom(line) {
     try {
-      // Odoo 17: uom_id is a record object with a name property
-      const uom = line?.product_uom_id || line?.uom_id;
+      if (!line) return "";
+
+      // 1. Identify UoM data (Odoo 17 uses getUnit() and product_id)
+      let uom = (typeof line.getUnit === 'function' ? line.getUnit() : null) ||
+                line.uom_id ||
+                line.product_uom_id ||
+                line.product_id?.uom_id ||
+                line.product?.uom_id;
+
+      if (!uom && line.product_id?.product_tmpl_id) {
+          uom = line.product_id.product_tmpl_id.uom_id;
+      }
+
       if (!uom) return "";
-      // If it's a Many2one record object
-      if (typeof uom === "object" && !Array.isArray(uom)) return uom.name || "";
-      // If it's a [id, name] tuple (older Odoo style)
-      if (Array.isArray(uom)) return uom[1] || "";
-      return "";
+
+      // 2. Extract Display Name
+      // Record/Object
+      if (typeof uom === "object" && !Array.isArray(uom)) {
+          const name = uom.name || uom.display_name || uom.uom_name || "";
+          if (name) return name;
+      }
+
+      // Tuple [id, name]
+      if (Array.isArray(uom) && uom.length > 1) {
+          return uom[1] || "";
+      }
+
+      // ID (Number or String-ID)
+      const uomId = (typeof uom === "number" || (typeof uom === "string" && !isNaN(uom))) ? parseInt(uom) : null;
+      if (uomId) {
+          const pos = this.pos || this.env?.pos;
+          const uomCollections = [
+              pos?.models?.["uom.uom"],
+              pos?.units_by_id,
+              pos?.units,
+              pos?.data?.["uom.uom"]
+          ];
+
+          for (const coll of uomCollections) {
+              if (!coll) continue;
+              if (Array.isArray(coll)) {
+                  const r = coll.find(m => m.id === uomId);
+                  if (r) return r.name || r.display_name || "";
+              } else if (typeof coll === 'object') {
+                  if (coll[uomId]) return coll[uomId].name || coll[uomId].display_name || "";
+                  const r = Object.values(coll).find(v => v.id === uomId);
+                  if (r) return r.name || r.display_name || "";
+              }
+          }
+      }
+
+      // Direct String
+      if (typeof uom === "string") return uom;
+
+      return "...";
     } catch (e) {
-      return "";
+      console.warn("[Sapphire] Error in sppLineUom:", e);
+      return "Err";
+    }
+  },
+
+  sppLineUomId(line) {
+    if (!line) return null;
+    // Check uiState first so the selection "sticks" even if qty is represented in base unit
+    if (line.uiState?.selected_uom_id) return line.uiState.selected_uom_id;
+
+    let uom = (typeof line.getUnit === 'function' ? line.getUnit() : null) ||
+              line.uom_id || line.product_uom_id || line.product_id?.uom_id;
+    if (uom && typeof uom === 'object' && !Array.isArray(uom)) return uom.id;
+    if (Array.isArray(uom)) return uom[0];
+    const id = parseInt(uom);
+    return isNaN(id) ? uom : id;
+  },
+
+  sppGetLineUoms(line) {
+    try {
+      if (!line || !this.pos) return [];
+      const product = line.product_id || line.product;
+      if (!product) return [];
+
+      const res = [];
+      const baseUom = (typeof line.getUnit === 'function' ? line.getUnit() : null) || product.uom_id;
+      if (baseUom) {
+          res.push({
+              id: baseUom.id || baseUom[0],
+              name: baseUom.name || baseUom[1] || "Base"
+          });
+      }
+
+      // 1. Check uom_ids (the custom M2M field for additional units/packagings)
+      if (product.uom_ids && Array.isArray(product.uom_ids)) {
+          for (const uomId of product.uom_ids) {
+              const uom = this.pos.models["uom.uom"]?.get(uomId);
+              if (uom && !res.find(x => x.id === uom.id)) {
+                  res.push({
+                      id: uom.id,
+                      name: uom.name || uom.display_name
+                  });
+              }
+          }
+      }
+
+      // 2. Check product.uom bridge model (used for scanners usually)
+      const packings = this.pos.models["product.uom"]?.filter(pu => {
+          const pid = pu.product_id?.id ?? pu.product_id;
+          return pid === product.id;
+      }) || [];
+
+      for (const p of packings) {
+          const u = p.uom_id;
+          if (u && !res.find(x => x.id === u.id)) {
+              res.push({
+                  id: u.id,
+                  name: u.name || u.display_name || "Pack"
+              });
+          }
+      }
+      return res;
+    } catch(e) {
+      console.warn("[Sapphire] Error in sppGetLineUoms:", e);
+      return [];
+    }
+  },
+
+  sppOnUomChange(line, ev) {
+    const order = this.sppOrder();
+    if (!order || !line) return;
+    const uomId = parseInt(ev.target.value);
+    const uom = this.pos.models["uom.uom"]?.get(uomId);
+    if (uom) {
+        // Store in uiState
+        if (!line.uiState) line.uiState = {};
+        line.uiState.selected_uom_id = uomId;
+
+        const product = line.product_id || line.product;
+        const baseUom = product?.uom_id;
+
+        let qty = 1;
+        if (baseUom && uom) {
+            // Formula: base_factor / target_factor
+            const bFactor = baseUom.factor || 1;
+            const tFactor = uom.factor || 1;
+            qty = bFactor / tFactor;
+        }
+
+        if (typeof line.set_quantity === "function") line.set_quantity(qty);
+        else if (typeof line.setQuantity === "function") line.setQuantity(qty);
+        else line.qty = qty;
+
+        order.trigger?.("change", order);
+        this.render?.();
     }
   },
 });
