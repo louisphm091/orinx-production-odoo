@@ -4,15 +4,41 @@
         <record id="swift_product_template_form_branch_qty" model="ir.ui.view">
             <field name="name">product.template.form.branch.qty.swift</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="stock.view_template_property_form"/>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[@class='o_row'][field[@name='qty_available']]" position="after">
-                    <label for="swift_branch_qty_html" class="oe_inline"
-                           invisible="not is_storable or not swift_branch_qty_html"
-                           groups="stock.group_stock_user"/>
-                    <div class="o_row" invisible="not is_storable or not swift_branch_qty_html" groups="stock.group_stock_user">
-                        <field name="swift_branch_qty_html" widget="html" readonly="1" nolabel="1"/>
+                <!-- Fix the instruction text and location -->
+                <xpath expr="//field[@name='type']" position="after">
+                    <div class="text-info mt-1 mb-2 small fw-bold"
+                         invisible="is_storable"
+                         groups="stock.group_stock_user">
+                        <i class="fa fa-info-circle me-1"/>
+                        Bật <span class="text-primary text-decoration-underline">"Theo dõi hàng tồn kho"</span> bên dưới để xem báo cáo chi tiết chi nhánh.
                     </div>
+                </xpath>
+
+                <!-- Fix the alignment of is_storable checkbox -->
+                <xpath expr="//label[@for='is_storable']" position="attributes">
+                    <attribute name="class">oe_inline fw-bold</attribute>
+                </xpath>
+                <xpath expr="//div[field[@name='is_storable']]" position="attributes">
+                    <attribute name="class">o_row oe_inline ms-2</attribute>
+                </xpath>
+
+                <!-- Dedicated Tab for Branch Inventory -->
+                <xpath expr="//page[@name='general_information']" position="after">
+                    <page name="swift_branch_inventory"
+                          string="Tồn kho chi nhánh"
+                          invisible="not is_storable or not swift_branch_qty_html"
+                          groups="stock.group_stock_user">
+                        <div class="o_horizontal_separator mt-3 mb-3 fw-bold text-primary">
+                            BÁO CÁO TỒN KHO CHI TIẾT THEO CHI NHÁNH POS
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-lg-9 col-xl-7 mt-2">
+                                <field name="swift_branch_qty_html" widget="html" readonly="1" nolabel="1"/>
+                            </div>
+                        </div>
+                    </page>
                 </xpath>
             </field>
         </record>

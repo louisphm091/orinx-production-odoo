@@ -31,9 +31,7 @@ class ProductTemplate(models.Model):
     )
 
     def _swift_get_branch_configs(self):
-        """Return POS configs to use for branch stock breakdown."""
-        if self.swift_branch_config_ids:
-            return self.swift_branch_config_ids.filtered(lambda c: c.active)
+        """Return all active POS configs for comprehensive branch stock breakdown."""
         return self.env["pos.config"].sudo().search(
             [("active", "=", True), ("company_id", "=", self.env.company.id)],
             order="name asc",
@@ -59,29 +57,101 @@ class ProductTemplate(models.Model):
                 template.swift_branch_qty_html = ""
                 continue
             branches = template._swift_get_branch_configs()
-            if not branches:
-                template.swift_branch_qty_html = ""
-                continue
 
             rows = []
-            for config in branches:
-                location = template._swift_get_branch_location(config)
-                if not location:
-                    continue
-                qty = template.with_context(location=location.id).qty_available
-                rows.append((config.name or location.display_name, qty))
-
-            if not rows:
-                template.swift_branch_qty_html = ""
-                continue
+            if branches:
+                for config in branches:
+                    location = template._swift_get_branch_location(config)
+                    if not location:
+                        continue
+                    qty = template.with_context(location=location.id).qty_available
+                    rows.append((config.name or location.display_name, qty))
 
             rows.sort(key=lambda r: (r[0] or "").lower())
-            items = "".join(
-                "<li>%s: <strong>%s</strong></li>"
-                % (name, ("%0.2f" % qty).rstrip("0").rstrip("."))
-                for name, qty in rows
-            )
-            template.swift_branch_qty_html = "<ul class='o_swift_branch_qty'>%s</ul>" % items
+
+            table_style = """
+                <style>
+                    .o_swift_branch_card {
+                        background: #ffffff;
+                        border-radius: 8px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        overflow: hidden;
+                        border: 1px solid #e2e8f0;
+                        margin-bottom: 20px;
+                    }
+                    .o_swift_branch_table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 13px;
+                    }
+                    .o_swift_branch_table th {
+                        background: #f8fafc;
+                        color: #64748b;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.025em;
+                        padding: 12px 16px;
+                        border-bottom: 2px solid #e2e8f0;
+                        text-align: left;
+                    }
+                    .o_swift_branch_table td {
+                        padding: 12px 16px;
+                        border-bottom: 1px solid #f1f5f9;
+                        color: #1e293b;
+                    }
+                    .o_swift_branch_table tr:last-child td {
+                        border-bottom: none;
+                    }
+                    .o_swift_branch_table tr:hover {
+                        background-color: #f1f5f9;
+                    }
+                    .o_swift_branch_table .text-end {
+                        text-align: right;
+                    }
+                    .o_swift_branch_table .qty-badge {
+                        background: #e0f2fe;
+                        color: #0369a1;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        font-weight: 700;
+                        font-family: 'Inter', sans-serif;
+                    }
+                    .o_swift_branch_table .total-row {
+                        background: #f1f5f9;
+                        font-weight: 700;
+                    }
+                    .o_swift_branch_table .total-badge {
+                        background: #714B67;
+                        color: white;
+                        padding: 4px 10px;
+                        border-radius: 6px;
+                    }
+                </style>
+            """
+
+            table_header = "<thead><tr><th>Chi nhánh</th><th class='text-end'>Số lượng hiện có</th></tr></thead>"
+            table_body = "<tbody>"
+            total_qty = 0
+            for name, qty in rows:
+                formatted_qty = ("%0.2f" % qty).rstrip("0").rstrip(".")
+                table_body += f"""
+                    <tr>
+                        <td>{name}</td>
+                        <td class='text-end'><span class='qty-badge'>{formatted_qty}</span></td>
+                    </tr>
+                """
+                total_qty += qty
+
+            total_formatted = ("%0.2f" % total_qty).rstrip("0").rstrip(".")
+            table_body += f"""
+                <tr class='total-row'>
+                    <td>TỔNG CỘNG HỆ THỐNG</td>
+                    <td class='text-end'><span class='total-badge'>{total_formatted}</span></td>
+                </tr>
+            """
+            table_body += "</tbody>"
+
+            template.swift_branch_qty_html = f"{table_style}<div class='o_swift_branch_card'><table class='o_swift_branch_table'>{table_header}{table_body}</table></div>"
 
     def _swift_get_threshold_config(self):
         """Pick a POS config for threshold/location context.
@@ -272,12 +342,14 @@ class ProductTemplate(models.Model):
         # When the button is clicked from the low-stock screen, try to respect
         # the filter; but if the context/config cannot be inferred reliably,
         # fall back to the user's explicit selection.
+        # If low_stock_mode is on, we target low-stock items.
+        # But if the user explicitly SELECTS items, we should respect that regardless of low-stock status.
         products = products.filtered(lambda p: p.is_storable)
-        if ctx.get("swift_low_stock_mode"):
+        if ctx.get("swift_low_stock_mode") and not active_ids:
             low_stock_products = products.filtered_domain([("swift_is_low_stock", "=", True)])
             if low_stock_products:
                 products = low_stock_products
-            elif not active_ids:
+            else:
                 raise UserError(_("No low-stock products (<= %s) found in current filter.") % threshold)
 
         if not products:
@@ -300,8 +372,14 @@ class ProductTemplate(models.Model):
         for product in variants:
             current_qty = product.qty_available
             needed_qty = target_qty - current_qty
+
+            # If current stock satisfies target but user explicitly selected this product,
+            # we buy the target_qty amount instead of skipping.
             if needed_qty <= 0:
-                continue
+                if active_ids:
+                    needed_qty = target_qty
+                else:
+                    continue
 
             seller = product._select_seller(
                 quantity=needed_qty,

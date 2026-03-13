@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="web.ListRenderer.GroupRow" t-inherit-mode="extension">
+        <xpath expr="//span[contains(@t-attf-class, 'o_group_caret')]" position="after">
+            <span t-if="this.hasSelectors" class="ms-2 me-3" t-on-click.stop="">
+                <CheckBox
+                    value="isGroupSelected(group)"
+                    onChange="() => this.onGroupSelectorClick(group)"
+                />
+            </span>
+        </xpath>
+    </t>
+</templates>

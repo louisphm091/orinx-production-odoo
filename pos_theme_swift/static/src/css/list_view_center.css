@@ -4,3 +4,12 @@
 .o_list_view th[data-name="swift_branch_config_ids"] > div {
     justify-content: center !important;
 }
+
+.o_list_view .o_group_header .o_list_record_selector {
+    padding-left: 1rem !important;
+}
+
+.o_list_view .o_group_header .o_checkbox {
+    display: inline-block;
+    vertical-align: middle;
+}
