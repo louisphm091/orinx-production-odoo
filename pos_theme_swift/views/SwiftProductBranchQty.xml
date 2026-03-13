@@ -9,19 +9,12 @@
                 <!-- Fix the instruction text and location -->
                 <xpath expr="//field[@name='type']" position="after">
                     <div class="text-info mt-1 mb-2 small fw-bold"
+                         colspan="4"
                          invisible="is_storable"
                          groups="stock.group_stock_user">
                         <i class="fa fa-info-circle me-1"/>
                         Bật <span class="text-primary text-decoration-underline">"Theo dõi hàng tồn kho"</span> bên dưới để xem báo cáo chi tiết chi nhánh.
                     </div>
-                </xpath>
-
-                <!-- Fix the alignment of is_storable checkbox -->
-                <xpath expr="//label[@for='is_storable']" position="attributes">
-                    <attribute name="class">oe_inline fw-bold</attribute>
-                </xpath>
-                <xpath expr="//div[field[@name='is_storable']]" position="attributes">
-                    <attribute name="class">o_row oe_inline ms-2</attribute>
                 </xpath>
 
                 <!-- Dedicated Tab for Branch Inventory -->

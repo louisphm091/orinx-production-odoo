@@ -6,7 +6,6 @@ import {registry} from "@web/core/registry";
 
 registry.category("web_tour.tours").add("dms_portal_mail_tour", {
     url: "/my/dms",
-    test: true,
     steps: () => [
         {
             content: "Go to Mails directory",
@@ -22,7 +21,6 @@ registry.category("web_tour.tours").add("dms_portal_mail_tour", {
 
 registry.category("web_tour.tours").add("dms_portal_partners_tour", {
     url: "/my/dms",
-    test: true,
     steps: () => [
         {
             content: "Go to Partners directory",

@@ -757,10 +757,14 @@ patch(PaymentScreen.prototype, {
 
   async onSapphireAddProduct(product) {
     if (!product) return;
+    const tmpl = product.product_tmpl_id;
+    // Skip variant configurator (Size/Color popup) when selecting a specific variant from search.
+    // We only keep configuration enabled for Combo products, Tracked products (Lots), or Weighted products.
+    const needsConfig = tmpl?.isCombo?.() || tmpl?.isTracked?.() || tmpl?.to_weight;
     await this.pos.addLineToCurrentOrder({
       product_id: product,
-      product_tmpl_id: product.product_tmpl_id,
-    });
+      product_tmpl_id: tmpl,
+    }, {}, !!needsConfig);
     this.pos.searchProductWord = "";
     this.render?.();
   },
