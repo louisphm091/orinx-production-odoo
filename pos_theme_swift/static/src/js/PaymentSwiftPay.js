@@ -923,41 +923,71 @@ patch(PaymentScreen.prototype, {
 
       const res = [];
       const baseUom = (typeof line.getUnit === 'function' ? line.getUnit() : null) || product.uom_id;
-      if (baseUom) {
-          res.push({
-              id: baseUom.id || baseUom[0],
-              name: baseUom.name || baseUom[1] || "Base"
-          });
-      }
-
-      // 1. Check uom_ids (the custom M2M field for additional units/packagings)
-      if (product.uom_ids && Array.isArray(product.uom_ids)) {
-          for (const uomId of product.uom_ids) {
-              const uom = this.pos.models["uom.uom"]?.get(uomId);
-              if (uom && !res.find(x => x.id === uom.id)) {
-                  res.push({
-                      id: uom.id,
-                      name: uom.name || uom.display_name
-                  });
-              }
-          }
-      }
-
-      // 2. Check product.uom bridge model (used for scanners usually)
-      const packings = this.pos.models["product.uom"]?.filter(pu => {
-          const pid = pu.product_id?.id ?? pu.product_id;
-          return pid === product.id;
-      }) || [];
-
-      for (const p of packings) {
-          const u = p.uom_id;
+      
+      const addUom = (u) => {
           if (u && !res.find(x => x.id === u.id)) {
               res.push({
                   id: u.id,
-                  name: u.name || u.display_name || "Pack"
+                  name: u.name || u.display_name || "Base"
               });
           }
+      };
+
+      if (baseUom) addUom(baseUom);
+
+      // Helper to handle Pos Collections safely
+      const getArray = (coll) => {
+          if (!coll) return [];
+          if (Array.isArray(coll)) return coll;
+          if (typeof coll.getAll === "function") return coll.getAll();
+          if (coll.models && Array.isArray(coll.models)) return coll.models;
+          return Object.values(coll);
+      };
+
+      const allUoms = getArray(this.pos.models["uom.uom"]);
+
+      // 1. All UoMs in the same category as Base UoM
+      if (baseUom && baseUom.category_id) {
+          const catId = Array.isArray(baseUom.category_id) ? baseUom.category_id[0] : 
+                        (typeof baseUom.category_id === 'object' ? baseUom.category_id.id : baseUom.category_id);
+          for (const u of allUoms) {
+              const uCatId = Array.isArray(u.category_id) ? u.category_id[0] : 
+                            (typeof u.category_id === 'object' ? u.category_id.id : u.category_id);
+              if (uCatId === catId) addUom(u);
+          }
       }
+
+      // 2. Custom M2M uom_ids just in case
+      if (product.uom_ids && Array.isArray(product.uom_ids)) {
+          for (const uomId of product.uom_ids) {
+              const uom = allUoms.find(x => (x.id === uomId || x.id === (uomId.id || uomId)));
+              if (uom) addUom(uom);
+          }
+      }
+
+      // 3. Product Packagings
+      const addPack = (p) => {
+          const packId = "pack_" + p.id;
+          if (p && !res.find(x => x.id === packId)) {
+              res.push({
+                  id: packId,
+                  name: p.name || p.display_name || "Pack"
+              });
+          }
+      };
+
+      const packModels = getArray(this.pos.models["product.packaging"]);
+      const packagings = packModels.filter(pu => {
+          const pid = pu.product_id;
+          const pidVal = Array.isArray(pid) ? pid[0] : (typeof pid === 'object' && pid !== null ? pid.id : pid);
+          const targetId = Array.isArray(product.id) ? product.id[0] : (typeof product.id === 'object' && product.id !== null ? product.id.id : product.id);
+          return pidVal === targetId;
+      });
+
+      for (const p of packagings) {
+          addPack(p);
+      }
+
       return res;
     } catch(e) {
       console.warn("[Sapphire] Error in sppGetLineUoms:", e);
@@ -968,8 +998,37 @@ patch(PaymentScreen.prototype, {
   sppOnUomChange(line, ev) {
     const order = this.sppOrder();
     if (!order || !line) return;
-    const uomId = parseInt(ev.target.value);
-    const uom = this.pos.models["uom.uom"]?.get(uomId);
+    const uomStr = ev.target.value;
+
+    const getArray = (coll) => {
+        if (!coll) return [];
+        if (Array.isArray(coll)) return coll;
+        if (typeof coll.getAll === "function") return coll.getAll();
+        if (coll.models && Array.isArray(coll.models)) return coll.models;
+        return Object.values(coll);
+    };
+
+    if (uomStr.startsWith("pack_")) {
+        const packId = parseInt(uomStr.replace("pack_", ""));
+        const packModels = getArray(this.pos.models["product.packaging"]);
+        const pack = packModels.find(p => p.id === packId);
+        if (pack) {
+            if (!line.uiState) line.uiState = {};
+            line.uiState.selected_uom_id = uomStr;
+            const qty = parseFloat(pack.qty) || 1;
+            if (typeof line.set_quantity === "function") line.set_quantity(qty);
+            else if (typeof line.setQuantity === "function") line.setQuantity(qty);
+            else line.qty = qty;
+            order.trigger?.("change", order);
+            this.render?.();
+        }
+        return;
+    }
+
+    const uomId = parseInt(uomStr);
+    const uomModels = this.pos.models["uom.uom"] || [];
+    const allUoms = getArray(uomModels);
+    const uom = allUoms.find(u => u.id === uomId);
     if (uom) {
         // Store in uiState
         if (!line.uiState) line.uiState = {};
@@ -980,10 +1039,21 @@ patch(PaymentScreen.prototype, {
 
         let qty = 1;
         if (baseUom && uom) {
-            // Formula: base_factor / target_factor
-            const bFactor = baseUom.factor || 1;
-            const tFactor = uom.factor || 1;
-            qty = bFactor / tFactor;
+            // Formula in Odoo 17 POS for resolving packagings to base equivalent is exactly: target_factor / base_factor
+            // If the user's ratio sets the Uom factor to 6, then: 6 / 1 = 6.
+            const bFactor = baseUom.factor || 1.0;
+            const tFactor = uom.factor || 1.0;
+            
+            // To be resilient against user configuration differences 
+            // where they might have set UoM ratio strictly to 1/6 (0.16666...) rather than 6:
+            // if target factor is < 1 and base is >= 1, it usually means 1/ratio. So we reverse it!
+            if (tFactor < 1 && bFactor === 1.0) {
+                // If tFactor is 0.16666, it means 1 Lốc = 6 Lon
+                qty = bFactor / tFactor;
+            } else {
+                // If the user misconfigured Odoo UOMs so that Factor = 6 directly instead
+                qty = tFactor / bFactor;
+            }
         }
 
         if (typeof line.set_quantity === "function") line.set_quantity(qty);
