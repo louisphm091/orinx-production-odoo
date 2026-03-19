@@ -923,7 +923,7 @@ patch(PaymentScreen.prototype, {
 
       const res = [];
       const baseUom = (typeof line.getUnit === 'function' ? line.getUnit() : null) || product.uom_id;
-      
+
       const addUom = (u) => {
           if (u && !res.find(x => x.id === u.id)) {
               res.push({
@@ -948,10 +948,10 @@ patch(PaymentScreen.prototype, {
 
       // 1. All UoMs in the same category as Base UoM
       if (baseUom && baseUom.category_id) {
-          const catId = Array.isArray(baseUom.category_id) ? baseUom.category_id[0] : 
+          const catId = Array.isArray(baseUom.category_id) ? baseUom.category_id[0] :
                         (typeof baseUom.category_id === 'object' ? baseUom.category_id.id : baseUom.category_id);
           for (const u of allUoms) {
-              const uCatId = Array.isArray(u.category_id) ? u.category_id[0] : 
+              const uCatId = Array.isArray(u.category_id) ? u.category_id[0] :
                             (typeof u.category_id === 'object' ? u.category_id.id : u.category_id);
               if (uCatId === catId) addUom(u);
           }
@@ -1022,6 +1022,7 @@ patch(PaymentScreen.prototype, {
             order.trigger?.("change", order);
             this.render?.();
         }
+        
         return;
     }
 
@@ -1043,8 +1044,8 @@ patch(PaymentScreen.prototype, {
             // If the user's ratio sets the Uom factor to 6, then: 6 / 1 = 6.
             const bFactor = baseUom.factor || 1.0;
             const tFactor = uom.factor || 1.0;
-            
-            // To be resilient against user configuration differences 
+
+            // To be resilient against user configuration differences
             // where they might have set UoM ratio strictly to 1/6 (0.16666...) rather than 6:
             // if target factor is < 1 and base is >= 1, it usually means 1/ratio. So we reverse it!
             if (tFactor < 1 && bFactor === 1.0) {

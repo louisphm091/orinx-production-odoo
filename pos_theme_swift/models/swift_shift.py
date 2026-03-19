@@ -13,6 +13,10 @@ class SwiftStaffShift(models.Model):
         ('done', 'Completed')
     ], string='Status', default='active')
     note = fields.Text(string='Note')
+
+    closing_total = fields.Float(string='Closing Total', default=0.0)
+    cash_amount = fields.Float(string='Cash Amount', default=0.0)
+    transfer_amount = fields.Float(string='Transfer Amount', default=0.0)
     is_approved = fields.Boolean(string='Attendance Approved', default=False, copy=False, index=True)
     approved_by = fields.Many2one('res.users', string='Approved By', copy=False)
     approved_at = fields.Datetime(string='Approved At', copy=False)
