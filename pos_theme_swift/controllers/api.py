@@ -37,7 +37,7 @@ class SwiftZaloApiController(http.Controller):
             raise AccessDenied(_("You do not have POS access rights."))
 
     # 1. Core APIs
-    @http.route("/", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/merchant", type="http", auth="user", methods=["GET"], csrf=False)
     def get_merchant_info(self, **kwargs):
         company = request.env.company
         branches = request.env['pos.config'].sudo().search([('active', '=', True)])
@@ -59,7 +59,7 @@ class SwiftZaloApiController(http.Controller):
         }
         return self._ok(data)
 
-    @http.route("/menu-items", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/menu-items", type="http", auth="user", methods=["GET"], csrf=False)
     def get_menu_items(self, **kwargs):
         config_id = request.httprequest.args.get('config_id')
         domain = [("available_in_pos", "=", True), ("sale_ok", "=", True), ("active", "=", True)]
@@ -93,7 +93,7 @@ class SwiftZaloApiController(http.Controller):
         
         return self._ok(list(cat_map.values()))
 
-    @http.route("/oa", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/oa", type="http", auth="user", methods=["GET"], csrf=False)
     def get_oa_info(self, **kwargs):
         data = {
             "oa": {
@@ -107,7 +107,7 @@ class SwiftZaloApiController(http.Controller):
         }
         return self._ok(data)
 
-    @http.route("/sessions", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/sessions", type="http", auth="user", methods=["GET"], csrf=False)
     def get_sessions(self, **kwargs):
         order_session_id = request.httprequest.args.get('orderSessionId')
         session = None
@@ -140,7 +140,7 @@ class SwiftZaloApiController(http.Controller):
             }
         return self._ok(data)
 
-    @http.route("/orders", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/orders", type="http", auth="user", methods=["GET"], csrf=False)
     def get_orders_list(self, **kwargs):
         order_session_id = request.httprequest.args.get('orderSessionId')
         domain = []
@@ -176,7 +176,7 @@ class SwiftZaloApiController(http.Controller):
             })
         return self._ok(res)
 
-    @http.route("/orders", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/orders", type="http", auth="user", methods=["POST"], csrf=False)
     def create_order(self, **kwargs):
         payload = self._json_body()
         order_session_id = payload.get("orderSessionId")
@@ -221,7 +221,7 @@ class SwiftZaloApiController(http.Controller):
         })
 
     # 2. Auth & Staff APIs
-    @http.route("/auth/login", type="http", auth="none", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/auth/login", type="http", auth="none", methods=["POST"], csrf=False)
     def login(self, **kwargs):
         payload = self._json_body()
         db = payload.get("db") or request.db
@@ -263,7 +263,7 @@ class SwiftZaloApiController(http.Controller):
         except Exception as e:
             return self._error(str(e), status=500)
 
-    @http.route("/auth/me", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/auth/me", type="http", auth="user", methods=["GET"], csrf=False)
     def auth_me(self, **kwargs):
         user = request.env.user
         profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
@@ -276,12 +276,12 @@ class SwiftZaloApiController(http.Controller):
         }
         return self._ok(data)
 
-    @http.route("/auth/logout", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/auth/logout", type="http", auth="user", methods=["POST"], csrf=False)
     def logout(self, **kwargs):
         request.session.logout(keep_db=True)
         return self._ok({"message": _("Logged out successfully")})
 
-    @http.route("/staff/me", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/staff/me", type="http", auth="user", methods=["GET"], csrf=False)
     def staff_me(self, **kwargs):
         user = request.env.user
         profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
@@ -297,7 +297,7 @@ class SwiftZaloApiController(http.Controller):
         return self._ok(data)
 
     # 3. Shift APIs
-    @http.route("/shifts/current", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/shifts/current", type="http", auth="user", methods=["GET"], csrf=False)
     def current_shift(self, **kwargs):
         shift = request.env['swift.staff.shift'].sudo().search([
             ('employee_id', '=', request.env.uid),
@@ -311,7 +311,7 @@ class SwiftZaloApiController(http.Controller):
             })
         return self._ok(None)
 
-    @http.route("/shifts/check-in", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/shifts/check-in", type="http", auth="user", methods=["POST"], csrf=False)
     def shift_checkin(self, **kwargs):
         payload = self._json_body()
         note = payload.get("note", "")
@@ -323,7 +323,7 @@ class SwiftZaloApiController(http.Controller):
         })
         return self._ok({"id": shift.id, "state": shift.state})
 
-    @http.route("/shifts/check-out", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/shifts/check-out", type="http", auth="user", methods=["POST"], csrf=False)
     def shift_checkout(self, **kwargs):
         shift = request.env['swift.staff.shift'].sudo().search([
             ('employee_id', '=', request.env.uid),
@@ -337,7 +337,7 @@ class SwiftZaloApiController(http.Controller):
         })
         return self._ok({"id": shift.id, "state": shift.state})
 
-    @http.route("/shifts/close", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/shifts/close", type="http", auth="user", methods=["POST"], csrf=False)
     def shift_close(self, **kwargs):
         payload = self._json_body()
         shift_id = payload.get("shiftId")
@@ -354,14 +354,14 @@ class SwiftZaloApiController(http.Controller):
         return self._ok({"message": _("Shift closed successfully")})
 
     # 4. Timesheets
-    @http.route("/timesheets", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/timesheets", type="http", auth="user", methods=["GET"], csrf=False)
     def get_timesheets(self, **kwargs):
         dashboard = request.env["pos.dashboard.swift"]
         data = dashboard.get_attendance_overview()
         return self._ok({"items": data.get("rows", [])})
 
     # 5. Inventory
-    @http.route("/inventory/items", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/inventory/items", type="http", auth="user", methods=["GET"], csrf=False)
     def get_inventory_items(self, **kwargs):
         keyword = request.httprequest.args.get('keyword', '')
         config_id = request.httprequest.args.get('branchId')
@@ -380,14 +380,14 @@ class SwiftZaloApiController(http.Controller):
             })
         return self._ok({"items": res, "total": len(res)})
 
-    @http.route("/inventory/categories", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/inventory/categories", type="http", auth="user", methods=["GET"], csrf=False)
     def get_inventory_categories(self, **kwargs):
         cats = request.env['pos.category'].sudo().search([])
         res = [{"id": c.id, "name": c.name} for c in cats]
         return self._ok(res)
 
     # 6. Transfers
-    @http.route("/transfers", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/transfers", type="http", auth="user", methods=["GET"], csrf=False)
     def get_transfers(self, **kwargs):
         config_id = request.httprequest.args.get('branchId')
         dashboard = request.env["pos.dashboard.swift"]
@@ -407,21 +407,21 @@ class SwiftZaloApiController(http.Controller):
             })
         return self._ok({"items": res, "summary": {"count": len(res)}})
 
-    @http.route("/transfers/<int:transfer_id>", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/transfers/<int:transfer_id>", type="http", auth="user", methods=["GET"], csrf=False)
     def get_transfer_detail(self, transfer_id, **kwargs):
         dashboard = request.env["pos.dashboard.swift"]
         t = dashboard.get_transfer_detail(transfer_id)
         if not t: return self._error(_("Transfer not found"))
         return self._ok(t)
 
-    @http.route("/transfers", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/transfers", type="http", auth="user", methods=["POST"], csrf=False)
     def create_transfer(self, **kwargs):
         payload = self._json_body()
         dashboard = request.env["pos.dashboard.swift"]
         res = dashboard.create_or_update_transfer(payload)
         return self._ok(res)
 
-    @http.route("/transfers/<int:transfer_id>/receive", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/transfers/<int:transfer_id>/receive", type="http", auth="user", methods=["POST"], csrf=False)
     def receive_transfer(self, transfer_id, **kwargs):
         payload = self._json_body()
         dashboard = request.env["pos.dashboard.swift"]
@@ -429,7 +429,7 @@ class SwiftZaloApiController(http.Controller):
         return self._ok({"message": "Received"})
 
     # 7. Stock Checks
-    @http.route("/stock-checks", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/stock-checks", type="http", auth="user", methods=["GET"], csrf=False)
     def get_stock_checks(self, **kwargs):
         dashboard = request.env["pos.dashboard.swift"]
         checks = dashboard.get_recent_inventories()
@@ -444,7 +444,7 @@ class SwiftZaloApiController(http.Controller):
             })
         return self._ok({"items": res, "summary": {"count": len(res)}})
 
-    @http.route("/stock-checks", type="http", auth="user", methods=["POST"], csrf=False)
+    @http.route("/api/swift/v1/stock-checks", type="http", auth="user", methods=["POST"], csrf=False)
     def create_stock_check(self, **kwargs):
         payload = self._json_body()
         dashboard = request.env["pos.dashboard.swift"]
@@ -452,20 +452,20 @@ class SwiftZaloApiController(http.Controller):
         return self._ok({"id": res_id})
 
     # 8. Common
-    @http.route("/branches", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/branches", type="http", auth="user", methods=["GET"], csrf=False)
     def get_branches(self, **kwargs):
         branches = request.env['pos.config'].sudo().search([('active', '=', True)])
         res = [{"id": str(b.id), "name": b.name} for b in branches]
         return self._ok(res)
 
-    @http.route("/users", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/users", type="http", auth="user", methods=["GET"], csrf=False)
     def get_users(self, **kwargs):
         dashboard = request.env["pos.dashboard.swift"]
         users = dashboard._get_attendance_staff_users()
         res = [{"id": u.id, "name": u.name} for u in users]
         return self._ok(res)
 
-    @http.route("/customers/search", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/customers/search", type="http", auth="user", methods=["GET"], csrf=False)
     def search_customers(self, **kwargs):
         keyword = request.httprequest.args.get('keyword', '')
         domain = [('name', 'ilike', keyword)]
@@ -473,13 +473,13 @@ class SwiftZaloApiController(http.Controller):
         res = [{"id": c.id, "name": c.name, "phone": c.phone or ""} for c in customers]
         return self._ok(res)
 
-    @http.route("/price-books", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/price-books", type="http", auth="user", methods=["GET"], csrf=False)
     def get_price_books(self, **kwargs):
         pricebooks = request.env['product.pricelist'].sudo().search([])
         res = [{"id": p.id, "name": p.name} for p in pricebooks]
         return self._ok(res)
 
-    @http.route("/payment-methods", type="http", auth="user", methods=["GET"], csrf=False)
+    @http.route("/api/swift/v1/payment-methods", type="http", auth="user", methods=["GET"], csrf=False)
     def get_payment_methods(self, **kwargs):
         methods = request.env['pos.payment.method'].sudo().search([])
         res = [{"id": m.id, "name": m.name} for m in methods]

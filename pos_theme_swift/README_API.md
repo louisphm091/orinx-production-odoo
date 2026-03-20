@@ -5,7 +5,7 @@ Hệ thống API backend phục vụ tích hợp cho dự án Zalo Mini App (Pro
 ## 📌 Quy ước chung
 
 ### Base URL
-`https://group.orinx.com.vn/` (hoặc `http://localhost:8081/` khi chạy local)
+`https://group.orinx.com.vn/api/swift/v1` (hoặc `http://localhost:8081/api/swift/v1` khi chạy local)
 
 ### Authentication
 Sau khi gọi API `/auth/login`, frontend sẽ nhận được `accessToken`.
@@ -42,6 +42,9 @@ Mọi phản hồi đều trả về một JSON bọc trong `error/message/data`
 Kiểm tra thông tin phiên đăng nhập hiện tại.
 *   **Response Data:** `{ "id": "2", "name": "...", "code": "NV001", ... }`
 
+### POST `/auth/logout`
+Đăng xuất.
+
 ### GET `/staff/me`
 Hồ sơ chi tiết của nhân viên (bao gồm chi nhánh thực nhận lương và chi nhánh đang làm việc).
 *   **Response Data:** `{ "id": "...", "name": "...", "salaryBranch": { "id": "...", "name": "..." }, "workingBranch": { ... }, "avatarUrl": "..." }`
@@ -50,9 +53,9 @@ Hồ sơ chi tiết của nhân viên (bao gồm chi nhánh thực nhận lươn
 
 ## 🛒 2. Nhóm Bán hàng (Core Sales)
 
-### GET `/` 
+### GET `/merchant` 
 Thông tin Merchant và danh sách các chi nhánh của cửa hàng.
-*   **Response Data:** `{ "merchant": { "name": "...", "branches": [{ "id": "1", "name": "Clothes Shop" }, ...] } }`
+*   **Response Data:** `{ "merchant": { "name": "...", "address": "...", "logoUrl": "...", "branches": [{ "id": "1", "name": "Clothes Shop" }, ...] } }`
 
 ### GET `/menu-items`
 Lấy toàn bộ thực đơn cửa hàng. Sản phẩm được **gộp theo Nhóm (Category)**.
@@ -67,10 +70,16 @@ Tạo đơn hàng mới (Draft order).
 
 ## ⏰ 3. Ca làm việc & Chấm công (Shifts)
 
+### GET `/shifts/current`
+Lấy thông tin ca làm việc hiện tại của nhân viên.
+
 ### POST `/shifts/check-in`
 Nhân viên vào ca làm việc.
 *   **Request Body:** `{ "note": "Ghi chú nếu có" }`
 *   **Response Data:** `{ "id": 4, "state": "active" }`
+
+### POST `/shifts/check-out`
+Kết thúc ca làm việc.
 
 ### POST `/shifts/close`
 **Chốt ca tài chính** (Lưu tiền mặt/chuyển khoản đã nhận).
@@ -87,6 +96,9 @@ Lấy danh sách lịch sử chấm công/giờ làm của nhân viên.
 Danh sách hàng tồn kho.
 *   **Query Params:** `keyword` (search tên/SKU), `branchId` (lọc theo chi nhánh).
 
+### GET `/inventory/categories`
+Danh sách danh mục sản phẩm.
+
 ### GET `/transfers`
 Danh sách các phiếu chuyển hàng.
 *   **Query Params:** `branchId` (lọc phiếu của chi nhánh).
@@ -101,7 +113,17 @@ Tạo/Cập nhật phiếu chuyển hàng mới.
 
 ---
 
-## 🛠️ 5. Dữ liệu nền (Common Data)
+## ⏰ 5. Kiểm kê kho (Stock Checks)
+
+### GET `/stock-checks`
+Danh sách các phiếu kiểm kê.
+
+### POST `/stock-checks`
+Tạo phiếu kiểm kê mới.
+
+---
+
+## 🛠️ 6. Dữ liệu nền (Common Data)
 *   **GET `/branches`:** Danh sách chi nhánh.
 *   **GET `/users`:** Danh sách toàn bộ nhân viên (dùng cho filter).
 *   **GET `/customers/search`:** Tìm kiếm khách hàng (Query: `keyword`).
