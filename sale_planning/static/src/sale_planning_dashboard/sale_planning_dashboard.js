@@ -30,7 +30,16 @@ export class SalePlanningDashboard extends Component {
             error: null,
             filters: {
                 warehouse_id: null,
+                category_id: null,
+                time_range: "this_month",
             },
+            warehouses: [],
+            categories: [],
+            time_options: [
+                { id: "today", name: _t("Today") },
+                { id: "this_week", name: _t("This Week") },
+                { id: "this_month", name: _t("This Month") },
+            ],
             kpis: {
                 total_supply_need: 0,
                 purchase_plan_qty: 0,
@@ -95,6 +104,9 @@ export class SalePlanningDashboard extends Component {
         _t("Rec. Purchase"),
         _t("Status"),
         _t("Stable"),
+        _t("Today"),
+        _t("This Week"),
+        _t("This Month"),
     ];
 
     async load() {
@@ -115,6 +127,9 @@ export class SalePlanningDashboard extends Component {
             this.state.rev_spark = data.rev_spark || this.state.rev_spark;
             this.state.inventory_forecast = data.inventory_forecast || null;
             this.state.order_suggestions = data.order_suggestions || [];
+            
+            this.state.warehouses = data.warehouses || [];
+            this.state.categories = data.categories || [];
 
             this._scheduleRenderAllCharts();
         } catch (e) {
@@ -124,6 +139,11 @@ export class SalePlanningDashboard extends Component {
         } finally {
             this.state.loading = false;
         }
+    }
+
+    onFilterChange(type, value) {
+        this.state.filters[type] = value || null;
+        this.load();
     }
 
     async onCreateSupplyPlan() {

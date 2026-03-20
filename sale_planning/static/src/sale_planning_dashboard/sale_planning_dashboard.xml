@@ -20,11 +20,28 @@
 
       <!-- FILTER ROW -->
       <div class="sp_filters d-flex flex-wrap gap-2 align-items-center mb-3">
-        <button class="btn btn-light sp_pill" type="button"><t t-out="this._t('Category')"/> <i class="fa fa-angle-down ms-1"/></button>
-        <button class="btn btn-light sp_pill" type="button"><t t-out="this._t('SKU / SKU Group')"/> <i class="fa fa-angle-down ms-1"/></button>
-        <button class="btn btn-light sp_pill" type="button"><t t-out="this._t('All')"/> <i class="fa fa-angle-down ms-1"/></button>
-        <button class="btn btn-light sp_pill" type="button"><t t-out="this._t('Warehouse')"/> <i class="fa fa-angle-down ms-1"/></button>
-        <button class="btn btn-light sp_pill" type="button"><t t-out="this._t('Time')"/> <i class="fa fa-angle-down ms-1"/></button>
+        <!-- Category Filter -->
+        <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('category_id', ev.target.value)">
+            <option value=""><t t-out="this._t('Category')"/>: <t t-out="this._t('All')"/></option>
+            <t t-foreach="state.categories" t-as="cat" t-key="cat.id">
+                <option t-att-value="cat.id" t-att-selected="state.filters.category_id == cat.id"><t t-esc="cat.name"/></option>
+            </t>
+        </select>
+
+        <!-- Warehouse Filter -->
+        <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
+            <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+            <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
+                <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
+            </t>
+        </select>
+
+        <!-- Time Filter -->
+        <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('time_range', ev.target.value)">
+            <t t-foreach="state.time_options" t-as="opt" t-key="opt.id">
+                <option t-att-value="opt.id" t-att-selected="state.filters.time_range == opt.id"><t t-esc="opt.name"/></option>
+            </t>
+        </select>
 
         <div class="ms-auto">
           <button class="btn btn-success sp_btn" type="button"

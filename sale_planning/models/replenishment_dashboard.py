@@ -18,6 +18,15 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
 
         env = self.env
         today = date.today()
+
+        # --- Master Data for Filters ---
+        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        categories = env["product.category"].sudo().search_read([], ["id", "name"])
+
+        # --- Filter Processing ---
+        wh_id = filters.get("warehouse_id")
+        cat_id = filters.get("category_id")
+
         PosConfig = env["pos.config"].sudo()
         configs = PosConfig.search([("active", "=", True)])
         selected_config = False
@@ -36,22 +45,33 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         ]
         if "available_in_pos" in Product._fields:
             product_domain.append(("available_in_pos", "=", True))
-        if selected_config and "swift_branch_config_ids" in env["product.template"]._fields:
-            product_domain.append(("product_tmpl_id.swift_branch_config_ids", "in", selected_config.ids))
-        if selected_config and getattr(selected_config, "limit_categories", False) and selected_config.iface_available_categ_ids:
-            product_domain.append(("pos_categ_ids", "in", selected_config.iface_available_categ_ids.ids))
-
+        
+        if cat_id:
+            product_domain.append(("categ_id", "child_of", int(cat_id)))
+            
         all_products = Product.search(product_domain)
 
         if not all_products:
-            return self._empty_payload(selected_config=selected_config, store_options=store_options)
+            return self._empty_payload(selected_config=selected_config, store_options=store_options, warehouses=warehouses, categories=categories)
 
         product_ids = all_products.ids
 
         # ---- Real stock quantities ----
         StockQuant = env["stock.quant"].sudo()
-        location = selected_config.picking_type_id.default_location_src_id if selected_config and selected_config.picking_type_id else False
-        wh_name = selected_config.name if selected_config else _("Main Warehouse")
+        
+        # Determine location from warehouse filter OR pos config
+        Warehouse = env["stock.warehouse"].sudo()
+        wh = None
+        if wh_id:
+            wh = Warehouse.browse(int(wh_id)).exists()
+        
+        location = False
+        if wh:
+            location = wh.view_location_id
+            wh_name = wh.name
+        else:
+            location = selected_config.picking_type_id.default_location_src_id if selected_config and selected_config.picking_type_id else False
+            wh_name = selected_config.name if selected_config else _("Main Warehouse")
 
         quant_domain = [
             ("product_id", "in", product_ids),
@@ -64,7 +84,7 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         for q in quants:
             stock_map[q.product_id.id] = stock_map.get(q.product_id.id, 0.0) + q.quantity
 
-        # ---- 30-day sales history (kept for context in the UI) ----
+        # ---- 30-day sales history ----
         SaleLine = env["sale.order.line"].sudo()
         thirty_days_ago = today - timedelta(days=30)
         sale_lines = SaleLine.search([
@@ -77,7 +97,7 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             pid = sl.product_id.id
             demand_30d_map[pid] = demand_30d_map.get(pid, 0.0) + sl.product_uom_qty
 
-        # ---- Thresholds from Swift low-stock alerts when available ----
+        # ---- Thresholds ----
         threshold_default = 10.0
         threshold_map = {}
         active_alert_product_ids = set()
@@ -88,7 +108,7 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
                 threshold_map[alert.product_id.id] = alert.threshold or threshold_default
                 active_alert_product_ids.add(alert.product_id.id)
 
-        # ---- Pending purchase orders ----
+        # ---- Purchase orders ----
         PurchaseLine = env["purchase.order.line"].sudo()
         pending_purchases = PurchaseLine.search([
             ("order_id.state", "in", ["draft", "sent"]),
@@ -99,7 +119,6 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             pid = pl.product_id.id
             pending_map[pid] = pending_map.get(pid, 0.0) + pl.product_qty
 
-        # ---- Approved purchase orders (ordered/confirmed) ----
         ordered_purchases = PurchaseLine.search([
             ("order_id.state", "in", ["purchase"]),
             ("product_id", "in", product_ids),
@@ -109,7 +128,7 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             pid = pl.product_id.id
             ordered_map[pid] = ordered_map.get(pid, 0.0) + pl.product_qty
 
-        # ---- Build replenishment rows based on low-stock threshold ----
+        # ---- Build rows ----
         rows = []
         for p in all_products:
             pid = p.id
@@ -123,7 +142,6 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             if pid not in active_alert_product_ids and onhand_qty > threshold:
                 continue
 
-            # Determine state based on purchase orders
             if ordered_map.get(pid):
                 state = "ordered"
             elif pending_map.get(pid):
@@ -135,11 +153,11 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
 
             forecast_30d = int(demand_30d_map.get(pid, 0))
             if onhand_qty <= 0:
-                reason = _("Out of stock - reorder immediately to reach threshold")
+                reason = _("Out of stock - reorder immediately")
             elif shortage > 0:
-                reason = _("Current stock is below threshold (%s)") % threshold_qty
+                reason = _("Current stock below threshold (%s)") % threshold_qty
             else:
-                reason = _("Low-stock alert is active for threshold (%s)") % threshold_qty
+                reason = _("Low-stock alert active")
 
             rows.append({
                 "key": f"r_{pid}",
@@ -157,132 +175,62 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
                 "season": _("Current Period"),
             })
 
-        # Sort: proposed first, then approved, then ordered
-        state_order = {"proposed": 0, "approved": 1, "ordered": 2}
-        rows.sort(key=lambda r: (state_order.get(r["state"], 9), r["onhand"] - r["threshold"], -r["suggest_qty"]))
-        # ---- KPIs ----
-        total = len(rows)
-        risk_skus = len([r for r in rows if r["onhand"] <= 0])
-        pending = len([r for r in rows if r["state"] == "proposed"])
-        ordered = len([r for r in rows if r["state"] == "ordered"])
-
-        # Sparkline (weekly demand trend – last 5 weeks)
-        spark_values = []
-        for i in range(4, -1, -1):
-            w_start = today - timedelta(days=(i + 1) * 7)
-            w_end = today - timedelta(days=i * 7)
-            w_lines = SaleLine.search([
-                ("order_id.state", "in", ["sale", "done"]),
-                ("order_id.date_order", ">=", str(w_start)),
-                ("order_id.date_order", "<", str(w_end)),
-            ])
-            spark_values.append(int(sum(w_lines.mapped("product_uom_qty"))))
-
-        spark = {
-            "labels": ["", "", "", "", ""],
-            "values": spark_values,
-        }
-
-        # ---- Detail panel ----
+        rows.sort(key=lambda r: ({"proposed": 0, "approved": 1, "ordered": 2}.get(r["state"], 9), r["onhand"] - r["threshold"], -r["suggest_qty"]))
+        
+        # ---- Detail final ----
         selected_key = filters.get("selected_key")
-        if selected_key:
-            selected = next((r for r in rows if r["key"] == selected_key), rows[0] if rows else None)
-        else:
-            selected = rows[0] if rows else None
+        selected = next((r for r in rows if r["key"] == selected_key), rows[0] if rows else None)
 
         detail = {
-            "product_id": False,
-            "title": "",
-            "category": "",
-            "season": "",
-            "warehouse": "",
-            "image_url": "",
+            "product_id": selected["product_id"] if selected else False,
+            "title": selected["sku_name"] if selected else "",
+            "category": selected["category"] if selected else "",
+            "season": selected["season"] if selected else "",
+            "warehouse": selected["warehouse"] if selected else "",
+            "image_url": selected["image_url"] if selected else "",
             "analysis": {
-                "onhand": 0,
-                "forecast_30d": 0,
-                "reorder_point": 0,
-                "suggest_qty": 0,
+                "onhand": selected["onhand"] if selected else 0,
+                "forecast_30d": selected["forecast_30d"] if selected else 0,
+                "reorder_point": selected["threshold"] if selected else 0,
+                "suggest_qty": selected["suggest_qty"] if selected else 0,
             },
-            "reason": "",
-            "state": "",
+            "reason": selected["reason"] if selected else "",
+            "state": selected["state"] if selected else "",
         }
-        if selected:
-            detail.update({
-                "product_id": selected["product_id"],
-                "title": selected["sku_name"],
-                "category": selected["category"],
-                "season": selected["season"],
-                "warehouse": selected["warehouse"],
-                "image_url": selected["image_url"],
-                "analysis": {
-                    "onhand": selected["onhand"],
-                    "forecast_30d": selected["forecast_30d"],
-                    "reorder_point": selected["threshold"],
-                    "suggest_qty": selected["suggest_qty"],
-                },
-                "reason": selected["reason"],
-                "state": selected["state"],
-            })
-
 
         return {
             "filters_echo": filters,
             "store_options": store_options,
-            "selected_store": {
-                "id": selected_config.id,
-                "name": selected_config.name,
-            } if selected_config else False,
+            "selected_store": {"id": selected_config.id, "name": selected_config.name} if selected_config else False,
             "kpis": {
-                "total_suggestions": total,
-                "delta_vs_last_week": f"+{pending}",
-                "risk_skus": risk_skus,
-                "risk_hint": _("Already at or below the configured threshold"),
-                "pending": pending,
-                "pending_hint": _("Below threshold and waiting replenishment"),
-                "ordered": ordered,
-                "ordered_hint": _("Purchase orders already created"),
+                "total_suggestions": len(rows),
+                "delta_vs_last_week": f"+{len([r for r in rows if r['state'] == 'proposed'])}",
+                "risk_skus": len([r for r in rows if r["onhand"] <= 0]),
+                "pending": len([r for r in rows if r["state"] == "proposed"]),
+                "ordered": len([r for r in rows if r["state"] == "ordered"]),
             },
-            "spark": spark,
             "rows": rows,
             "detail": detail,
+            "warehouses": warehouses,
+            "categories": categories,
             "last_update": fields.Datetime.now(),
         }
 
-    def _empty_payload(self, selected_config=False, store_options=None):
+    def _empty_payload(self, selected_config=False, store_options=None, warehouses=None, categories=None):
         return {
             "filters_echo": {},
             "store_options": store_options or [],
-            "selected_store": {
-                "id": selected_config.id,
-                "name": selected_config.name,
-            } if selected_config else False,
+            "selected_store": {"id": selected_config.id, "name": selected_config.name} if selected_config else False,
             "kpis": {
                 "total_suggestions": 0,
                 "delta_vs_last_week": "+0",
                 "risk_skus": 0,
-                "risk_hint": "",
                 "pending": 0,
-                "pending_hint": "",
                 "ordered": 0,
-                "ordered_hint": "",
             },
-            "spark": {"labels": [], "values": []},
             "rows": [],
-            "detail": {
-                "product_id": False,
-                "title": "",
-                "category": "",
-                "season": "",
-                "warehouse": "",
-                "image_url": "",
-                "analysis": {
-                    "onhand": 0,
-                    "forecast_30d": 0,
-                    "reorder_point": 0,
-                    "suggest_qty": 0,
-                },
-                "reason": "",
-                "state": "",
-            },
+            "detail": {},
+            "warehouses": warehouses or [],
+            "categories": categories or [],
             "last_update": fields.Datetime.now(),
         }

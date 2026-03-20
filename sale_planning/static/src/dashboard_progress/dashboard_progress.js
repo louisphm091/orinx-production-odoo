@@ -27,7 +27,16 @@ export class SalePlanningDashboardProgress extends Component {
         group_by: "sku",
         time_unit: "week",
         view_mode: "month",
+        warehouse_id: null,
+        category_id: null,
       },
+      warehouses: [],
+      categories: [],
+      time_options: [
+          { id: "week", name: _t("Week") },
+          { id: "month", name: _t("Month") },
+          { id: "quarter", name: _t("Quarter") },
+      ],
       kpis: {},
       overall_chart: { labels: [], planned: [], actual: [], trend: [] },
       risks: [],
@@ -71,6 +80,9 @@ export class SalePlanningDashboardProgress extends Component {
       _t("See All"),
       _t("Progress by SKU / Order"),
       _t("Execution History & Trends"),
+      _t("Category"),
+      _t("Warehouse"),
+      _t("All"),
   ];
 
   async load() {
@@ -90,6 +102,9 @@ export class SalePlanningDashboardProgress extends Component {
       this.state.risks = data.risks || [];
       this.state.sku_cards = data.sku_cards || [];
       this.state.history = data.history || this.state.history;
+      
+      this.state.warehouses = data.warehouses || [];
+      this.state.categories = data.categories || [];
 
       // vẽ chart sau khi data đã vào state
       this.renderCharts();
@@ -100,6 +115,11 @@ export class SalePlanningDashboardProgress extends Component {
     } finally {
       this.state.loading = false;
     }
+  }
+
+  onFilterChange(type, value) {
+      this.state.filters[type] = value || null;
+      this.load();
   }
 
   destroyCharts() {

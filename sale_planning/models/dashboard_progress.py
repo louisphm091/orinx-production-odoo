@@ -19,18 +19,37 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         prev_month_start = first_day_month - relativedelta(months=1)
         prev_month_end = first_day_month - timedelta(days=1)
 
+        # --- Master Data for Filters ---
+        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        categories = env["product.category"].sudo().search_read([], ["id", "name"])
+
+        # --- Filter Processing ---
+        wh_id = filters.get("warehouse_id")
+        cat_id = filters.get("category_id")
+
         # ---- Top products to track ----
-        # Get top 10 products by qty in the last 60 days
-        SaleLine = env['sale.order.line']
+        Product = env['product.product'].sudo()
+        SaleLine = env['sale.order.line'].sudo()
+        
+        product_domain = [('active', '=', True), ('type', 'in', ['product', 'consu'])]
+        if cat_id:
+            product_domain.append(('categ_id', 'child_of', int(cat_id)))
+            
+        all_products = Product.search(product_domain)
+        product_ids = all_products.ids
+
         top_lines = SaleLine.read_group(
-            [('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', str(today - timedelta(days=60)))],
+            [('state', 'in', ['sale', 'done']), 
+             ('order_id.date_order', '>=', str(today - timedelta(days=60))),
+             ('product_id', 'in', product_ids)],
             ['product_id', 'product_uom_qty'],
             ['product_id'],
-            limit=10
+            limit=10,
+            orderby='product_uom_qty desc'
         )
 
-        product_ids = [l['product_id'][0] for l in top_lines if l['product_id']]
-        products = env['product.product'].browse(product_ids)
+        final_product_pids = [l['product_id'][0] for l in top_lines if l['product_id']]
+        products = Product.browse(final_product_pids)
 
         # planned vs actual (planned = last month, actual = this month)
         overall = []
@@ -63,7 +82,7 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         total_planned = sum(x["planned"] for x in overall) or 1
         total_actual = sum(x["actual"] for x in overall)
 
-        progress_percent = int(round(total_actual / total_planned * 100))
+        progress_percent = int(total_actual / total_planned * 100) or 0
         late_skus = [x for x in overall if x["actual"] < x["planned"] * 0.8]
         ontrack_skus = [x for x in overall if x["actual"] >= x["planned"] * 0.95]
 
@@ -153,5 +172,7 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
                 "values": hist_values,
                 "note": note,
             },
+            "warehouses": warehouses,
+            "categories": categories,
             "last_update": fields.Datetime.now(),
         }

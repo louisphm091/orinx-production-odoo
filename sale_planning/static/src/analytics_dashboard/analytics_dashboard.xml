@@ -15,9 +15,22 @@
         </div>
 
         <div class="d-flex gap-2 align-items-center flex-wrap sp_filters">
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-th-large me-1"/> <t t-out="this._t('Women\'s Fashion')"/></button>
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-tag me-1"/> <t t-out="this._t('Products / SKU')"/></button>
-          <button class="btn btn-light sp_pill" type="button"><i class="fa fa-clock-o me-1"/> <t t-out="this._t('Time')"/></button>
+          <!-- Category Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('category_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Category')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.categories" t-as="cat" t-key="cat.id">
+                  <option t-att-value="cat.id" t-att-selected="state.filters.category_id == cat.id"><t t-esc="cat.name"/></option>
+              </t>
+          </select>
+
+          <!-- Warehouse Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
+                  <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
+              </t>
+          </select>
+
           <div class="sp_actions d-flex gap-2">
             <button class="btn btn-light sp_pill" type="button"><i class="fa fa-calendar me-1"/> <t t-out="this._t('Month')"/></button>
             <button class="btn btn-light sp_pill" type="button"><i class="fa fa-wifi me-1"/> <t t-out="this._t('Online')"/></button>

@@ -21,7 +21,11 @@ export class SaleScheduleDashboard extends Component {
                 view_mode: "timeline", // timeline | calendar
                 group_by: "sku",       // sku | group
                 period: "week",        // week | month
+                warehouse_id: null,
+                category_id: null,
             },
+            warehouses: [],
+            categories: [],
             kpis: null,
             timeline: { cols: [], rows: [], view_mode: "timeline" },
             selected: null,
@@ -77,6 +81,9 @@ export class SaleScheduleDashboard extends Component {
         _t("Adjust Schedule"),
         _t("Pause Sale"),
         _t("End Early"),
+        _t("Category"),
+        _t("Warehouse"),
+        _t("All"),
     ];
 
     async load() {
@@ -98,6 +105,9 @@ export class SaleScheduleDashboard extends Component {
             this.state.performance = data.performance || null;
             this.state.risk_alerts = data.risk_alerts || [];
             this.state.last_update = data.last_update || "";
+            
+            this.state.warehouses = data.warehouses || [];
+            this.state.categories = data.categories || [];
         } catch (e) {
             console.error(e);
             this.state.error = _t("Failed to load Sale Schedule dashboard data.");
@@ -105,6 +115,11 @@ export class SaleScheduleDashboard extends Component {
         } finally {
             this.state.loading = false;
         }
+    }
+
+    onFilterChange(type, value) {
+        this.state.filters[type] = value || null;
+        this.load();
     }
 
     setViewMode(mode) {

@@ -11,25 +11,34 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <button class="btn sp_pill" type="button">
-            <t t-out="this._t('SKU / SKU Group')"/> <i class="fa fa-angle-down ms-1"/>
-          </button>
-          <button class="btn sp_pill sp_active" type="button" t-out="this._t('Week')"/>
-          <button class="btn sp_pill" type="button"><t t-out="this._t('Quarter')"/> <i class="fa fa-angle-down ms-1"/></button>
+          <!-- Category Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('category_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Category')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.categories" t-as="cat" t-key="cat.id">
+                  <option t-att-value="cat.id" t-att-selected="state.filters.category_id == cat.id"><t t-esc="cat.name"/></option>
+              </t>
+          </select>
+
+          <!-- Warehouse Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
+                  <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
+              </t>
+          </select>
+
+          <!-- Time Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('view_mode', ev.target.value)">
+              <t t-foreach="state.time_options" t-as="opt" t-key="opt.id">
+                  <option t-att-value="opt.id" t-att-selected="state.filters.view_mode == opt.id"><t t-esc="opt.name"/></option>
+              </t>
+          </select>
         </div>
       </div>
 
       <div class="sp_subheader mb-3 d-flex justify-content-between align-items-center">
         <div class="text-muted">
           <t t-out="this._t('Executive Dashboard')"/> · <b><t t-out="this._t('Fashion Industry')"/></b> · <t t-out="this._t('By Time')"/>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn sp_pill" type="button">
-            <i class="fa fa-calendar-o me-1"/> <t t-out="this._t('Week')"/> <i class="fa fa-angle-down ms-1"/>
-          </button>
-          <button class="btn sp_pill sp_active" type="button">
-            <t t-out="this._t('Month')"/> <i class="fa fa-angle-down ms-1"/>
-          </button>
         </div>
       </div>
 

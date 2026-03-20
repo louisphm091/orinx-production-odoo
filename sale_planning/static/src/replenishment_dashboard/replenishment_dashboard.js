@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onMounted, onPatched, useRef, useState } from "@odoo/owl";
+import { Component, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -21,10 +21,13 @@ export class ReplenishmentDashboard extends Component {
       filters: {
         pos_config_id: null,
         warehouse_id: null,
+        category_id: null,
         status: "all",
         search: "",
         selected_key: null,
       },
+      warehouses: [],
+      categories: [],
       kpis: {
         total_suggestions: 0,
         delta_vs_last_week: "+0",
@@ -34,10 +37,6 @@ export class ReplenishmentDashboard extends Component {
         pending_hint: "",
         ordered: 0,
         ordered_hint: "",
-      },
-      spark: {
-        labels: [],
-        values: [],
       },
       storeOptions: [],
       selectedStore: null,
@@ -60,14 +59,6 @@ export class ReplenishmentDashboard extends Component {
         reason: "",
         state: "",
       },
-    });
-    this.sparkChartRef = useRef("sparkChart");
-
-    onMounted(() => {
-      this.renderSparkline();
-    });
-    onPatched(() => {
-      this.renderSparkline();
     });
 
     this.load();
@@ -114,6 +105,7 @@ export class ReplenishmentDashboard extends Component {
     _t("Reject"),
     _t("Proposed"),
     _t("Approved"),
+    _t("Ordered"),
   ];
 
   async load() {
@@ -127,9 +119,12 @@ export class ReplenishmentDashboard extends Component {
         { filters: this.state.filters }
       );
       this.state.kpis = data.kpis || this.state.kpis;
-      this.state.spark = data.spark || this.state.spark;
       this.state.storeOptions = data.store_options || [];
       this.state.selectedStore = data.selected_store || null;
+      
+      this.state.warehouses = data.warehouses || [];
+      this.state.categories = data.categories || [];
+
       if (this.state.selectedStore && !this.state.filters.pos_config_id) {
         this.state.filters.pos_config_id = this.state.selectedStore.id;
       }
@@ -142,13 +137,18 @@ export class ReplenishmentDashboard extends Component {
       this.state.filters.selected_key = (data.detail && data.detail.title)
         ? (data.filters_echo && data.filters_echo.selected_key) || (data.rows?.[0]?.key ?? null)
         : null;
-      this.renderSparkline();
     } catch (e) {
       console.error(e);
       this.state.error = _t("Failed to load replenishment data.");
     } finally {
       this.state.loading = false;
     }
+  }
+
+  onFilterChange(type, value) {
+      this.state.filters[type] = value || null;
+      this.state.pagination.currentPage = 1;
+      this.load();
   }
 
   normalizeSearchValue(value) {
@@ -259,68 +259,6 @@ export class ReplenishmentDashboard extends Component {
       default:
         return "badge bg-secondary-subtle text-secondary";
     }
-  }
-
-  renderSparkline() {
-    const canvas = this.sparkChartRef.el;
-    if (!canvas) {
-      return;
-    }
-    const ctx = canvas.getContext("2d");
-    const values = this.state.spark.values || [];
-    const rect = canvas.getBoundingClientRect();
-    const width = Math.max(Math.round(rect.width || canvas.clientWidth || 220), 220);
-    const height = Math.max(Math.round(rect.height || canvas.clientHeight || 54), 54);
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(ratio, ratio);
-    ctx.clearRect(0, 0, width, height);
-
-    if (!values.length) {
-      return;
-    }
-
-    const max = Math.max(...values, 1);
-    const min = Math.min(...values, 0);
-    const range = Math.max(max - min, 1);
-    const padding = 6;
-    const stepX = values.length > 1 ? (width - padding * 2) / (values.length - 1) : 0;
-    const points = values.map((value, index) => ({
-      x: padding + index * stepX,
-      y: height - padding - ((value - min) / range) * (height - padding * 2),
-    }));
-
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, height - padding);
-    points.forEach((point) => ctx.lineTo(point.x, point.y));
-    ctx.lineTo(points[points.length - 1].x, height - padding);
-    ctx.closePath();
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, "rgba(16, 185, 129, 0.22)");
-    gradient.addColorStop(1, "rgba(16, 185, 129, 0)");
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    ctx.beginPath();
-    points.forEach((point, index) => {
-      if (index === 0) {
-        ctx.moveTo(point.x, point.y);
-      } else {
-        ctx.lineTo(point.x, point.y);
-      }
-    });
-    ctx.strokeStyle = "#10b981";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    points.forEach((point) => {
-      ctx.beginPath();
-      ctx.arc(point.x, point.y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#10b981";
-      ctx.fill();
-    });
   }
 }
 

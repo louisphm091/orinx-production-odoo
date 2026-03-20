@@ -13,6 +13,11 @@
   border: 1px solid #e5e7eb;
   border-radius: 999px;
   padding: 8px 12px;
+  &.form-select {
+    background-position: right 0.75rem center;
+    background-size: 12px 10px;
+    padding-right: 2rem;
+  }
 }
 
 .sp_pill.sp_active {

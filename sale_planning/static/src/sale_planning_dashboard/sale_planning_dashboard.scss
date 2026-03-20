@@ -16,6 +16,11 @@
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 12px;
+  &.form-select {
+    background-position: right 0.75rem center;
+    background-size: 12px 10px;
+    padding-right: 2rem;
+  }
 }
 .sp_btn {
   border-radius: 10px;

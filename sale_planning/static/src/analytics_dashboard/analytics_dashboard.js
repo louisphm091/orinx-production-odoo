@@ -26,8 +26,15 @@ class AnalyticsDashboard extends Component {
     this.state = useState({
       loading: true,
       error: null,
-      filters: { segment: _t("Women's Fashion"), sku_mode: "SKU", time_grain: _t("Month") },
-
+      filters: { 
+          segment: _t("Women's Fashion"), 
+          sku_mode: "SKU", 
+          time_grain: _t("Month"),
+          warehouse_id: null,
+          category_id: null,
+      },
+      warehouses: [],
+      categories: [],
       kpis: null,
       behavior_chart: null,
       revenue_bar: null,
@@ -75,6 +82,9 @@ class AnalyticsDashboard extends Component {
       _t("Charts & Data Table"),
       _t("Search"),
       _t("Full Price"),
+      _t("Category"),
+      _t("Warehouse"),
+      _t("All"),
   ];
 
   destroyAllCharts() {
@@ -121,6 +131,9 @@ class AnalyticsDashboard extends Component {
 
       this.state.plan_actual_rows = data.plan_actual_rows || [];
       this.state.data_table_rows = data.data_table_rows || [];
+      
+      this.state.warehouses = data.warehouses || [];
+      this.state.categories = data.categories || [];
 
       this.renderAllCharts();
     } catch (e) {
@@ -130,6 +143,11 @@ class AnalyticsDashboard extends Component {
     } finally {
       this.state.loading = false;
     }
+  }
+
+  onFilterChange(type, value) {
+      this.state.filters[type] = value || null;
+      this.load();
   }
 
   renderAllCharts() {

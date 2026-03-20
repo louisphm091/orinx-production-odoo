@@ -19,7 +19,22 @@
               </t>
             </select>
           </label>
-          <button class="btn sp_pill" type="button"><t t-out="this._t('HCM Warehouse')"/> <i class="fa fa-angle-down ms-1"/></button>
+          <!-- Category Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('category_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Category')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.categories" t-as="cat" t-key="cat.id">
+                  <option t-att-value="cat.id" t-att-selected="state.filters.category_id == cat.id"><t t-esc="cat.name"/></option>
+              </t>
+          </select>
+
+          <!-- Warehouse Filter -->
+          <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
+              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
+                  <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
+              </t>
+          </select>
+
           <button class="btn sp_pill" type="button"><t t-out="this._t('Month')"/> <i class="fa fa-angle-down ms-1"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-envelope-o"/></button>
           <button class="btn sp_icon_btn" type="button"><i class="fa fa-angle-down"/></button>
@@ -56,9 +71,6 @@
                 <button class="btn btn-sm btn-light rounded-circle" type="button" style="width:32px;height:32px;">
                   <i class="fa fa-ellipsis-h"/>
                 </button>
-              </div>
-              <div class="position-relative mt-2" style="height:54px;">
-                <canvas t-ref="sparkChart"/>
               </div>
             </div>
           </div>
