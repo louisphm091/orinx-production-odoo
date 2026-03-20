@@ -53,7 +53,7 @@ Hồ sơ chi tiết của nhân viên (bao gồm chi nhánh thực nhận lươn
 
 ## 🛒 2. Nhóm Bán hàng (Core Sales)
 
-### GET `/merchant` 
+### GET `/merchant`
 Thông tin Merchant và danh sách các chi nhánh của cửa hàng.
 *   **Response Data:** `{ "merchant": { "name": "...", "address": "...", "logoUrl": "...", "branches": [{ "id": "1", "name": "Clothes Shop" }, ...] } }`
 

@@ -234,14 +234,22 @@ class SwiftZaloApiController(http.Controller):
         try:
             with ExitStack() as stack:
                 if not request.db or request.db != db:
-                    cr = stack.enter_context(odoo.modules.registry.Registry(db).cursor())
-                    env = odoo.api.Environment(cr, None, {})
+                    registry = odoo.modules.registry.Registry(db)
+                    cr = stack.enter_context(registry.cursor())
+                    # Use SUPERUSER_ID to ensure the environment has full access to the registry
+                    env = odoo.api.Environment(cr, odoo.SUPERUSER_ID, {})
                 else:
                     env = request.env
                 
+                # Verify that the model exists in the registry before proceeding
+                if 'swift.employee.profile' not in env.registry:
+                    return self._error(_("Model 'swift.employee.profile' not found in database '%s'. Please ensure the 'pos_theme_swift' module is installed and upgraded.") % db, status=500)
+
                 request.session.authenticate(env, {"login": login, "password": password, "type": "password"})
                 request.session.db = db
                 request._save_session(env)
+
+                # Post-authentication, get the user and profile
                 user = env['res.users'].sudo().browse(request.session.uid)
                 profile = env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
                 
@@ -266,7 +274,10 @@ class SwiftZaloApiController(http.Controller):
     @http.route("/api/swift/v1/auth/me", type="http", auth="user", methods=["GET"], csrf=False)
     def auth_me(self, **kwargs):
         user = request.env.user
-        profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        profile = False
+        if 'swift.employee.profile' in request.env.registry:
+            profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        
         data = {
             "id": str(user.id),
             "name": user.name,
@@ -284,7 +295,9 @@ class SwiftZaloApiController(http.Controller):
     @http.route("/api/swift/v1/staff/me", type="http", auth="user", methods=["GET"], csrf=False)
     def staff_me(self, **kwargs):
         user = request.env.user
-        profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        profile = False
+        if 'swift.employee.profile' in request.env.registry:
+            profile = request.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
         data = {
             "id": str(user.id),
             "name": user.name,
