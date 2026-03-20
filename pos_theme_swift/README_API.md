@@ -35,7 +35,7 @@ Mọi phản hồi đều trả về một JSON bọc trong `error/message/data`
 
 ### POST `/auth/login`
 Đăng nhập nhân viên.
-*   **Request Body:** `{"username": "...", "password": "...", "db": "orinx"}`
+*   **Request Body:** `{"username": "...", "password": "...", "db": "your_database"}` (Tham số `db` có thể bỏ qua nếu Odoo chỉ chạy 1 database hoặc thông qua db-filter).
 *   **Response Data:** `{ "accessToken": "...", "expiresAt": 1741165200000, "user": { "id": "2", "name": "...", "code": "NV001", "branchId": "..." } }`
 
 ### GET `/auth/me`

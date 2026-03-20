@@ -477,11 +477,11 @@ patch(PaymentScreen.prototype, {
     }
 
     const add = Number(amount) || 0;
-    const next = cur + add;
+    const next = add; // Changed: do not add to current amount, set it directly
 
     // Update input display and force focus/editing state
     if (input) {
-        input.value = String(next);
+        input.value = this.formatSapphireNumber(next, true);
         input.focus();
         this.isSapphireEditing = true;
     }

@@ -90,8 +90,11 @@ export class ReplenishmentDashboard extends Component {
     const detail = this.state.detail;
     if (!detail || !detail.product_id) return;
     
-    const qty = customQty !== null ? customQty : (detail.analysis?.suggest_qty || 0);
-    if (qty <= 0) {
+    // If called from an event handler, customQty will be the Event object
+    const qtyValue = (customQty !== null && typeof customQty === 'number') ? customQty : (detail.analysis?.suggest_qty || 0);
+    const qty = parseFloat(qtyValue);
+
+    if (isNaN(qty) || qty <= 0) {
         this.notification.add(this._t("Suggested quantity must be greater than zero."), { type: "warning" });
         return;
     }

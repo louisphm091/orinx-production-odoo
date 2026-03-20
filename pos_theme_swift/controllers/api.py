@@ -224,9 +224,27 @@ class SwiftZaloApiController(http.Controller):
     @http.route("/api/swift/v1/auth/login", type="http", auth="none", methods=["POST"], csrf=False)
     def login(self, **kwargs):
         payload = self._json_body()
+        
+        # Dynamic database detection:
+        # 1. From payload 'db'
+        # 2. From current request.db (session/domain/config)
+        # 3. Fallback to the first available DB if only one exists (optional/conservative)
         db = payload.get("db") or request.db
+        
+        if not db:
+            # If still no DB, try to find it from Odoo service
+            try:
+                db_list = odoo.service.db.list_dbs()
+                if len(db_list) == 1:
+                    db = db_list[0]
+            except Exception:
+                pass
+
         login = payload.get("username") or payload.get("login")
         password = payload.get("password")
+        
+        if not db:
+            return self._error(_("Database name is required. Please provide 'db' in request body or ensure server configuration is correct."))
         
         if not login or not password:
             return self._error(_("Username and password are required"))

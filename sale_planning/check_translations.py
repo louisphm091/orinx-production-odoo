@@ -1,9 +1,11 @@
+import os
 import xmlrpc.client
 
 url = 'http://localhost:8069'
-db = 'orinx'
-username = 'admin'
-password = '1'
+# Try to get DB name from environment, otherwise default to 'orinx' (local) or 'orinx-manufacturing' (live logic fallback)
+db = os.environ.get('ODOO_DB', 'orinx') # Change to 'orinx-manufacturing' on live if needed, or pass via env
+username = os.environ.get('ODOO_USER', 'admin')
+password = os.environ.get('ODOO_PASSWORD', '1')
 
 common = xmlrpc.client.ServerProxy(f"{url}/xmlrpc/2/common")
 uid = common.authenticate(db, username, password, {})

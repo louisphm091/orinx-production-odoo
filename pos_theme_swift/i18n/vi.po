@@ -2606,3 +2606,9 @@ msgstr "Sản phẩm '%s' đang có tồn kho thấp: %s (ngưỡng: %s)."
 #, python-format
 msgid "%s [%s]"
 msgstr "%s [%s]"
+
+#. module: product
+#: model:ir.model.fields,field_description:product.field_product_product__standard_price
+#: model:ir.model.fields,field_description:product.field_product_template__standard_price
+msgid "Cost"
+msgstr "Giá vốn"

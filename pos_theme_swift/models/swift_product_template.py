@@ -6,6 +6,9 @@ from odoo.tools.safe_eval import safe_eval
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
+    standard_price = fields.Float(string="Giá vốn")
+
+
     swift_is_low_stock = fields.Boolean(
         string="Low Stock (Swift)",
         search="_search_swift_is_low_stock",

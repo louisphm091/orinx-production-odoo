@@ -41,9 +41,12 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="point_of_sale.product_template_tree_view_point_of_sale"/>
             <field name="arch" type="xml">
-                <field name="available_in_pos" position="after">
+                <xpath expr="//field[@name='available_in_pos']" position="after">
                     <field name="swift_branch_config_ids" widget="many2many_tags" optional="show" string="Chi nhánh POS" class="text-center"/>
-                </field>
+                </xpath>
+                <xpath expr="//field[@name='standard_price']" position="replace">
+                    <field name="standard_price" string="Giá vốn" widget="monetary" options="{'currency_field': 'cost_currency_id'}" optional="show" readonly="1"/>
+                </xpath>
                 <xpath expr="//list" position="inside">
                     <header>
                         <button
@@ -156,25 +159,9 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_kanban_view"/>
             <field name="arch" type="xml">
+                <!-- Header buttons are not natively supported in standard kanban views at this level -->
                 <xpath expr="//kanban" position="inside">
-                    <header>
-                        <button
-                            name="action_swift_import_goods_filtered"
-                            type="object"
-                            string="Nhập hàng"
-                            class="btn btn-primary"
-                            display="always"
-                            context="{'swift_low_stock_mode': True}"
-                            groups="purchase.group_purchase_user"
-                        />
-                        <button
-                            name="action_open_swift_branch_assignment_wizard"
-                            type="object"
-                            string="Gán chi nhánh"
-                            class="btn btn-secondary"
-                            display="always"
-                        />
-                    </header>
+                   <!-- You may consider placing buttons inside individual kanban cards or use other UI mechanisms -->
                 </xpath>
             </field>
         </record>
