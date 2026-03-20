@@ -1,9 +1,9 @@
-# Hướng Dẫn Cài Đặt Module Odoo - Fashion Orinx
+# Hướng Dẫn Cài Đặt Module Odoo - Orinx Production
 
-Tài liệu này hướng dẫn chi tiết các bước để cài đặt bộ module tùy chỉnh từ kho lưu trữ `fashion-orinx-odoo` vào một hệ thống Odoo mới.
+Tài liệu này hướng dẫn chi tiết các bước để cài đặt bộ module tùy chỉnh từ kho lưu trữ `orinx-production-odoo` vào một hệ thống Odoo mới.
 
 ## Thông tin Repository
-- **GitLab URL:** [https://gitlab.com/orinx/fashion-orinx-odoo](https://gitlab.com/orinx/fashion-orinx-odoo)
+- **GitLab URL:** [https://github.com/louisphm091/orinx-production-odoo](https://github.com/louisphm091/orinx-production-odoo)
 
 Danh sách các module có trong bộ mã nguồn này:
 - `pos_theme_swift` (Cấu hình và giao diện cho POS Swift)
@@ -25,7 +25,7 @@ Ví dụ, nếu bạn muốn lưu source code vào thư mục `/home/ubuntu/orin
 
 ```bash
 cd /home/ubuntu/orinx/
-git clone https://gitlab.com/orinx/fashion-orinx-odoo.git
+git clone https://github.com/louisphm091/orinx-production-odoo.git
 ```
 
 *(Lưu ý: Nếu repo ở chế độ private, bạn sẽ cần nhập Username và Password (hoặc Access Token) của GitLab).*
@@ -35,20 +35,20 @@ git clone https://gitlab.com/orinx/fashion-orinx-odoo.git
 Trước khi khởi động, hãy kiểm tra xem các module này có yêu cầu cài thêm thư viện Python đặc thù nào không (thường được list trong file `requirements.txt`).
 Nếu có, hãy chạy:
 ```bash
-pip3 install -r /home/ubuntu/orinx/fashion-orinx-odoo/requirements.txt
+pip3 install -r /home/ubuntu/orinx/orinx-production-odoo/requirements.txt
 ```
 
 ### Bước 3: Khai báo thư mục cho Odoo bằng `addons_path`
 
 Odoo cần biết thư mục chứa code của bạn ở đâu để nạp lên hệ thống. Mở file cấu hình Odoo của bạn (thường là `odoo.conf` hoặc `/etc/odoo/odoo.conf`) bằng trình soạn thảo (vi/nano).
 
-Tìm đến dòng `addons_path` và **thêm đường dẫn tuyệt đối** tới thư mục `fashion-orinx-odoo` mà bạn vừa clone về. Các đường dẫn được cách nhau bởi dấu phẩy `,`.
+Tìm đến dòng `addons_path` và **thêm đường dẫn tuyệt đối** tới thư mục `orinx-production-odoo` mà bạn vừa clone về. Các đường dẫn được cách nhau bởi dấu phẩy `,`.
 
 Ví dụ:
 ```ini
 [options]
 ; ... các cấu hình khác
-addons_path = /home/ubuntu/orinx/odoo/addons,/home/ubuntu/orinx/fashion-orinx-odoo
+addons_path = /home/ubuntu/orinx/odoo/addons,/home/ubuntu/orinx/orinx-production-odoo
 ```
 
 ### Bước 4: Khởi động lại dịch vụ Odoo
@@ -79,7 +79,7 @@ Sau khi Odoo chạy lại, Odoo vẫn chưa cài đặt ngay module của bạn.
 ### Bước 6: Tìm và Cài Đặt (Install)
 
 1. Vẫn ở màn hình **Apps (Ứng dụng)**, tắt bộ lọc *Apps (Ứng dụng)* trên thanh tìm kiếm (bấm dấu x để xóa chữ *Apps*).
-2. Nhập tên các module có trong `fashion-orinx-odoo` để tìm kiếm. Ví dụ: nhập `pos_theme_swift` hoặc `fashion_forecast`.
+2. Nhập tên các module có trong `orinx-production-odoo` để tìm kiếm. Ví dụ: nhập `pos_theme_swift` hoặc `fashion_forecast`.
 3. Giao diện sẽ hiển thị kết quả. Nhấn **Install (Cài đặt)** hoặc **Activate (Kích hoạt)** trên thẻ module tương ứng.
 4. Quá trình cài đặt sẽ chạy và hệ thống có thể tự làm mới trang khi cài xong. Lặp lại bước này cho các module khác nếu cần thiết.
 
@@ -96,4 +96,4 @@ Sau khi Odoo chạy lại, Odoo vẫn chưa cài đặt ngay module của bạn.
 - **Module không xuất hiện trong danh sách:** Đảm bảo đường dẫn trong `addons_path` ở `odoo.conf` là chính xác, khởi động lại Odoo, và **chắc chắn** đã làm thao tác *Update Apps List*.
 - **Lỗi permission denied khi clone mã nguồn:** Kiểm tra phân quyền truy cập repo git, hoặc cấu hình SSH keys trên server.
 - **Lỗi ImportError khi cài đặt hoặc chạy Odoo:** Do server đang thiếu thư viện Python. Hãy xem module đó cần import thư viện gì (ví dụ: `requests`, `pytz`, v.v) và sử dụng lệnh `pip3 install tên_thư_viện` để sửa.
-- **Quyền đọc/ghi file log:** Hãy đảm bảo user hệ điều hành dùng để chạy Odoo (ví dụ `odoo` hoặc `ubuntu`) có toàn quyền truy xuất vô folder `fashion-orinx-odoo`. Dùng `sudo chown -R ubuntu:ubuntu /home/ubuntu/orinx/fashion-orinx-odoo` nếu cần.
+- **Quyền đọc/ghi file log:** Hãy đảm bảo user hệ điều hành dùng để chạy Odoo (ví dụ `odoo` hoặc `ubuntu`) có toàn quyền truy xuất vô folder `orinx-production-odoo`. Dùng `sudo chown -R ubuntu:ubuntu /home/ubuntu/orinx/orinx-production-odoo` nếu cần.
