@@ -217,13 +217,15 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         }
 
     @api.model
-    def action_approve_replenishment(self, **kwargs):
+    def action_approve_replenishment(self, params=None, **kwargs):
         """
         Create a draft Purchase Order for the selected product and quantity.
         """
         env = self.env
         try:
-            params = kwargs.get("params") or {}
+            if not params:
+                params = kwargs
+            
             product_id = params.get("product_id")
             qty = params.get("qty")
             wh_id = params.get("warehouse_id")
@@ -272,10 +274,10 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             PurchaseLine.create({
                 "order_id": po.id,
                 "product_id": Product.id,
-                "product_qty": float(qty),
+                "product_qty": float(qty or 0),
                 "price_unit": price,
                 "name": Product.display_name,
-                "product_uom": getattr(Product, 'uom_po_id', Product.uom_id).id or Product.uom_id.id,
+                "product_uom_id": getattr(Product, 'uom_po_id', Product.uom_id).id or Product.uom_id.id,
                 "date_planned": fields.Datetime.now(),
             })
 

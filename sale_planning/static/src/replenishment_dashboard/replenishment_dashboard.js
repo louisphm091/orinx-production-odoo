@@ -103,11 +103,9 @@ export class ReplenishmentDashboard extends Component {
             "action_approve_replenishment",
             [],
             {
-                params: {
-                    product_id: detail.product_id,
-                    qty: qty,
-                    warehouse_id: this.state.filters.warehouse_id
-                }
+                product_id: detail.product_id,
+                qty: qty,
+                warehouse_id: this.state.filters.warehouse_id
             }
         );
 

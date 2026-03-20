@@ -268,7 +268,7 @@ class SalePlanningDashboard(models.AbstractModel):
                     "product_qty": row["plan_buy"],
                     "price_unit": price,
                     "name": products.display_name,
-                    "product_uom": getattr(products, 'uom_po_id', products.uom_id).id or products.uom_id.id,
+                    "product_uom_id": getattr(products, 'uom_po_id', products.uom_id).id or products.uom_id.id,
                     "date_planned": fields.Datetime.now(),
                 })
 
@@ -339,7 +339,7 @@ class SalePlanningDashboard(models.AbstractModel):
                     "product_qty": qty,
                     "price_unit": price,
                     "name": products.display_name,
-                    "product_uom": getattr(products, 'uom_po_id', products.uom_id).id or products.uom_id.id,
+                    "product_uom_id": getattr(products, 'uom_po_id', products.uom_id).id or products.uom_id.id,
                     "date_planned": fields.Datetime.now(),
                 })
 
