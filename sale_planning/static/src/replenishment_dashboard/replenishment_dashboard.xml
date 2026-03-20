@@ -241,7 +241,13 @@
               </div>
 
               <div class="pt-3 d-flex gap-2">
-                <button class="btn btn-success flex-fill" type="button" t-out="this._t('Approve')"/>
+                <button
+                  class="btn btn-success flex-fill"
+                  type="button"
+                  t-att-disabled="!state.detail.product_id"
+                  t-on-click="approveReplenishment"
+                  t-out="this._t('Approve')"
+                />
                 <button
                   class="btn btn-outline-secondary flex-fill"
                   type="button"

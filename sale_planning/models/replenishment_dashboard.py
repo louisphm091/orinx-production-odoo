@@ -216,6 +216,79 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             "last_update": fields.Datetime.now(),
         }
 
+    @api.model
+    def action_approve_replenishment(self, **kwargs):
+        """
+        Create a draft Purchase Order for the selected product and quantity.
+        """
+        env = self.env
+        try:
+            params = kwargs.get("params") or {}
+            product_id = params.get("product_id")
+            qty = params.get("qty")
+            wh_id = params.get("warehouse_id")
+
+            if not product_id or not qty:
+                return {"ok": False, "message": _("Missing product or quantity.")}
+
+            PurchaseOrder = env["purchase.order"].sudo()
+            PurchaseLine = env["purchase.order.line"].sudo()
+            Product = env["product.product"].sudo().browse(int(product_id))
+
+            if not Product.exists():
+                return {"ok": False, "message": _("Product not found.")}
+
+            # Find supplier
+            partner = Product.seller_ids[:1].partner_id
+            if not partner:
+                partner = env["res.partner"].sudo().search([("supplier_rank", ">", 0)], limit=1)
+            if not partner:
+                partner = env.company.partner_id
+
+            # Create PO
+            po_vals = {
+                "partner_id": partner.id,
+                "date_order": fields.Datetime.now(),
+                "company_id": env.company.id,
+                "origin": _("Manual Replenishment Dashboard"),
+            }
+            # Handle warehouse if provided
+            if wh_id:
+                wh = env["stock.warehouse"].sudo().browse(int(wh_id))
+                if wh.exists():
+                    picking_type = env["stock.picking.type"].sudo().search([
+                        ("code", "=", "incoming"),
+                        ("warehouse_id", "=", wh.id)
+                    ], limit=1)
+                    if picking_type:
+                        po_vals["picking_type_id"] = picking_type.id
+
+            po = PurchaseOrder.create(po_vals)
+
+            # Create line
+            seller = Product.seller_ids[:1]
+            price = seller.price if seller else Product.standard_price or 0.0
+
+            PurchaseLine.create({
+                "order_id": po.id,
+                "product_id": Product.id,
+                "product_qty": float(qty),
+                "price_unit": price,
+                "name": Product.display_name,
+                "product_uom": getattr(Product, 'uom_po_id', Product.uom_id).id or Product.uom_id.id,
+                "date_planned": fields.Datetime.now(),
+            })
+
+            return {
+                "ok": True,
+                "res_id": po.id,
+                "name": po.name,
+                "message": _("Draft PO %s created for %s") % (po.name, Product.display_name),
+            }
+        except Exception as e:
+            _logger.error("action_approve_replenishment error: %s", e)
+            return {"ok": False, "message": str(e)}
+
     def _empty_payload(self, selected_config=False, store_options=None, warehouses=None, categories=None):
         return {
             "filters_echo": {},

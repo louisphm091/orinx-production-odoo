@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, useRef, useState } from "@odoo/owl";
+import { Component, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -62,6 +62,76 @@ export class ReplenishmentDashboard extends Component {
     });
 
     this.load();
+  }
+
+  async editSelectedQuantity() {
+    const detail = this.state.detail;
+    if (!detail || !detail.product_id) {
+      this.notification.add(this._t("No product selected."), { type: "warning" });
+      return;
+    }
+    
+    const currentQty = detail.analysis?.suggest_qty || 0;
+    const newQtyStr = window.prompt(this._t("Enter new replenishment quantity:"), currentQty);
+    
+    if (newQtyStr === null) return; // Cancelled
+    
+    const newQty = parseFloat(newQtyStr);
+    if (isNaN(newQty) || newQty <= 0) {
+        this.notification.add(this._t("Please enter a valid positive number."), { type: "warning" });
+        return;
+    }
+
+    // Call approve with the new quantity
+    await this.approveReplenishment(newQty);
+  }
+
+  async approveReplenishment(customQty = null) {
+    const detail = this.state.detail;
+    if (!detail || !detail.product_id) return;
+    
+    const qty = customQty !== null ? customQty : (detail.analysis?.suggest_qty || 0);
+    if (qty <= 0) {
+        this.notification.add(this._t("Suggested quantity must be greater than zero."), { type: "warning" });
+        return;
+    }
+
+    try {
+        this.state.loading = true;
+        const result = await this.orm.call(
+            "sale.planning.replenishment",
+            "action_approve_replenishment",
+            [],
+            {
+                params: {
+                    product_id: detail.product_id,
+                    qty: qty,
+                    warehouse_id: this.state.filters.warehouse_id
+                }
+            }
+        );
+
+        if (result && result.ok) {
+            this.notification.add(result.message, { type: "success" });
+            if (result.res_id) {
+                this.action.doAction({
+                    type: "ir.actions.act_window",
+                    res_model: "purchase.order",
+                    res_id: result.res_id,
+                    views: [[false, "form"]],
+                    target: "current",
+                });
+            }
+            await this.load();
+        } else {
+            this.notification.add(result.message || this._t("Failed to approve replenishment."), { type: "danger" });
+        }
+    } catch (err) {
+        console.error(err);
+        this.notification.add(this._t("Error during approval."), { type: "danger" });
+    } finally {
+        this.state.loading = false;
+    }
   }
 
   // strings for translation extraction
@@ -209,22 +279,6 @@ export class ReplenishmentDashboard extends Component {
     const totalPages = this.getTotalPages();
     const nextPage = Math.min(Math.max(page, 1), totalPages);
     this.state.pagination.currentPage = nextPage;
-  }
-
-  editSelectedQuantity() {
-    const productId = this.state.detail.product_id;
-    if (!productId) {
-      this.notification.add(_t("No product selected."), { type: "warning" });
-      return;
-    }
-    this.action.doAction({
-      type: "ir.actions.act_window",
-      name: this.state.detail.title || _t("Product"),
-      res_model: "product.product",
-      res_id: productId,
-      views: [[false, "form"]],
-      target: "current",
-    });
   }
 
   async selectRow(key) {
