@@ -13,6 +13,7 @@ export class SaleScheduleDashboard extends Component {
         this._t = _t;
         this.orm = useService("orm");
         this.notification = useService("notification");
+        this.action = useService("action");
 
         this.state = useState({
             loading: true,
@@ -23,17 +24,25 @@ export class SaleScheduleDashboard extends Component {
                 period: "week",        // week | month
                 warehouse_id: null,
                 category_id: null,
+                selected_key: null,
             },
             warehouses: [],
             categories: [],
-            kpis: null,
+            kpis: {
+                wave_count: 0,
+                main_sku: "-",
+                revenue: 0,
+                revenue_delta: 0,
+                risk_sku_count: 0,
+                need_review_count: 0,
+            },
             timeline: { cols: [], rows: [], view_mode: "timeline" },
-            selected: null,
-            inventory_link: null,
-            performance: null,
+            selected: { sku: "-", campaign: "-", sku_code: "-", date_from: "", date_to: "", badges: [] },
+            inventory_link: { onhand: 0, daily_sell: 0, out_of_stock_date: "-", out_of_stock_in_days: "-" },
+            performance: { title: "-", progress_percent: 0, days: 0 },
             risk_alerts: [],
             last_update: "",
-            active_row_key: "r1",
+            active_row_key: null,
         });
 
         onWillStart(async () => {
@@ -82,8 +91,14 @@ export class SaleScheduleDashboard extends Component {
         _t("Pause Sale"),
         _t("End Early"),
         _t("Category"),
-        _t("Warehouse"),
+        _t("Branch"),
         _t("All"),
+        _t("Open Sales Orders"),
+        _t("View Product"),
+        _t("View Inventory"),
+        _t("No risk alerts"),
+        _t("No schedule data for current filters."),
+        _t("Action could not be completed."),
     ];
 
     async load() {
@@ -98,16 +113,20 @@ export class SaleScheduleDashboard extends Component {
                 { filters: this.state.filters || {} }
             );
 
-            this.state.kpis = data.kpis || null;
+            this.state.kpis = data.kpis || this.state.kpis;
             this.state.timeline = data.timeline || { cols: [], rows: [], view_mode: "timeline" };
-            this.state.selected = data.selected || null;
-            this.state.inventory_link = data.inventory_link || null;
-            this.state.performance = data.performance || null;
+            this.state.selected = data.selected || this.state.selected;
+            this.state.inventory_link = data.inventory_link || this.state.inventory_link;
+            this.state.performance = data.performance || this.state.performance;
             this.state.risk_alerts = data.risk_alerts || [];
             this.state.last_update = data.last_update || "";
             
             this.state.warehouses = data.warehouses || [];
             this.state.categories = data.categories || [];
+            this.state.active_row_key = this.state.filters.selected_key || (this.state.timeline.rows[0] && this.state.timeline.rows[0].key) || null;
+            if (!this.state.filters.selected_key && this.state.active_row_key) {
+                this.state.filters.selected_key = this.state.active_row_key;
+            }
         } catch (e) {
             console.error(e);
             this.state.error = _t("Failed to load Sale Schedule dashboard data.");
@@ -129,13 +148,33 @@ export class SaleScheduleDashboard extends Component {
 
     selectRow(row) {
         this.state.active_row_key = row.key;
-        // demo: nếu muốn chọn row thì gọi lại backend lấy detail theo row.key
-        // hiện tại dùng mock fixed để nhanh
+        this.state.filters.selected_key = row.key;
+        this.load();
     }
 
     formatMoneyVND(v) {
         const n = Number(v || 0);
         return n.toLocaleString("vi-VN") + " đ";
+    }
+
+    async openAction(methodName) {
+        try {
+            const action = await this.orm.call(
+                "sale.schedule.dashboard",
+                methodName,
+                [],
+                {
+                    filters: this.state.filters || {},
+                    selected_key: this.state.active_row_key,
+                }
+            );
+            if (action) {
+                this.action.doAction(action);
+            }
+        } catch (e) {
+            console.error(e);
+            this.notification.add(_t("Action could not be completed."), { type: "warning" });
+        }
     }
 }
 

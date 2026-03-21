@@ -243,19 +243,20 @@ class SwiftStockInventory(models.Model):
         if not recipients:
             return
 
-        title = _("Low Stock Alert")
-        product_label = product.display_name
-        if config:
-            product_label = _("%s [%s]") % (product.display_name, config.name)
-        message = _("Product '%s' has low stock: %s (threshold: %s).") % (
-            product_label,
-            qty_on_hand,
-            int(threshold),
-        )
-
         # Real-time sticky toast in web client for admin users currently online.
         bus = self.env['bus.bus'].sudo()
         for admin in recipients:
+            lang = admin.lang or self.env.user.lang or 'vi_VN'
+            translator = self.with_context(lang=lang)
+            title = translator._("Low Stock Alert")
+            product_label = product.display_name
+            if config:
+                product_label = translator._("%s [%s]") % (product.display_name, config.name)
+            message = translator._("Product '%s' has low stock: %s (threshold: %s).") % (
+                product_label,
+                qty_on_hand,
+                int(threshold),
+            )
             if admin.partner_id:
                 bus._sendone(
                     admin.partner_id,
@@ -271,7 +272,17 @@ class SwiftStockInventory(models.Model):
         # Persist notification in chatter for audit/history.
         product_tmpl = product.product_tmpl_id
         if hasattr(product_tmpl, 'message_post'):
-            product_tmpl.message_post(
+            lang = self.env.user.lang or 'vi_VN'
+            translator = self.with_context(lang=lang)
+            product_label = product.display_name
+            if config:
+                product_label = translator._("%s [%s]") % (product.display_name, config.name)
+            message = translator._("Product '%s' has low stock: %s (threshold: %s).") % (
+                product_label,
+                qty_on_hand,
+                int(threshold),
+            )
+            product_tmpl.with_context(lang=lang).message_post(
                 body=message,
                 message_type='notification',
                 subtype_xmlid='mail.mt_note',

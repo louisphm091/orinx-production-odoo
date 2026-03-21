@@ -89,11 +89,19 @@
   width: 34px; height: 34px;
   border-radius: 10px;
   background: #e5e7eb;
+  object-fit: cover;
+  flex: 0 0 auto;
+  overflow: hidden;
+  display: block;
 }
 .ssd_thumb_big {
   width: 64px; height: 64px;
   border-radius: 14px;
   background: #e5e7eb;
+  object-fit: cover;
+  flex: 0 0 auto;
+  overflow: hidden;
+  display: block;
 }
 
 .ssd_row_track {

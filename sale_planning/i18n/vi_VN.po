@@ -760,6 +760,36 @@ msgstr "Chi tiết lịch bán"
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
+msgid "Open Sales Orders"
+msgstr "Mở đơn bán hàng"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
+msgid "View Product"
+msgstr "Xem sản phẩm"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
+msgid "View Inventory"
+msgstr "Xem tồn kho"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
+msgid "No risk alerts"
+msgstr "Không có cảnh báo rủi ro"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
+msgid "No schedule data for current filters."
+msgstr "Không có dữ liệu lịch bán cho bộ lọc hiện tại."
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/sale_schedule_dashboard/sale_schedule_dashboard.js:0
 msgid "Linked to Inventory"
 msgstr "Liên kết với tồn kho"
 
@@ -931,6 +961,16 @@ msgstr "Tạo gợi ý mua hàng thành công!"
 #: code:addons/sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.js:0
 msgid "Inventory"
 msgstr "Tồn kho"
+
+#. module: sale_planning
+#: code:addons/sale_planning/models/sale_schedule_dashbard.py:0
+msgid "Sales Orders"
+msgstr "Đơn bán hàng"
+
+#. module: sale_planning
+#: code:addons/sale_planning/models/sale_schedule_dashbard.py:0
+msgid "Please select a product from the schedule first."
+msgstr "Vui lòng chọn một sản phẩm từ lịch bán trước."
 
 #. module: sale_planning
 #. odoo-javascript

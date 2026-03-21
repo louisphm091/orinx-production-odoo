@@ -81,7 +81,7 @@ msgstr "Chuyển Hàng"
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_shift_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_shift
 msgid "Shift Management"
-msgstr "Quản Lý Nhân Viên"
+msgstr "Chấm Công"
 
 #. module: pos_theme_swift
 #. odoo-javascript
@@ -108,8 +108,14 @@ msgstr "Lịch Làm Việc"
 #. odoo-javascript
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_employee_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_employee
-msgid "Employee"
-msgstr "Nhân Viên"
+msgid "Employee Management"
+msgstr "Quản Lý Nhân Viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_shift_root
+msgid "Employee Management"
+msgstr "Quản Lý Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
@@ -2606,3 +2612,98 @@ msgstr "Sản phẩm '%s' đang có tồn kho thấp: %s (ngưỡng: %s)."
 #, python-format
 msgid "%s [%s]"
 msgstr "%s [%s]"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Manage Staff and Shift Attendance"
+msgstr "Quản Lý Nhân Viên và Chấm Công"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "A polished workspace to manage employee profiles and monitor daily check-in / check-out in one place."
+msgstr "Không gian làm việc hiện đại để quản lý hồ sơ nhân viên và theo dõi chấm công vào/ra ca tại một nơi."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Working Staff"
+msgstr "Nhân viên đang làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Off Staff"
+msgstr "Nhân viên nghỉ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Active Shifts"
+msgstr "Ca đang hoạt động"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Checked Out"
+msgstr "Đã ra ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Staff Check-in / Check-out Tracker"
+msgstr "Theo Dõi Nhân Viên Vào / Ra Ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Track attendance by day and operate check-in or check-out directly from the board."
+msgstr "Theo dõi chấm công theo ngày và thao tác vào ca hoặc ra ca trực tiếp ngay trên bảng."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Loading check-in / check-out board..."
+msgstr "Đang tải bảng vào / ra ca..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "No attendance records for this day."
+msgstr "Không có dữ liệu chấm công cho ngày này."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Working Time"
+msgstr "Thời gian làm"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Action"
+msgstr "Tác vụ"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "No action"
+msgstr "Không có thao tác"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Cannot load check-in/check-out board"
+msgstr "Không thể tải bảng vào/ra ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Confirm Check In"
+msgstr "Xác nhận vào ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Confirm Check Out"
+msgstr "Xác nhận ra ca"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Add a checkout note..."
+msgstr "Thêm ghi chú ra ca..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Add a checkin note (optional)..."
+msgstr "Thêm ghi chú vào ca (không bắt buộc)..."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Employee Directory"
+msgstr "Danh Sách Nhân Viên"

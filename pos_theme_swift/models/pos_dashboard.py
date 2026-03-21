@@ -1447,33 +1447,69 @@ class PosDashboardSwift(models.AbstractModel):
                 values['attendance_code'] = values['employee_code']
                 return profile_model.create(values)
 
-    @api.model
-    def get_employee_list_data(self, keyword='', status='working'):
-        try:
-            users = self._get_attendance_staff_users(keyword)
+    def _ensure_employee_internal_user(self, user):
+        user = user.sudo()
+        internal_group = self.env.ref('base.group_user', raise_if_not_found=False)
+        pos_group = self.env.ref('point_of_sale.group_pos_user', raise_if_not_found=False)
+        group_commands = []
+        if internal_group and internal_group not in user.group_ids:
+            group_commands.append((4, internal_group.id))
+        if pos_group and pos_group not in user.group_ids:
+            group_commands.append((4, pos_group.id))
+        if group_commands:
+            user.write({'group_ids': group_commands})
+        return user
 
-            # Also include users that already have employee profiles, even if POS
-            # group membership is not fully synced yet.
-            profile_domain = [('user_id.active', '=', True), ('user_id.share', '=', False)]
-            if status in ('working', 'off'):
-                profile_domain.append(('status', '=', status))
-            if keyword:
-                profile_domain += ['|', '|', '|',
-                    ('user_id.name', 'ilike', keyword),
-                    ('user_id.login', 'ilike', keyword),
-                    ('employee_code', 'ilike', keyword),
-                    ('attendance_code', 'ilike', keyword),
-                ]
-            prof_users = self.env['swift.employee.profile'].sudo().search(profile_domain).mapped('user_id')
-            users |= prof_users
+    def _build_employee_profile_domain(self, status='working', filters=None, keyword=''):
+        filters = filters or {}
+        profile_domain = [('user_id.active', '=', True)]
+        if status in ('working', 'off'):
+            profile_domain.append(('status', '=', status))
+
+        work_branch = (filters.get('workBranch') or '').strip()
+        pay_branch = (filters.get('payBranch') or '').strip()
+        department = (filters.get('department') or '').strip()
+        job_title = (filters.get('jobTitle') or '').strip()
+        if work_branch:
+            profile_domain.append(('work_branch', '=', work_branch))
+        if pay_branch:
+            profile_domain.append(('pay_branch', '=', pay_branch))
+        if department:
+            profile_domain.append(('department', '=', department))
+        if job_title:
+            profile_domain.append(('job_title', '=', job_title))
+        if keyword:
+            profile_domain += ['|', '|', '|',
+                ('user_id.name', 'ilike', keyword),
+                ('user_id.login', 'ilike', keyword),
+                ('employee_code', 'ilike', keyword),
+                ('attendance_code', 'ilike', keyword),
+            ]
+        return profile_domain
+
+    def _get_local_day_bounds(self, target_date):
+        user_tz = self.env.user.tz or 'UTC'
+        local = pytz.timezone(user_tz)
+        utc = pytz.utc
+        start_local = local.localize(datetime.combine(target_date, datetime.min.time()))
+        end_local = local.localize(datetime.combine(target_date, datetime.max.time()))
+        return (
+            start_local.astimezone(utc).replace(tzinfo=None),
+            end_local.astimezone(utc).replace(tzinfo=None),
+        )
+
+    def _get_user_avatar_url(self, user):
+        return f"/web/image/res.users/{user.id}/avatar_128"
+
+    @api.model
+    def get_employee_list_data(self, keyword='', status='working', filters=None):
+        try:
+            profile_domain = self._build_employee_profile_domain(status=status, filters=filters, keyword=keyword)
+            profiles = self.env['swift.employee.profile'].sudo().search(profile_domain)
 
             rows = []
-            for user in users.sorted(lambda u: (u.name or '').lower()):
-                profile = self._ensure_employee_profile(user)
-                if status == 'working' and profile.status != 'working':
-                    continue
-                if status == 'off' and profile.status != 'off':
-                    continue
+            for profile in profiles.sorted(lambda p: ((p.user_id.name or '').lower(), p.id)):
+                user = profile.user_id
 
                 if not profile.id_number and 'hr.employee' in self.env:
                     emp = self.env['hr.employee'].sudo().search([('user_id', '=', user.id), ('active', '=', True)], limit=1)
@@ -1485,6 +1521,7 @@ class PosDashboardSwift(models.AbstractModel):
                     'employeeCode': profile.employee_code,
                     'attendanceCode': profile.attendance_code or profile.employee_code,
                     'employeeName': user.name,
+                    'avatarUrl': self._get_user_avatar_url(user),
                     'phone': profile.phone or '',
                     'idNumber': profile.id_number or '',
                     'debtAdvance': profile.debt_advance_balance,
@@ -1498,11 +1535,131 @@ class PosDashboardSwift(models.AbstractModel):
             return {'rows': []}
 
     @api.model
+    def get_employee_checkin_board(self, date_value=False, filters=None, keyword=''):
+        try:
+            target_date = self._to_date_value(date_value) or fields.Date.context_today(self)
+            profile_domain = self._build_employee_profile_domain(
+                status='working',
+                filters=filters,
+                keyword=keyword,
+            )
+            profiles = self.env['swift.employee.profile'].sudo().search(profile_domain)
+            if not profiles:
+                return {
+                    'date': fields.Date.to_string(target_date),
+                    'rows': [],
+                }
+
+            start_dt, end_dt = self._get_local_day_bounds(target_date)
+            shifts = self.env['swift.staff.shift'].sudo().search([
+                ('employee_id', 'in', profiles.mapped('user_id').ids),
+                ('check_in', '>=', fields.Datetime.to_string(start_dt)),
+                ('check_in', '<=', fields.Datetime.to_string(end_dt)),
+            ], order='check_in asc')
+
+            shift_map = {}
+            for shift in shifts:
+                shift_map.setdefault(shift.employee_id.id, []).append(shift)
+
+            today = fields.Date.context_today(self)
+            rows = []
+            for profile in profiles.sorted(lambda p: ((p.user_id.name or '').lower(), p.id)):
+                user = profile.user_id
+                user_shifts = shift_map.get(user.id, [])
+                first_shift = user_shifts[0] if user_shifts else False
+                active_shift = next((shift for shift in reversed(user_shifts) if shift.state == 'active'), False)
+                last_done = next((shift for shift in reversed(user_shifts) if shift.check_out), False)
+                total_hours = sum(user_shifts.filtered(lambda s: s.state == 'done').mapped('duration'))
+                if active_shift and active_shift.check_in:
+                    total_hours += max((fields.Datetime.now() - active_shift.check_in).total_seconds(), 0.0) / 3600.0
+
+                if active_shift:
+                    status_label = _('Checked In')
+                    status_tone = 'warning'
+                elif first_shift:
+                    status_label = _('Checked Out')
+                    status_tone = 'success'
+                else:
+                    status_label = _('Not Checked In')
+                    status_tone = 'muted'
+
+                check_in_local = fields.Datetime.context_timestamp(self, first_shift.check_in) if first_shift and first_shift.check_in else False
+                check_out_local = fields.Datetime.context_timestamp(self, last_done.check_out) if last_done and last_done.check_out else False
+                rows.append({
+                    'userId': user.id,
+                    'employeeCode': profile.employee_code,
+                    'employeeName': user.name,
+                    'avatarUrl': self._get_user_avatar_url(user),
+                    'phone': profile.phone or self._partner_phone_value(user.partner_id),
+                    'checkIn': check_in_local.strftime('%H:%M') if check_in_local else '--:--',
+                    'checkOut': check_out_local.strftime('%H:%M') if check_out_local else '--:--',
+                    'hours': round(total_hours, 2),
+                    'statusLabel': status_label,
+                    'statusTone': status_tone,
+                    'note': (active_shift or last_done or first_shift).note if (active_shift or last_done or first_shift) else '',
+                    'canCheckIn': target_date == today and not active_shift,
+                    'canCheckOut': target_date == today and bool(active_shift),
+                })
+
+            return {
+                'date': fields.Date.to_string(target_date),
+                'rows': rows,
+            }
+        except Exception as e:
+            _logger.exception("get_employee_checkin_board failed: %s", e)
+            return {
+                'date': fields.Date.to_string(fields.Date.context_today(self)),
+                'rows': [],
+            }
+
+    @api.model
+    def action_employee_checkin(self, user_id, note=''):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile or profile.status != 'working':
+            return {'ok': False, 'message': _('Employee record not found')}
+        active_shift = self.env['swift.staff.shift'].sudo().search([
+            ('employee_id', '=', user.id),
+            ('state', '=', 'active'),
+        ], limit=1)
+        if active_shift:
+            return {'ok': False, 'message': _('Employee is already checked in')}
+        self.env['swift.staff.shift'].sudo().create({
+            'employee_id': user.id,
+            'check_in': fields.Datetime.now(),
+            'state': 'active',
+            'note': note or '',
+        })
+        return {'ok': True}
+
+    @api.model
+    def action_employee_checkout(self, user_id, note=''):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        active_shift = self.env['swift.staff.shift'].sudo().search([
+            ('employee_id', '=', user.id),
+            ('state', '=', 'active'),
+        ], limit=1)
+        if not active_shift:
+            return {'ok': False, 'message': _('Employee has no active shift')}
+        active_shift.sudo().write({
+            'check_out': fields.Datetime.now(),
+            'state': 'done',
+            'note': note or active_shift.note,
+        })
+        return {'ok': True}
+
+    @api.model
     def get_employee_detail_data(self, user_id):
         user = self.env['res.users'].sudo().browse(int(user_id))
         if not user.exists():
             return {'ok': False, 'message': _('Employee not found')}
-        profile = self._ensure_employee_profile(user)
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
 
         # schedule matrix this week
         week_start, week_end = self._get_week_range_from_offset(0)
@@ -1607,6 +1764,47 @@ class PosDashboardSwift(models.AbstractModel):
         return {'rows': rows}
 
     @api.model
+    def get_employee_branch_options(self):
+        branch_domain = [('active', '=', True)]
+        if 'company_id' in self.env['pos.config']._fields:
+            branch_domain.append(('company_id', '=', self.env.company.id))
+        branches = self.env['pos.config'].sudo().search(branch_domain, order='name asc')
+        return {
+            'rows': [
+                {
+                    'id': branch.id,
+                    'name': branch.name,
+                }
+                for branch in branches
+            ]
+        }
+
+    @api.model
+    def get_employee_filter_options(self):
+        profiles = self.env['swift.employee.profile'].sudo().search([
+            ('user_id.active', '=', True),
+        ])
+        branch_rows = self.get_employee_branch_options().get('rows', [])
+        departments = sorted({(profile.department or '').strip() for profile in profiles if (profile.department or '').strip()})
+        job_titles = sorted({(profile.job_title or '').strip() for profile in profiles if (profile.job_title or '').strip()})
+        pay_branches = sorted({(profile.pay_branch or '').strip() for profile in profiles if (profile.pay_branch or '').strip()})
+
+        known_branch_names = {row['name'] for row in branch_rows}
+        for branch_name in pay_branches:
+            if branch_name not in known_branch_names:
+                branch_rows.append({
+                    'id': f'pay-{branch_name}',
+                    'name': branch_name,
+                })
+
+        return {
+            'workBranches': branch_rows,
+            'payBranches': branch_rows,
+            'departments': [{'id': name, 'name': name} for name in departments],
+            'jobTitles': [{'id': name, 'name': name} for name in job_titles],
+        }
+
+    @api.model
     def create_employee_record(self, vals):
         vals = vals or {}
         try:
@@ -1616,7 +1814,6 @@ class PosDashboardSwift(models.AbstractModel):
                 return {'ok': False, 'message': _('Name is required')}
 
             phone = (vals.get('phone') or '').strip()
-            pos_group = self.env.ref('point_of_sale.group_pos_user', raise_if_not_found=False)
             if selected_user_id:
                 user = self.env['res.users'].sudo().browse(int(selected_user_id))
                 if not user.exists():
@@ -1632,8 +1829,6 @@ class PosDashboardSwift(models.AbstractModel):
                     'active': True,
                     'share': False,
                 }
-                if pos_group:
-                    user_vals['group_ids'] = [(4, pos_group.id)]
 
                 with self.env.cr.savepoint():
                     try:
@@ -1643,8 +1838,7 @@ class PosDashboardSwift(models.AbstractModel):
                         user_vals['login'] = f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
                         user = self.env['res.users'].sudo().create(user_vals)
 
-            if pos_group:
-                user.sudo().write({'group_ids': [(4, pos_group.id)]})
+            user = self._ensure_employee_internal_user(user)
             if name:
                 user.sudo().write({'name': name})
             self._write_partner_phone(user.partner_id, phone)
@@ -1676,7 +1870,9 @@ class PosDashboardSwift(models.AbstractModel):
         user = self.env['res.users'].sudo().browse(int(user_id))
         if not user.exists():
             return {'ok': False, 'message': _('Employee not found')}
-        profile = self._ensure_employee_profile(user)
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
         profile.sudo().write({
             'salary_type': vals.get('salaryType') or profile.salary_type,
             'salary_amount': self._to_float_amount(vals.get('salaryAmount'), 0.0),
@@ -1690,7 +1886,9 @@ class PosDashboardSwift(models.AbstractModel):
         user = self.env['res.users'].sudo().browse(int(user_id))
         if not user.exists():
             return {'ok': False, 'message': _('Employee not found')}
-        profile = self._ensure_employee_profile(user)
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
         self.env['swift.employee.finance.line'].sudo().create({
             'profile_id': profile.id,
             'line_type': line_type if line_type in ('debt', 'advance', 'payment') else 'advance',
@@ -1705,6 +1903,23 @@ class PosDashboardSwift(models.AbstractModel):
         if not user.exists():
             return {'ok': False, 'message': _('Employee not found')}
         status_value = status if status in ('working', 'off') else 'off'
-        profile = self._ensure_employee_profile(user)
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
         profile.sudo().write({'status': status_value})
         return {'ok': True, 'status': status_value}
+
+    @api.model
+    def action_delete_employee_record(self, user_id):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        if user.id == self.env.user.id:
+            return {'ok': False, 'message': _('You cannot delete your own employee record.')}
+
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
+
+        profile.sudo().unlink()
+        return {'ok': True}

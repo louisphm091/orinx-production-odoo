@@ -2,37 +2,159 @@
 <templates xml:space="preserve">
     <t t-name="pos_theme_swift.SwiftEmployeeManagement" owl="1">
         <div class="sem-page">
+            <section class="sem-hero">
+                <div class="sem-heroCopy">
+                    <div class="sem-kicker" t-out="this._t('Employee Management')"/>
+                    <div class="sem-title" t-out="this._t('Manage Staff and Shift Attendance')"/>
+                    <div class="sem-subtitle" t-out="this._t('A polished workspace to manage employee profiles and monitor daily check-in / check-out in one place.')"/>
+                </div>
+                <div class="sem-heroStats">
+                    <div class="sem-statCard">
+                        <span class="sem-statLabel" t-out="this._t('Working Staff')"/>
+                        <strong t-esc="getWorkingCount()"/>
+                    </div>
+                    <div class="sem-statCard">
+                        <span class="sem-statLabel" t-out="this._t('Off Staff')"/>
+                        <strong t-esc="getOffCount()"/>
+                    </div>
+                    <div class="sem-statCard">
+                        <span class="sem-statLabel" t-out="this._t('Active Shifts')"/>
+                        <strong t-esc="getActiveShiftCount()"/>
+                    </div>
+                    <div class="sem-statCard">
+                        <span class="sem-statLabel" t-out="this._t('Checked Out')"/>
+                        <strong t-esc="getAttendanceReadyCount()"/>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sem-card sem-checkinBoard">
+                <div class="sem-boardHead">
+                    <div>
+                        <div class="sem-sectionTitle" t-out="this._t('Staff Check-in / Check-out Tracker')"/>
+                        <div class="sem-sectionSub" t-out="this._t('Track attendance by day and operate check-in or check-out directly from the board.')"/>
+                    </div>
+                    <div class="sem-boardActions">
+                        <label class="sem-dateField">
+                            <i class="fa fa-calendar-o"/>
+                            <input type="date" t-att-value="state.attendanceDate" t-on-change="onAttendanceDateChange"/>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="sem-attendanceTableWrap">
+                    <table class="sem-attendanceTable">
+                        <thead>
+                            <tr>
+                                <th><t t-out="this._t('Employee Code')"/></th>
+                                <th><t t-out="this._t('Employee Name')"/></th>
+                                <th><t t-out="this._t('Phone Number')"/></th>
+                                <th><t t-out="this._t('Check In')"/></th>
+                                <th><t t-out="this._t('Check Out')"/></th>
+                                <th><t t-out="this._t('Working Time')"/></th>
+                                <th><t t-out="this._t('Status')"/></th>
+                                <th><t t-out="this._t('Note')"/></th>
+                                <th class="text-right"><t t-out="this._t('Action')"/></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="state.attendanceLoading">
+                                <tr><td colspan="9" class="sem-empty" t-out="this._t('Loading check-in / check-out board...')"/></tr>
+                            </t>
+                            <t t-foreach="state.attendanceRows" t-as="row" t-key="'att-' + row.userId">
+                                <tr>
+                                    <td><strong><t t-esc="row.employeeCode"/></strong></td>
+                                    <td>
+                                        <div class="sem-personCell">
+                                            <t t-if="row.avatarUrl">
+                                                <img class="sem-avatar sem-avatarBig sem-avatarImg" t-att-src="row.avatarUrl" t-att-alt="row.employeeName"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="sem-avatar sem-avatarBig"><t t-esc="getInitials(row.employeeName)"/></div>
+                                            </t>
+                                            <div>
+                                                <div class="sem-personName"><t t-esc="row.employeeName"/></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><t t-esc="row.phone || '--'"/></td>
+                                    <td><span class="sem-timeBadge"><t t-esc="row.checkIn"/></span></td>
+                                    <td><span class="sem-timeBadge is-out"><t t-esc="row.checkOut"/></span></td>
+                                    <td><t t-esc="row.hours"/>h</td>
+                                    <td><span class="sem-statusPill" t-att-class="getAttendanceToneClass(row.statusTone)"><t t-esc="row.statusLabel"/></span></td>
+                                    <td><t t-esc="row.note || '--'"/></td>
+                                    <td class="text-right">
+                                        <div class="sem-inlineActions">
+                                            <button class="sem-primaryBtn sem-miniBtn" t-if="row.canCheckIn" t-on-click="() => openAttendanceModal('action_employee_checkin', row)" t-out="this._t('Check In')"/>
+                                            <button class="sem-lightBtn sem-miniBtn" t-if="row.canCheckOut" t-on-click="() => openAttendanceModal('action_employee_checkout', row)" t-out="this._t('Check Out')"/>
+                                            <span t-if="!row.canCheckIn and !row.canCheckOut" class="sem-quietText" t-out="this._t('No action')"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="!state.attendanceLoading and !state.attendanceRows.length">
+                                <tr><td colspan="9" class="sem-empty" t-out="this._t('No attendance records for this day.')"/></tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <div class="sem-topbar">
-                <div class="sem-title" t-out="this._t('Employee List')"/>
+                <div class="sem-titleSm" t-out="this._t('Employee Directory')"/>
                 <div class="sem-searchWrap">
                     <i class="fa fa-search"/>
                     <input type="text" t-att-placeholder="this._t('Search by code, employee name')" t-model="state.keyword" t-on-input="onSearchInput"/>
                 </div>
                 <div class="sem-actions">
                     <button class="sem-primaryBtn" t-on-click="openCreate"><i class="fa fa-plus me-1"/> <t t-out="this._t('Employee')"/></button>
-                    <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
-                    <button class="sem-lightBtn" t-out="this._t('Approve Requests')"/>
-                    <button class="sem-iconBtn"><i class="fa fa-ellipsis-h"/></button>
+                    <t t-if="state.status === 'working'">
+                        <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
+                    </t>
+                    <t t-else="">
+                        <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedWorking" t-out="this._t('Mark as Working')"/>
+                    </t>
+                    <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="deleteSelectedEmployee" t-out="this._t('Delete Employee')"/>
                 </div>
             </div>
 
             <div class="sem-content">
-                <aside class="sem-filter">
+                <aside class="sem-card sem-filter">
                     <div class="sem-filterTitle" t-out="this._t('Employee Status')"/>
                     <label><input type="radio" name="empStatus" t-att-checked="state.status==='working'" t-on-click="() => setStatus('working')"/> <t t-out="this._t('Working')"/></label>
                     <label><input type="radio" name="empStatus" t-att-checked="state.status==='off'" t-on-click="() => setStatus('off')"/> <t t-out="this._t('Off')"/></label>
 
                     <div class="sem-filterTitle mt" t-out="this._t('Work Branch')"/>
-                    <div class="sem-chip"><t t-out="this._t('Central Branch')"/> <span>×</span></div>
+                    <select class="sem-input" t-att-value="state.filters.workBranch" t-on-change="(ev) => onFilterChange('workBranch', ev.target.value)">
+                        <option value="" t-out="this._t('All branches')"/>
+                        <t t-foreach="state.filterOptions.workBranches" t-as="branch" t-key="'filter-work-' + branch.id">
+                            <option t-att-value="branch.name"><t t-esc="branch.name"/></option>
+                        </t>
+                    </select>
                     <div class="sem-filterTitle mt" t-out="this._t('Pay Branch')"/>
-                    <input class="sem-input" t-att-placeholder="this._t('Select branch')"/>
+                    <select class="sem-input" t-att-value="state.filters.payBranch" t-on-change="(ev) => onFilterChange('payBranch', ev.target.value)">
+                        <option value="" t-out="this._t('All branches')"/>
+                        <t t-foreach="state.filterOptions.payBranches" t-as="branch" t-key="'filter-pay-' + branch.id">
+                            <option t-att-value="branch.name"><t t-esc="branch.name"/></option>
+                        </t>
+                    </select>
                     <div class="sem-filterTitle mt" t-out="this._t('Department')"/>
-                    <input class="sem-input" t-att-placeholder="this._t('Select department')"/>
+                    <select class="sem-input" t-att-value="state.filters.department" t-on-change="(ev) => onFilterChange('department', ev.target.value)">
+                        <option value="" t-out="this._t('All departments')"/>
+                        <t t-foreach="state.filterOptions.departments" t-as="department" t-key="'filter-department-' + department.id">
+                            <option t-att-value="department.name"><t t-esc="department.name"/></option>
+                        </t>
+                    </select>
                     <div class="sem-filterTitle mt" t-out="this._t('Job Title')"/>
-                    <input class="sem-input" t-att-placeholder="this._t('Select job title')"/>
+                    <select class="sem-input" t-att-value="state.filters.jobTitle" t-on-change="(ev) => onFilterChange('jobTitle', ev.target.value)">
+                        <option value="" t-out="this._t('All job titles')"/>
+                        <t t-foreach="state.filterOptions.jobTitles" t-as="jobTitle" t-key="'filter-job-' + jobTitle.id">
+                            <option t-att-value="jobTitle.name"><t t-esc="jobTitle.name"/></option>
+                        </t>
+                    </select>
                 </aside>
 
-                <section class="sem-main">
+                <section class="sem-card sem-main">
                     <table class="sem-table">
                         <thead>
                             <tr>
@@ -55,7 +177,14 @@
                             <t t-foreach="state.rows" t-as="r" t-key="r.userId">
                                 <tr t-att-class="state.selectedUserId===r.userId ? 'is-selected' : ''" t-on-click="() => selectRow(r)">
                                     <td class="w-check"><input type="checkbox"/></td>
-                                    <td><div class="sem-avatar"/></td>
+                                    <td>
+                                        <t t-if="r.avatarUrl">
+                                            <img class="sem-avatar sem-avatarImg" t-att-src="r.avatarUrl" t-att-alt="r.employeeName"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="sem-avatar"><t t-esc="getInitials(r.employeeName)"/></div>
+                                        </t>
+                                    </td>
                                     <td><t t-esc="r.employeeCode"/></td>
                                     <td><t t-esc="r.attendanceCode"/></td>
                                     <td><t t-esc="r.employeeName"/></td>
@@ -91,6 +220,15 @@
                                                         <div><span t-out="this._t('Pay Branch')"/><strong><t t-esc="state.detail.profile.payBranch"/></strong></div>
                                                         <div><span t-out="this._t('Department')"/><strong><t t-esc="state.detail.profile.department || '-'"/></strong></div>
                                                         <div><span t-out="this._t('Job Title')"/><strong><t t-esc="state.detail.profile.jobTitle || '-'"/></strong></div>
+                                                    </div>
+                                                    <div class="sem-actionsRow">
+                                                        <t t-if="state.status === 'working'">
+                                                            <button class="sem-lightBtn" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <button class="sem-lightBtn" t-on-click="markSelectedWorking" t-out="this._t('Mark as Working')"/>
+                                                        </t>
+                                                        <button class="sem-lightBtn" t-on-click="deleteSelectedEmployee" t-out="this._t('Delete Employee')"/>
                                                     </div>
                                                 </t>
 
@@ -244,8 +382,20 @@
                         <label t-out="this._t('Birth Date')"/><input type="date" t-model="state.createForm.birthDate"/>
                         <label t-out="this._t('Gender')"/>
                         <select t-model="state.createForm.gender"><option value="">--</option><option value="male" t-out="this._t('Male')"/><option value="female" t-out="this._t('Female')"/></select>
-                        <label t-out="this._t('Work Branch')"/><input type="text" t-model="state.createForm.workBranch"/>
-                        <label t-out="this._t('Pay Branch')"/><input type="text" t-model="state.createForm.payBranch"/>
+                        <label t-out="this._t('Work Branch')"/>
+                        <select t-model="state.createForm.workBranch">
+                            <option value="" t-out="this._t('Select branch')"/>
+                            <t t-foreach="state.branches" t-as="branch" t-key="'work-' + branch.id">
+                                <option t-att-value="branch.name"><t t-esc="branch.name"/></option>
+                            </t>
+                        </select>
+                        <label t-out="this._t('Pay Branch')"/>
+                        <select t-model="state.createForm.payBranch">
+                            <option value="" t-out="this._t('Select branch')"/>
+                            <t t-foreach="state.branches" t-as="branch" t-key="'pay-' + branch.id">
+                                <option t-att-value="branch.name"><t t-esc="branch.name"/></option>
+                            </t>
+                        </select>
                         <label t-out="this._t('Salary Type')"/>
                         <select t-model="state.createForm.salaryType">
                             <option value="hour" t-out="this._t('By working hour')"/>
@@ -279,6 +429,26 @@
                     <div class="sem-actionsRow">
                         <button class="sem-lightBtn" t-on-click="closeFinance" t-out="this._t('Cancel')"/>
                         <button class="sem-primaryBtn" t-on-click="saveFinance" t-out="this._t('Save')"/>
+                    </div>
+                </div>
+            </t>
+
+            <t t-if="state.showAttendanceModal">
+                <div class="sem-modalBackdrop" t-on-click="closeAttendanceModal"/>
+                <div class="sem-modal sem-small">
+                    <button class="sem-modalClose" t-on-click="closeAttendanceModal">×</button>
+                    <h3><t t-esc="getAttendanceModalTitle()"/></h3>
+                    <div class="sem-formGrid">
+                        <label t-out="this._t('Employee')"/>
+                        <div class="sem-modalValue"><t t-esc="state.attendanceForm.employeeName"/></div>
+                        <label t-out="this._t('Action')"/>
+                        <div class="sem-modalValue"><t t-esc="getAttendanceModalConfirmLabel()"/></div>
+                        <label t-out="this._t('Notes')"/>
+                        <textarea class="sem-textarea" t-model="state.attendanceForm.note" t-att-placeholder="state.attendanceForm.actionName === 'action_employee_checkout' ? this._t('Add a checkout note...') : this._t('Add a checkin note (optional)...')"/>
+                    </div>
+                    <div class="sem-actionsRow">
+                        <button class="sem-lightBtn" t-on-click="closeAttendanceModal" t-out="this._t('Cancel')"/>
+                        <button class="sem-primaryBtn" t-on-click="confirmAttendanceAction"><t t-esc="getAttendanceModalConfirmLabel()"/></button>
                     </div>
                 </div>
             </t>

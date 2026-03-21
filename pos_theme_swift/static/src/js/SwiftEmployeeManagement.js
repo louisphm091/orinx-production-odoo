@@ -15,15 +15,32 @@ export class SwiftEmployeeManagement extends Component {
 
         this.state = useState({
             loading: true,
+            attendanceLoading: true,
             keyword: "",
             status: "working",
             rows: [],
+            attendanceRows: [],
+            attendanceDate: new Date().toISOString().slice(0, 10),
             selectedUserId: null,
             detail: null,
             activeTab: "info",
             showCreateModal: false,
             showFinanceModal: false,
+            showAttendanceModal: false,
             availableUsers: [],
+            branches: [],
+            filterOptions: {
+                workBranches: [],
+                payBranches: [],
+                departments: [],
+                jobTitles: [],
+            },
+            filters: {
+                workBranch: "",
+                payBranch: "",
+                department: "",
+                jobTitle: "",
+            },
             createForm: {
                 userId: "",
                 name: "",
@@ -31,8 +48,8 @@ export class SwiftEmployeeManagement extends Component {
                 idNumber: "",
                 birthDate: "",
                 gender: "",
-                workBranch: _t("Central Branch"),
-                payBranch: _t("Central Branch"),
+                workBranch: "",
+                payBranch: "",
                 salaryType: "hour",
                 salaryAmount: 0,
                 advancedSetting: false,
@@ -43,6 +60,12 @@ export class SwiftEmployeeManagement extends Component {
                 amount: 0,
                 note: "",
             },
+            attendanceForm: {
+                actionName: "",
+                userId: null,
+                employeeName: "",
+                note: "",
+            },
         });
 
         this._searchTimer = null;
@@ -50,6 +73,12 @@ export class SwiftEmployeeManagement extends Component {
         this.loadData = this.loadData.bind(this);
         this.onSearchInput = this.onSearchInput.bind(this);
         this.setStatus = this.setStatus.bind(this);
+        this.onFilterChange = this.onFilterChange.bind(this);
+        this.onAttendanceDateChange = this.onAttendanceDateChange.bind(this);
+        this.loadAttendanceBoard = this.loadAttendanceBoard.bind(this);
+        this.openAttendanceModal = this.openAttendanceModal.bind(this);
+        this.closeAttendanceModal = this.closeAttendanceModal.bind(this);
+        this.confirmAttendanceAction = this.confirmAttendanceAction.bind(this);
         this.selectRow = this.selectRow.bind(this);
         this.setTab = this.setTab.bind(this);
         this.openCreate = this.openCreate.bind(this);
@@ -60,13 +89,17 @@ export class SwiftEmployeeManagement extends Component {
         this.closeFinance = this.closeFinance.bind(this);
         this.saveFinance = this.saveFinance.bind(this);
         this.markSelectedOff = this.markSelectedOff.bind(this);
+        this.markSelectedWorking = this.markSelectedWorking.bind(this);
+        this.deleteSelectedEmployee = this.deleteSelectedEmployee.bind(this);
         this.onCreateSalaryInput = this.onCreateSalaryInput.bind(this);
         this.onDetailSalaryInput = this.onDetailSalaryInput.bind(this);
         this.loadAvailableUsers = this.loadAvailableUsers.bind(this);
+        this.loadBranches = this.loadBranches.bind(this);
+        this.loadFilterOptions = this.loadFilterOptions.bind(this);
         this.onSelectAvailableUser = this.onSelectAvailableUser.bind(this);
 
         onMounted(async () => {
-            await this.loadData();
+            await Promise.all([this.loadFilterOptions(), this.loadData(), this.loadAttendanceBoard()]);
         });
     }
 
@@ -79,10 +112,55 @@ export class SwiftEmployeeManagement extends Component {
         return digits ? Number(digits) : 0;
     }
 
+    getInitials(name) {
+        return String(name || "")
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part.charAt(0).toUpperCase())
+            .join("") || "--";
+    }
+
+    getAttendanceToneClass(tone) {
+        return `is-${tone || "muted"}`;
+    }
+
+    getWorkingCount() {
+        return this.state.status === "working" ? this.state.rows.length : 0;
+    }
+
+    getOffCount() {
+        return this.state.status === "off" ? this.state.rows.length : 0;
+    }
+
+    getActiveShiftCount() {
+        return this.state.attendanceRows.filter((row) => row.statusTone === "warning").length;
+    }
+
+    getAttendanceReadyCount() {
+        return this.state.attendanceRows.filter((row) => row.statusTone === "success").length;
+    }
+
+    getAttendanceModalTitle() {
+        return this.state.attendanceForm.actionName === "action_employee_checkin"
+            ? this._t("Confirm Check In")
+            : this._t("Confirm Check Out");
+    }
+
+    getAttendanceModalConfirmLabel() {
+        return this.state.attendanceForm.actionName === "action_employee_checkin"
+            ? this._t("Check In")
+            : this._t("Check Out");
+    }
+
     async loadData() {
         this.state.loading = true;
         try {
-            const data = await this.orm.call("pos.dashboard.swift", "get_employee_list_data", [this.state.keyword || "", this.state.status]);
+            const data = await this.orm.call("pos.dashboard.swift", "get_employee_list_data", [
+                this.state.keyword || "",
+                this.state.status,
+                this.state.filters,
+            ]);
             this.state.rows = data.rows || [];
             if (this.state.selectedUserId) {
                 const exists = this.state.rows.some((r) => r.userId === this.state.selectedUserId);
@@ -102,12 +180,84 @@ export class SwiftEmployeeManagement extends Component {
     onSearchInput(ev) {
         this.state.keyword = ev.target.value;
         clearTimeout(this._searchTimer);
-        this._searchTimer = setTimeout(() => this.loadData(), 250);
+        this._searchTimer = setTimeout(() => {
+            this.loadData();
+            this.loadAttendanceBoard();
+        }, 250);
     }
 
     async setStatus(status) {
         this.state.status = status;
         await this.loadData();
+    }
+
+    async onFilterChange(field, value) {
+        this.state.filters[field] = value || "";
+        await Promise.all([this.loadData(), this.loadAttendanceBoard()]);
+    }
+
+    async onAttendanceDateChange(ev) {
+        this.state.attendanceDate = ev.target.value;
+        await this.loadAttendanceBoard();
+    }
+
+    async loadAttendanceBoard() {
+        this.state.attendanceLoading = true;
+        try {
+            const data = await this.orm.call("pos.dashboard.swift", "get_employee_checkin_board", [
+                this.state.attendanceDate,
+                this.state.filters,
+                this.state.keyword || "",
+            ]);
+            this.state.attendanceRows = data.rows || [];
+        } catch (e) {
+            console.error("load attendance board failed", e);
+            this.notification.add(_t("Cannot load check-in/check-out board"), { type: "danger" });
+            this.state.attendanceRows = [];
+        } finally {
+            this.state.attendanceLoading = false;
+        }
+    }
+
+    openAttendanceModal(actionName, row) {
+        this.state.attendanceForm.actionName = actionName;
+        this.state.attendanceForm.userId = row.userId;
+        this.state.attendanceForm.employeeName = row.employeeName;
+        this.state.attendanceForm.note = "";
+        this.state.showAttendanceModal = true;
+    }
+
+    closeAttendanceModal() {
+        this.state.showAttendanceModal = false;
+        this.state.attendanceForm.actionName = "";
+        this.state.attendanceForm.userId = null;
+        this.state.attendanceForm.employeeName = "";
+        this.state.attendanceForm.note = "";
+    }
+
+    async confirmAttendanceAction() {
+        const actionName = this.state.attendanceForm.actionName;
+        const userId = this.state.attendanceForm.userId;
+        const note = this.state.attendanceForm.note || "";
+        if (!actionName || !userId) {
+            return;
+        }
+        try {
+            const res = await this.orm.call("pos.dashboard.swift", actionName, [userId, note]);
+            if (!res || !res.ok) {
+                this.notification.add((res && res.message) || _t("Cannot update check-in/check-out status"), { type: "warning" });
+                return;
+            }
+            this.notification.add(
+                actionName === "action_employee_checkin" ? _t("Employee checked in") : _t("Employee checked out"),
+                { type: "success" }
+            );
+            this.closeAttendanceModal();
+            await this.loadAttendanceBoard();
+        } catch (e) {
+            console.error("confirmAttendanceAction failed", e);
+            this.notification.add(_t("Cannot update check-in/check-out status"), { type: "danger" });
+        }
     }
 
     async selectRow(row) {
@@ -146,8 +296,8 @@ export class SwiftEmployeeManagement extends Component {
             idNumber: "",
             birthDate: "",
             gender: "",
-            workBranch: _t("Central Branch"),
-            payBranch: _t("Central Branch"),
+            workBranch: "",
+            payBranch: "",
             salaryType: "hour",
             salaryAmount: 0,
             advancedSetting: false,
@@ -158,7 +308,7 @@ export class SwiftEmployeeManagement extends Component {
     async openCreate() {
         this.resetCreateForm();
         this.state.showCreateModal = true;
-        await this.loadAvailableUsers();
+        await Promise.all([this.loadAvailableUsers(), this.loadBranches()]);
     }
 
     closeCreate() {
@@ -173,6 +323,43 @@ export class SwiftEmployeeManagement extends Component {
         } catch (e) {
             console.error("load available users failed", e);
             this.state.availableUsers = [];
+        }
+    }
+
+    async loadBranches() {
+        try {
+            const res = await this.orm.call("pos.dashboard.swift", "get_employee_branch_options", []);
+            this.state.branches = res.rows || [];
+            const firstBranch = this.state.branches[0]?.name || "";
+            if (!this.state.createForm.workBranch) {
+                this.state.createForm.workBranch = firstBranch;
+            }
+            if (!this.state.createForm.payBranch) {
+                this.state.createForm.payBranch = firstBranch;
+            }
+        } catch (e) {
+            console.error("load employee branches failed", e);
+            this.state.branches = [];
+        }
+    }
+
+    async loadFilterOptions() {
+        try {
+            const res = await this.orm.call("pos.dashboard.swift", "get_employee_filter_options", []);
+            this.state.filterOptions = {
+                workBranches: res.workBranches || [],
+                payBranches: res.payBranches || [],
+                departments: res.departments || [],
+                jobTitles: res.jobTitles || [],
+            };
+        } catch (e) {
+            console.error("load employee filter options failed", e);
+            this.state.filterOptions = {
+                workBranches: [],
+                payBranches: [],
+                departments: [],
+                jobTitles: [],
+            };
         }
     }
 
@@ -204,29 +391,8 @@ export class SwiftEmployeeManagement extends Component {
             );
             this.state.showCreateModal = false;
             this.resetCreateForm();
+            await this.loadFilterOptions();
             await this.loadData();
-
-            // Ensure newly created/linked employee is visible immediately.
-            if (res && res.userId && !this.state.rows.some((r) => r.userId === res.userId)) {
-                const detail = await this.orm.call("pos.dashboard.swift", "get_employee_detail_data", [res.userId]);
-                if (detail && detail.ok && detail.profile) {
-                    const p = detail.profile;
-                    const status = "working";
-                    if (this.state.status === status) {
-                        this.state.rows.unshift({
-                            userId: res.userId,
-                            employeeCode: p.employeeCode,
-                            attendanceCode: p.attendanceCode || p.employeeCode,
-                            employeeName: p.name || "",
-                            phone: p.phone || "",
-                            idNumber: p.idNumber || "",
-                            debtAdvance: p.debtAdvance || 0,
-                            note: "",
-                            status,
-                        });
-                    }
-                }
-            }
         } catch (e) {
             console.error("saveCreate failed", e);
             this.notification.add(_t("Cannot create employee"), { type: "danger" });
@@ -309,10 +475,60 @@ export class SwiftEmployeeManagement extends Component {
                 return;
             }
             this.notification.add(_t("Employee marked as off"), { type: "success" });
-            await this.loadData();
+            await Promise.all([this.loadData(), this.loadAttendanceBoard()]);
         } catch (e) {
             console.error("markSelectedOff failed", e);
             this.notification.add(_t("Cannot update employee status"), { type: "danger" });
+        }
+    }
+
+    async markSelectedWorking() {
+        if (!this.state.selectedUserId) {
+            this.notification.add(_t("Please select an employee"), { type: "warning" });
+            return;
+        }
+        try {
+            const res = await this.orm.call("pos.dashboard.swift", "action_set_employee_status", [
+                this.state.selectedUserId,
+                "working",
+            ]);
+            if (!res || !res.ok) {
+                this.notification.add((res && res.message) || _t("Cannot update employee status"), { type: "warning" });
+                return;
+            }
+            this.notification.add(_t("Employee marked as working"), { type: "success" });
+            await Promise.all([this.loadData(), this.loadAttendanceBoard()]);
+        } catch (e) {
+            console.error("markSelectedWorking failed", e);
+            this.notification.add(_t("Cannot update employee status"), { type: "danger" });
+        }
+    }
+
+    async deleteSelectedEmployee() {
+        if (!this.state.selectedUserId) {
+            this.notification.add(_t("Please select an employee"), { type: "warning" });
+            return;
+        }
+        const confirmed = window.confirm(_t("Remove this employee from the employee list?"));
+        if (!confirmed) {
+            return;
+        }
+        try {
+            const res = await this.orm.call("pos.dashboard.swift", "action_delete_employee_record", [
+                this.state.selectedUserId,
+            ]);
+            if (!res || !res.ok) {
+                this.notification.add((res && res.message) || _t("Cannot delete employee"), { type: "warning" });
+                return;
+            }
+            this.notification.add(_t("Employee removed from the list"), { type: "success" });
+            this.state.selectedUserId = null;
+            this.state.detail = null;
+            await this.loadFilterOptions();
+            await Promise.all([this.loadData(), this.loadAttendanceBoard()]);
+        } catch (e) {
+            console.error("deleteSelectedEmployee failed", e);
+            this.notification.add(_t("Cannot delete employee"), { type: "danger" });
         }
     }
 

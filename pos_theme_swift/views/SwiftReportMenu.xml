@@ -32,7 +32,7 @@
         <field name="tag">pos_theme_swift.swift_pos_work_schedule_management</field>
     </record>
     <record id="action_swift_pos_employee_management" model="ir.actions.client">
-        <field name="name">Employee</field>
+        <field name="name">Employee Management</field>
         <field name="tag">pos_theme_swift.swift_pos_employee_management</field>
     </record>
 
@@ -104,7 +104,7 @@
 
     <menuitem
         id="menu_swift_pos_shift_root"
-        name="Shift Management"
+        name="Employee Management"
         parent="point_of_sale.menu_point_root"
         sequence="120"
     />
@@ -143,7 +143,7 @@
 
     <menuitem
         id="menu_swift_pos_employee"
-        name="Employee"
+        name="Employee Management"
         parent="menu_swift_pos_shift_root"
         action="pos_theme_swift.action_swift_pos_employee_management"
         sequence="50"

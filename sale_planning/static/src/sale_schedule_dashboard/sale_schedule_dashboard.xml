@@ -22,7 +22,7 @@
 
           <!-- Warehouse Filter -->
           <select class="form-select ssd_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
-              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <option value=""><t t-out="this._t('Branch')"/>: <t t-out="this._t('All')"/></option>
               <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
                   <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
               </t>
@@ -41,8 +41,12 @@
             <span class="text-muted">· <t t-out="this._t('By SKU')"/> · <t t-out="this._t('By Campaign')"/> · <t t-out="this._t('By Time')"/></span>
           </div>
           <div class="d-flex gap-2">
-            <button class="btn btn-light ssd_btn"><i class="fa fa-plus me-1"/> <t t-out="this._t('Create Schedule')"/></button>
-            <button class="btn btn-success ssd_btn"><i class="fa fa-plus me-1"/> <t t-out="this._t('Create Schedule')"/></button>
+            <button class="btn btn-light ssd_btn" t-on-click="() => this.openAction('action_open_sale_orders')">
+              <i class="fa fa-list me-1"/> <t t-out="this._t('Open Sales Orders')"/>
+            </button>
+            <button class="btn btn-success ssd_btn" t-on-click="() => this.openAction('action_open_inventory')">
+              <i class="fa fa-cubes me-1"/> <t t-out="this._t('View Inventory')"/>
+            </button>
           </div>
         </div>
       </div>
@@ -119,10 +123,10 @@
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="fw-semibold" t-out="this._t('Sale Schedule Timeline by SKU')"/>
                 <div class="d-flex gap-2">
-                  <button class="btn btn-light ssd_pill" t-on-click="() => setViewMode('timeline')">
+                  <button class="btn btn-light ssd_pill" t-on-click="() => this.setViewMode('timeline')">
                     <i class="fa fa-align-left me-1"/> <t t-out="this._t('Timeline')"/>
                   </button>
-                  <button class="btn btn-light ssd_pill" t-on-click="() => setViewMode('calendar')">
+                  <button class="btn btn-light ssd_pill" t-on-click="() => this.setViewMode('calendar')">
                     <i class="fa fa-calendar me-1"/> <t t-out="this._t('Calendar')"/>
                   </button>
                 </div>
@@ -142,8 +146,13 @@
               <div class="ssd_grid_body">
                 <t t-foreach="state.timeline.rows" t-as="r" t-key="r.key">
                   <div class="ssd_row" t-att-class="r.key === state.active_row_key ? 'is_active' : ''">
-                    <div class="ssd_row_left" t-on-click="() => selectRow(r)">
-                      <div class="ssd_thumb"/>
+                    <div class="ssd_row_left" t-on-click="() => this.selectRow(r)">
+                      <t t-if="r.image_url">
+                        <img class="ssd_thumb" t-att-src="r.image_url" t-att-alt="r.sku"/>
+                      </t>
+                      <t t-else="">
+                        <div class="ssd_thumb"/>
+                      </t>
                       <div>
                         <div class="fw-semibold"><t t-esc="r.sku"/> – <t t-esc="r.campaign"/></div>
                         <div class="text-muted small">
@@ -166,6 +175,9 @@
                     </div>
                   </div>
                 </t>
+                <t t-if="!state.timeline.rows.length">
+                  <div class="text-muted small py-3" t-out="this._t('No schedule data for current filters.')"/>
+                </t>
               </div>
             </div>
 
@@ -178,7 +190,12 @@
                     <i class="fa fa-ellipsis-h text-muted"/>
                   </div>
                   <div class="d-flex align-items-center gap-3">
-                    <div class="ssd_thumb_big"/>
+                    <t t-if="state.performance.image_url">
+                      <img class="ssd_thumb_big" t-att-src="state.performance.image_url" t-att-alt="state.performance.title"/>
+                    </t>
+                    <t t-else="">
+                      <div class="ssd_thumb_big"/>
+                    </t>
                     <div class="flex-grow-1">
                       <div class="fw-semibold"><t t-esc="state.performance.title"/></div>
                       <div class="text-muted small">
@@ -210,6 +227,9 @@
                         <i t-att-class="a.trend === 'up' ? 'fa fa-arrow-up text-success' : 'fa fa-arrow-down text-danger'"/>
                       </div>
                     </t>
+                    <t t-if="!state.risk_alerts.length">
+                      <div class="text-muted small" t-out="this._t('No risk alerts')"/>
+                    </t>
                   </div>
                 </div>
               </div>
@@ -226,7 +246,12 @@
               </div>
 
               <div class="d-flex gap-3">
-                <div class="ssd_thumb_big"/>
+                <t t-if="state.selected.image_url">
+                  <img class="ssd_thumb_big" t-att-src="state.selected.image_url" t-att-alt="state.selected.sku"/>
+                </t>
+                <t t-else="">
+                  <div class="ssd_thumb_big"/>
+                </t>
                 <div>
                   <div class="fw-semibold fs-5"><t t-esc="state.selected.sku"/></div>
                   <div class="text-muted"><t t-esc="state.selected.campaign"/></div>
@@ -239,9 +264,9 @@
               </span></div>
 
               <div class="d-flex gap-2 mt-2">
-                <span class="badge bg-light text-dark">This week</span>
-                <span class="badge bg-success">On sale</span>
-                <span class="badge bg-light text-dark">Ended</span>
+                <t t-foreach="state.selected.badges || []" t-as="badge" t-key="badge.label">
+                  <span class="badge" t-att-class="badge.className"><t t-esc="badge.label"/></span>
+                </t>
               </div>
 
               <div class="mt-3 pt-3 border-top">
@@ -254,9 +279,9 @@
               </div>
 
               <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-success flex-fill" t-out="this._t('Adjust Schedule')"/>
-                <button class="btn btn-light flex-fill" t-out="this._t('Pause Sale')"/>
-                <button class="btn btn-light flex-fill" disabled="1" t-out="this._t('End Early')"/>
+                <button class="btn btn-success flex-fill" t-on-click="() => this.openAction('action_open_sale_orders')" t-out="this._t('Open Sales Orders')"/>
+                <button class="btn btn-light flex-fill" t-on-click="() => this.openAction('action_open_product')" t-out="this._t('View Product')"/>
+                <button class="btn btn-light flex-fill" t-on-click="() => this.openAction('action_open_inventory')" t-out="this._t('View Inventory')"/>
               </div>
             </div>
 
