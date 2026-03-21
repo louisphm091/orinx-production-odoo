@@ -1569,7 +1569,7 @@ class PosDashboardSwift(models.AbstractModel):
                 first_shift = user_shifts[0] if user_shifts else False
                 active_shift = next((shift for shift in reversed(user_shifts) if shift.state == 'active'), False)
                 last_done = next((shift for shift in reversed(user_shifts) if shift.check_out), False)
-                total_hours = sum(user_shifts.filtered(lambda s: s.state == 'done').mapped('duration'))
+                total_hours = sum((shift.duration or 0.0) for shift in user_shifts if shift.state == 'done')
                 if active_shift and active_shift.check_in:
                     total_hours += max((fields.Datetime.now() - active_shift.check_in).total_seconds(), 0.0) / 3600.0
 
