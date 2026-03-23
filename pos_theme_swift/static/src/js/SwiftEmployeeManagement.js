@@ -14,6 +14,7 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Add Debt"),
     _t("Add Debt and Advance"),
     _t("Add New Employee"),
+    _t("Edit Employee"),
     _t("Add a checkin note (optional)..."),
     _t("Add a checkout note..."),
     _t("Advance"),
@@ -43,12 +44,14 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Employee Management"),
     _t("Employee Name"),
     _t("Employee Status"),
+    _t("Employee updated"),
     _t("Female"),
     _t("Gender"),
     _t("ID Number"),
     _t("Image"),
     _t("Info"),
     _t("Job Title"),
+    _t("Position"),
     _t("Loading check-in / check-out board..."),
     _t("Loading data..."),
     _t("Male"),
@@ -82,7 +85,11 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Schedule"),
     _t("Search by code, employee name"),
     _t("Select branch"),
+    _t("Select position"),
     _t("Select from existing users"),
+    _t("No position available."),
+    _t("Please select a position"),
+    _t("Please select an employee"),
     _t("Shift"),
     _t("Slip code"),
     _t("Staff Check-in / Check-out Tracker"),
@@ -91,6 +98,7 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Track attendance by day and operate check-in or check-out directly from the board."),
     _t("Type"),
     _t("Update"),
+    _t("Update Employee"),
     _t("Work Branch"),
     _t("Working"),
     _t("Working Staff"),
@@ -98,6 +106,13 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("hour"),
     _t("month"),
     _t("shift"),
+    _t("Cannot update employee"),
+    _t("Name is required"),
+    _t("Phone Number is required"),
+    _t("POS PIN is required"),
+    _t("Birth Date is required"),
+    _t("Salary Amount is required"),
+    _t("Job Title is required"),
 ];
 
 void EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS;
@@ -122,6 +137,7 @@ export class SwiftEmployeeManagement extends Component {
             detail: null,
             activeTab: "info",
             showCreateModal: false,
+            formMode: "create",
             showFinanceModal: false,
             showAttendanceModal: false,
             availableUsers: [],
@@ -145,13 +161,17 @@ export class SwiftEmployeeManagement extends Component {
                 idNumber: "",
                 birthDate: "",
                 gender: "",
+                department: "",
+                jobTitle: "",
                 workBranch: "",
                 payBranch: "",
                 salaryType: "hour",
                 salaryAmount: 0,
                 advancedSetting: false,
                 overtimeEnabled: false,
+                posPin: "",
             },
+            pinDraft: "",
             financeForm: {
                 type: "advance",
                 amount: 0,
@@ -182,6 +202,7 @@ export class SwiftEmployeeManagement extends Component {
         this.closeCreate = this.closeCreate.bind(this);
         this.saveCreate = this.saveCreate.bind(this);
         this.saveSalary = this.saveSalary.bind(this);
+        this.savePin = this.savePin.bind(this);
         this.openFinance = this.openFinance.bind(this);
         this.closeFinance = this.closeFinance.bind(this);
         this.saveFinance = this.saveFinance.bind(this);
@@ -366,6 +387,7 @@ export class SwiftEmployeeManagement extends Component {
         this.state.selectedUserId = row.userId;
         this.state.activeTab = "info";
         try {
+            this.state.pinDraft = "";
             const data = await this.orm.call("pos.dashboard.swift", "get_employee_detail_data", [row.userId]);
             if (!data || !data.ok) {
                 this.notification.add((data && data.message) || _t("Cannot load employee detail"), { type: "warning" });
@@ -393,24 +415,64 @@ export class SwiftEmployeeManagement extends Component {
             idNumber: "",
             birthDate: "",
             gender: "",
+            department: "",
+            jobTitle: "",
             workBranch: "",
             payBranch: "",
             salaryType: "hour",
             salaryAmount: 0,
             advancedSetting: false,
             overtimeEnabled: false,
+            posPin: "",
         };
     }
 
     async openCreate() {
         this.resetCreateForm();
+        this.state.formMode = "create";
         this.state.showCreateModal = true;
         await Promise.all([this.loadAvailableUsers(), this.loadBranches()]);
+    }
+
+    _resolveJobTitleId(jobTitleName) {
+        const selected = this.state.filterOptions.jobTitles.find(
+            (jobTitle) => jobTitle.name === (jobTitleName || "")
+        );
+        return selected ? selected.id : (jobTitleName || "");
+    }
+
+    async openEditEmployee() {
+        if (!this.state.selectedUserId || !this.state.detail) {
+            this.notification.add(_t("Please select an employee"), { type: "warning" });
+            return;
+        }
+        const profile = this.state.detail.profile || {};
+        this.state.formMode = "edit";
+        this.state.createForm = {
+            userId: this.state.selectedUserId,
+            name: profile.name || "",
+            phone: profile.phone || "",
+            idNumber: profile.idNumber || "",
+            birthDate: profile.birthDate || "",
+            gender: profile.gender || "",
+            department: profile.department || "",
+            jobTitle: this._resolveJobTitleId(profile.jobTitle),
+            workBranch: profile.workBranch || "",
+            payBranch: profile.payBranch || "",
+            salaryType: profile.salaryType || "hour",
+            salaryAmount: this.parseCurrencyInput(profile.salaryAmount),
+            advancedSetting: Boolean(profile.advancedSetting),
+            overtimeEnabled: Boolean(profile.overtimeEnabled),
+            posPin: profile.posPin || "",
+        };
+        this.state.showCreateModal = true;
+        await Promise.all([this.loadFilterOptions(), this.loadBranches()]);
     }
 
     closeCreate() {
         this.state.showCreateModal = false;
         this.resetCreateForm();
+        this.state.formMode = "create";
     }
 
     async loadAvailableUsers() {
@@ -476,23 +538,71 @@ export class SwiftEmployeeManagement extends Component {
 
     async saveCreate() {
         try {
+            const requiredFields = [
+                { key: "name", label: _t("Name is required") },
+                { key: "phone", label: _t("Phone Number is required") },
+                { key: "posPin", label: _t("POS PIN is required") },
+                { key: "birthDate", label: _t("Birth Date is required") },
+                { key: "salaryAmount", label: _t("Salary Amount is required") },
+            ];
+            for (const field of requiredFields) {
+                const value = this.state.createForm[field.key];
+                const isEmpty = field.key === "salaryAmount"
+                    ? this.parseCurrencyInput(value) <= 0
+                    : !String(value || "").trim();
+                if (isEmpty) {
+                    this.notification.add(field.label, { type: "warning" });
+                    return;
+                }
+            }
+            const selectedJobTitleId = String(this.state.createForm.jobTitle || "").trim();
+            if (!selectedJobTitleId) {
+                this.notification.add(
+                    this.state.filterOptions.jobTitles.length
+                        ? _t("Please select a position")
+                        : _t("No position available."),
+                    { type: "warning" }
+                );
+                return;
+            }
+            const selectedJobTitle = this.state.filterOptions.jobTitles.find(
+                (jobTitle) => String(jobTitle.id) === selectedJobTitleId
+            );
+            this.state.createForm.jobTitle = selectedJobTitle ? selectedJobTitle.name : selectedJobTitleId;
             this.state.createForm.salaryAmount = this.parseCurrencyInput(this.state.createForm.salaryAmount);
-            const res = await this.orm.call("pos.dashboard.swift", "create_employee_record", [this.state.createForm]);
+            const isEditMode = this.state.formMode === "edit";
+            const methodName = isEditMode ? "update_employee_record" : "create_employee_record";
+            const payload = isEditMode ? [this.state.selectedUserId, this.state.createForm] : [this.state.createForm];
+            const res = await this.orm.call("pos.dashboard.swift", methodName, payload);
             if (!res || !res.ok) {
-                this.notification.add((res && res.message) || _t("Cannot create employee"), { type: "warning" });
+                this.notification.add(
+                    (res && res.message) || (isEditMode ? _t("Cannot update employee") : _t("Cannot create employee")),
+                    { type: "warning" }
+                );
                 return;
             }
             this.notification.add(
-                (res && res.createdNewUser) ? _t("Employee created") : _t("Employee added from existing user"),
+                isEditMode
+                    ? _t("Employee updated")
+                    : ((res && res.createdNewUser) ? _t("Employee created") : _t("Employee added from existing user")),
                 { type: "success" }
             );
+            const refreshedUserId = this.state.selectedUserId;
             this.state.showCreateModal = false;
             this.resetCreateForm();
+            this.state.formMode = "create";
             await this.loadFilterOptions();
             await this.loadData();
+            if (isEditMode && refreshedUserId) {
+                this.state.selectedUserId = null;
+                await this.selectRow({ userId: refreshedUserId });
+            }
         } catch (e) {
             console.error("saveCreate failed", e);
-            this.notification.add(_t("Cannot create employee"), { type: "danger" });
+            this.notification.add(
+                this.state.formMode === "edit" ? _t("Cannot update employee") : _t("Cannot create employee"),
+                { type: "danger" }
+            );
         }
     }
 
@@ -518,6 +628,31 @@ export class SwiftEmployeeManagement extends Component {
         } catch (e) {
             console.error("saveSalary failed", e);
             this.notification.add(_t("Cannot save salary setup"), { type: "danger" });
+        }
+    }
+
+    async savePin() {
+        if (!this.state.selectedUserId || !this.state.detail) {
+            return;
+        }
+        const newPin = String(this.state.pinDraft || "").trim();
+        if (!newPin) {
+            this.notification.add(_t("Please enter a new PIN"), { type: "warning" });
+            return;
+        }
+        try {
+            const p = this.state.detail.profile;
+            const res = await this.orm.call("pos.dashboard.swift", "update_employee_pin", [this.state.selectedUserId, newPin]);
+            if (!res || !res.ok) {
+                this.notification.add((res && res.message) || _t("Cannot save PIN"), { type: "warning" });
+                return;
+            }
+            this.notification.add(_t("PIN updated successfully"), { type: "success" });
+            this.state.pinDraft = "";
+            await this.selectRow({ userId: this.state.selectedUserId });
+        } catch (e) {
+            console.error("savePin failed", e);
+            this.notification.add(_t("Cannot save PIN"), { type: "danger" });
         }
     }
 

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import base64
+import csv
 from contextlib import ExitStack
+import io
 import json
 from datetime import datetime
 import pytz
@@ -9,6 +12,7 @@ import odoo.modules.registry
 from odoo import fields, http, _
 from odoo.exceptions import AccessDenied, UserError
 from odoo.http import request
+from werkzeug.utils import secure_filename
 
 class SwiftZaloApiController(http.Controller):
 
@@ -35,6 +39,264 @@ class SwiftZaloApiController(http.Controller):
     def _ensure_pos_user(self):
         if not request.env.user.has_group("point_of_sale.group_pos_user"):
             raise AccessDenied(_("You do not have POS access rights."))
+
+    def _swift_to_int(self, value, default=0):
+        try:
+            if value in (None, "", False):
+                return default
+            return int(value)
+        except Exception:
+            return default
+
+    def _swift_to_float(self, value, default=0.0):
+        try:
+            if value in (None, "", False):
+                return default
+            return float(value)
+        except Exception:
+            return default
+
+    def _swift_get_branch_config(self, branch_id):
+        branch_id = self._swift_to_int(branch_id, 0)
+        if not branch_id:
+            return False
+        return request.env["pos.config"].sudo().browse(branch_id).exists()
+
+    def _swift_get_branch_location(self, branch_config):
+        if not branch_config:
+            return False
+        dashboard = request.env["pos.dashboard.swift"]
+        try:
+            return dashboard._get_pos_stock_location(branch_config)
+        except Exception:
+            return False
+
+    def _swift_product_category(self, product):
+        categories = product.pos_categ_ids or product.product_tmpl_id.pos_categ_ids
+        category = categories[:1]
+        if category:
+            return {"id": category.id, "name": category.name or ""}
+        return {"id": "", "name": ""}
+
+    def _swift_brand_name(self, template):
+        brand_name = (getattr(template, "swift_brand_name", "") or "").strip()
+        if brand_name:
+            return brand_name
+        seller = template.seller_ids[:1]
+        if seller and seller.partner_id:
+            return (seller.partner_id.name or "").strip()
+        return ""
+
+    def _swift_stock_qty_map(self, product_ids, branch_config=False):
+        if not product_ids:
+            return {}, False
+        location = self._swift_get_branch_location(branch_config)
+        quant_domain = [
+            ("product_id", "in", product_ids),
+            ("location_id.usage", "=", "internal"),
+        ]
+        if location:
+            quant_domain.append(("location_id", "child_of", location.id))
+        grouped = request.env["stock.quant"].sudo().read_group(
+            quant_domain,
+            ["quantity:sum", "product_id"],
+            ["product_id"],
+        )
+        qty_map = {}
+        for row in grouped:
+            product_ref = row.get("product_id")
+            if product_ref:
+                qty_map[product_ref[0]] = row.get("quantity", 0.0) or 0.0
+        return qty_map, location
+
+    def _swift_product_payload(self, product, qty_map=None, location=False):
+        qty_map = qty_map or {}
+        template = product.product_tmpl_id
+        brand_name = self._swift_brand_name(template)
+        category = self._swift_product_category(product)
+        attrs = template.uom_ids.ids if "uom_ids" in template._fields else []
+        qty_on_hand = qty_map.get(product.id, 0.0)
+        status = "active" if product.active else "inactive"
+        status_label = _("Đang kinh doanh") if product.active else _("Ngừng kinh doanh")
+        updated_at = product.write_date or template.write_date or fields.Datetime.now()
+
+        return {
+            "id": product.id,
+            "name": product.display_name or product.name or "",
+            "sku": product.barcode or product.default_code or "",
+            "barcode": product.barcode or "",
+            "price": product.lst_price or 0.0,
+            "costPrice": product.standard_price or template.standard_price or 0.0,
+            "stock": qty_on_hand,
+            "category": category,
+            "brand": {"id": brand_name, "name": brand_name} if brand_name else {"id": "", "name": ""},
+            "unitLabel": product.uom_id.name if product.uom_id else "",
+            "attributeIds": attrs,
+            "status": status,
+            "statusLabel": status_label,
+            "warehouseLocation": template.swift_warehouse_location or (location.display_name if location else ""),
+            "minStockThreshold": template.swift_min_stock_threshold or 0.0,
+            "maxStockThreshold": template.swift_max_stock_threshold or 0.0,
+            "imageUrl": f"/web/image?model=product.product&id={product.id}&field=image_128",
+            "updatedAt": fields.Datetime.to_string(updated_at),
+        }
+
+    def _swift_product_domain(self, search="", category_id=False, branch_id=False):
+        domain = [
+            ("sale_ok", "=", True),
+            ("active", "=", True),
+        ]
+        if "available_in_pos" in request.env["product.product"]._fields:
+            domain.append(("available_in_pos", "=", True))
+        branch_config = self._swift_get_branch_config(branch_id)
+        if branch_config:
+            domain.append(("product_tmpl_id.swift_branch_config_ids", "in", branch_config.ids))
+        if search:
+            domain += ["|", ("name", "ilike", search), ("barcode", "ilike", search)]
+        category_id = self._swift_to_int(category_id, 0)
+        if category_id:
+            domain.append(("product_tmpl_id.pos_categ_ids", "in", [category_id]))
+        return domain, branch_config
+
+    def _swift_apply_initial_stock(self, product, stock_qty, branch_config):
+        if stock_qty in (None, ""):
+            return
+        stock_qty = self._swift_to_float(stock_qty, 0.0)
+        location = self._swift_get_branch_location(branch_config)
+        if not location:
+            location = request.env["stock.location"].sudo().search([("usage", "=", "internal")], limit=1)
+        if not location:
+            return
+        Quant = request.env["stock.quant"].sudo().with_context(inventory_mode=True)
+        quant = Quant.search([
+            ("product_id", "=", product.id),
+            ("location_id", "=", location.id),
+        ], limit=1)
+        if quant:
+            quant.write({"inventory_quantity_auto_apply": stock_qty})
+        else:
+            Quant.create({
+                "product_id": product.id,
+                "location_id": location.id,
+                "inventory_quantity_auto_apply": stock_qty,
+            })
+
+    def _swift_write_product_from_payload(self, tmpl, payload, branch_config=False):
+        vals = {}
+        if "name" in payload and payload.get("name") is not None:
+            name = (payload.get("name") or "").strip()
+            if name:
+                vals["name"] = name
+        if payload.get("sku") is not None or payload.get("barcode") is not None:
+            barcode = (payload.get("barcode") or payload.get("sku") or "").strip()
+            vals["barcode"] = barcode
+        if "salePrice" in payload:
+            vals["list_price"] = self._swift_to_float(payload.get("salePrice"), getattr(tmpl, "list_price", 0.0) or 0.0)
+        if "costPrice" in payload:
+            vals["standard_price"] = self._swift_to_float(payload.get("costPrice"), getattr(tmpl, "standard_price", 0.0) or 0.0)
+        if "status" in payload:
+            status = (payload.get("status") or "").strip().lower()
+            if status in ("inactive", "draft"):
+                vals["active"] = False
+            elif status == "active":
+                vals["active"] = True
+        if "brandId" in payload:
+            vals["swift_brand_name"] = (payload.get("brandId") or "").strip()
+        if "warehouseLocation" in payload:
+            vals["swift_warehouse_location"] = (payload.get("warehouseLocation") or "").strip()
+        if "minStockThreshold" in payload:
+            vals["swift_min_stock_threshold"] = self._swift_to_float(payload.get("minStockThreshold"), getattr(tmpl, "swift_min_stock_threshold", 0.0) or 0.0)
+        if "maxStockThreshold" in payload:
+            vals["swift_max_stock_threshold"] = self._swift_to_float(payload.get("maxStockThreshold"), getattr(tmpl, "swift_max_stock_threshold", 0.0) or 0.0)
+
+        category_id = self._swift_to_int(payload.get("categoryId"), 0)
+        if category_id and "pos_categ_ids" in tmpl._fields:
+            category = request.env["pos.category"].sudo().browse(category_id).exists()
+            if category:
+                vals["pos_categ_ids"] = [(6, 0, [category.id])]
+
+        attribute_ids = payload.get("attributeIds") or []
+        if "uom_ids" in tmpl._fields and isinstance(attribute_ids, list):
+            uom_ids = []
+            for item in attribute_ids:
+                uom_id = self._swift_to_int(item, 0)
+                if uom_id:
+                    uom = request.env["uom.uom"].sudo().browse(uom_id).exists()
+                    if uom:
+                        uom_ids.append(uom.id)
+            vals["uom_ids"] = [(6, 0, uom_ids)]
+
+        if payload.get("imageId"):
+            attachment = request.env["ir.attachment"].sudo().browse(self._swift_to_int(payload.get("imageId"), 0)).exists()
+            if attachment and attachment.datas:
+                vals["image_1920"] = attachment.datas
+
+        if "swift_branch_config_ids" in tmpl._fields:
+            branch_ids = []
+            if isinstance(payload.get("branchIds"), list):
+                branch_ids = [self._swift_to_int(bid, 0) for bid in payload.get("branchIds") if self._swift_to_int(bid, 0)]
+            elif payload.get("branchId"):
+                branch = self._swift_get_branch_config(payload.get("branchId"))
+                branch_ids = [branch.id] if branch else []
+            elif branch_config:
+                branch_ids = [branch_config.id]
+            if branch_ids:
+                vals["swift_branch_config_ids"] = [(6, 0, branch_ids)]
+
+        if "detailed_type" in tmpl._fields:
+            vals.setdefault("detailed_type", "product")
+        elif "type" in tmpl._fields:
+            vals.setdefault("type", "product")
+
+        return vals
+
+    def _swift_product_history_payload(self, product):
+        stock_moves = request.env["stock.move.line"].sudo().search(
+            [("product_id", "=", product.id), ("state", "=", "done")],
+            order="date desc, id desc",
+            limit=50,
+        )
+        stock_items = []
+        for move in stock_moves:
+            stock_items.append({
+                "id": move.id,
+                "date": fields.Datetime.to_string(move.date) if move.date else "",
+                "reference": move.reference or move.picking_id.name or move.move_id.reference or "",
+                "quantity": move.qty_done,
+                "source": move.location_id.display_name if move.location_id else "",
+                "destination": move.location_dest_id.display_name if move.location_dest_id else "",
+                "state": move.state,
+            })
+
+        sale_lines = request.env["sale.order.line"].sudo().search(
+            [("product_id", "=", product.id)],
+            order="write_date desc, id desc",
+            limit=25,
+        )
+        pos_lines = request.env["pos.order.line"].sudo().search(
+            [("product_id", "=", product.id)],
+            order="write_date desc, id desc",
+            limit=25,
+        )
+        price_items = []
+        for line in sale_lines:
+            price_items.append({
+                "id": f"sale-{line.id}",
+                "date": fields.Datetime.to_string(line.write_date) if line.write_date else "",
+                "reference": line.order_id.name or "",
+                "price": line.price_unit,
+                "source": "sale.order.line",
+            })
+        for line in pos_lines:
+            price_items.append({
+                "id": f"pos-{line.id}",
+                "date": fields.Datetime.to_string(line.write_date) if line.write_date else "",
+                "reference": line.order_id.name or "",
+                "price": line.price_unit,
+                "source": "pos.order.line",
+            })
+
+        return stock_items, price_items
 
     # 1. Core APIs
     @http.route("/api/swift/v1/merchant", type="http", auth="user", methods=["GET"], csrf=False)
@@ -416,6 +678,322 @@ class SwiftZaloApiController(http.Controller):
         cats = request.env['pos.category'].sudo().search([])
         res = [{"id": c.id, "name": c.name} for c in cats]
         return self._ok(res)
+
+    @http.route("/api/swift/v1/product-categories", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_product_categories(self, **kwargs):
+        return self.get_inventory_categories(**kwargs)
+
+    @http.route("/api/swift/v1/products", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_products(self, **kwargs):
+        args = request.httprequest.args
+        search = (args.get("search") or args.get("keyword") or "").strip()
+        category_id = args.get("categoryId") or args.get("category_id") or ""
+        branch_id = args.get("branchId") or args.get("config_id") or ""
+        sort_by = (args.get("sortBy") or "price").strip()
+        sort_order = (args.get("sortOrder") or "desc").strip().lower()
+        page = max(self._swift_to_int(args.get("page"), 1), 1)
+        page_size = max(self._swift_to_int(args.get("pageSize"), 20), 1)
+
+        domain, branch_config = self._swift_product_domain(search=search, category_id=category_id, branch_id=branch_id)
+        products = request.env["product.product"].sudo().search(domain)
+        qty_map, location = self._swift_stock_qty_map(products.ids, branch_config=branch_config)
+
+        items = [self._swift_product_payload(product, qty_map=qty_map, location=location) for product in products]
+        reverse = sort_order != "asc"
+        if sort_by == "name":
+            items.sort(key=lambda item: (item.get("name") or "").lower(), reverse=reverse)
+        elif sort_by == "stock":
+            items.sort(key=lambda item: item.get("stock", 0.0), reverse=reverse)
+        else:
+            items.sort(key=lambda item: item.get("price", 0.0), reverse=reverse)
+
+        total = len(items)
+        start = (page - 1) * page_size
+        end = start + page_size
+        return self._ok({
+            "items": items[start:end],
+            "pagination": {
+                "page": page,
+                "pageSize": page_size,
+                "total": total,
+            },
+        })
+
+    @http.route("/api/swift/v1/products/summary", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_products_summary(self, **kwargs):
+        args = request.httprequest.args
+        search = (args.get("search") or args.get("keyword") or "").strip()
+        category_id = args.get("categoryId") or args.get("category_id") or ""
+        branch_id = args.get("branchId") or args.get("config_id") or ""
+        domain, branch_config = self._swift_product_domain(search=search, category_id=category_id, branch_id=branch_id)
+        products = request.env["product.product"].sudo().search(domain)
+        qty_map, _location = self._swift_stock_qty_map(products.ids, branch_config=branch_config)
+        total_stock_value = 0.0
+        for product in products:
+            total_stock_value += (qty_map.get(product.id, 0.0) or 0.0) * (product.standard_price or 0.0)
+        return self._ok({
+            "totalItems": len(products),
+            "totalStockValue": total_stock_value,
+        })
+
+    @http.route("/api/swift/v1/products/by-barcode/<string:barcode>", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_product_by_barcode(self, barcode, **kwargs):
+        branch_id = request.httprequest.args.get("branchId") or request.httprequest.args.get("config_id") or ""
+        branch_config = self._swift_get_branch_config(branch_id)
+        domain = [
+            ("barcode", "=", barcode),
+            ("sale_ok", "=", True),
+            ("active", "=", True),
+        ]
+        if "available_in_pos" in request.env["product.product"]._fields:
+            domain.append(("available_in_pos", "=", True))
+        if branch_config:
+            domain.append(("product_tmpl_id.swift_branch_config_ids", "in", branch_config.ids))
+        product = request.env["product.product"].sudo().search(domain, limit=1)
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/products/export-stock-report", type="http", auth="user", methods=["POST"], csrf=False)
+    def export_stock_report(self, **kwargs):
+        payload = self._json_body()
+        search = (payload.get("search") or payload.get("keyword") or "").strip()
+        category_id = payload.get("categoryId") or payload.get("category_id") or ""
+        branch_id = payload.get("branchId") or payload.get("config_id") or ""
+        sort_by = (payload.get("sortBy") or "price").strip()
+        sort_order = (payload.get("sortOrder") or "desc").strip().lower()
+        domain, branch_config = self._swift_product_domain(search=search, category_id=category_id, branch_id=branch_id)
+        products = request.env["product.product"].sudo().search(domain)
+        qty_map, location = self._swift_stock_qty_map(products.ids, branch_config=branch_config)
+        items = [self._swift_product_payload(product, qty_map=qty_map, location=location) for product in products]
+        reverse = sort_order != "asc"
+        if sort_by == "name":
+            items.sort(key=lambda item: (item.get("name") or "").lower(), reverse=reverse)
+        elif sort_by == "stock":
+            items.sort(key=lambda item: item.get("stock", 0.0), reverse=reverse)
+        else:
+            items.sort(key=lambda item: item.get("price", 0.0), reverse=reverse)
+
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(["ID", "Name", "SKU", "Barcode", "Price", "Cost Price", "Stock", "Category", "Brand", "Unit", "Status"])
+        for item in items:
+            writer.writerow([
+                item.get("id"),
+                item.get("name"),
+                item.get("sku"),
+                item.get("barcode"),
+                item.get("price"),
+                item.get("costPrice"),
+                item.get("stock"),
+                item.get("category", {}).get("name", ""),
+                item.get("brand", {}).get("name", ""),
+                item.get("unitLabel"),
+                item.get("statusLabel"),
+            ])
+
+        file_name = "bao-cao-ton-kho.csv"
+        attachment = request.env["ir.attachment"].sudo().create({
+            "name": file_name,
+            "type": "binary",
+            "datas": base64.b64encode(buffer.getvalue().encode("utf-8")),
+            "mimetype": "text/csv",
+        })
+        return self._ok({
+            "fileUrl": f"/web/content/{attachment.id}?download=true",
+            "fileName": file_name,
+        })
+
+    @http.route("/api/swift/v1/products", type="http", auth="user", methods=["POST"], csrf=False)
+    def create_product(self, **kwargs):
+        payload = self._json_body()
+        name = (payload.get("name") or "").strip()
+        if not name:
+            return self._error(_("Name is required"))
+
+        tmpl_model = request.env["product.template"].sudo()
+        tmpl_vals = self._swift_write_product_from_payload(tmpl_model, payload)
+        tmpl_vals["name"] = name
+        if "sale_ok" in tmpl_model._fields:
+            tmpl_vals["sale_ok"] = True
+        if "available_in_pos" in tmpl_model._fields:
+            tmpl_vals["available_in_pos"] = True
+
+        branch_config = self._swift_get_branch_config(payload.get("branchId") or payload.get("config_id") or "")
+        if branch_config and "swift_branch_config_ids" in tmpl_model._fields and not tmpl_vals.get("swift_branch_config_ids"):
+            tmpl_vals["swift_branch_config_ids"] = [(6, 0, [branch_config.id])]
+
+        template = tmpl_model.create(tmpl_vals)
+        product = template.product_variant_id or template.product_variant_ids[:1]
+        if not product:
+            return self._error(_("Cannot create product"), status=500)
+
+        self._swift_apply_initial_stock(product, payload.get("stockQuantity"), branch_config)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/services", type="http", auth="user", methods=["POST"], csrf=False)
+    def create_service(self, **kwargs):
+        payload = self._json_body()
+        name = (payload.get("name") or "").strip()
+        if not name:
+            return self._error(_("Name is required"))
+
+        tmpl_model = request.env["product.template"].sudo()
+        tmpl_vals = self._swift_write_product_from_payload(tmpl_model, payload)
+        tmpl_vals["name"] = name
+        if "sale_ok" in tmpl_model._fields:
+            tmpl_vals["sale_ok"] = True
+        if "available_in_pos" in tmpl_model._fields:
+            tmpl_vals["available_in_pos"] = True
+        if "detailed_type" in tmpl_model._fields:
+            tmpl_vals["detailed_type"] = "service"
+        elif "type" in tmpl_model._fields:
+            tmpl_vals["type"] = "service"
+
+        template = tmpl_model.create(tmpl_vals)
+        product = template.product_variant_id or template.product_variant_ids[:1]
+        if not product:
+            return self._error(_("Cannot create service"), status=500)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=False)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/products/<int:product_id>", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_product_detail(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        branch_id = request.httprequest.args.get("branchId") or request.httprequest.args.get("config_id") or ""
+        branch_config = self._swift_get_branch_config(branch_id)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/products/<int:product_id>", type="http", auth="user", methods=["PATCH"], csrf=False)
+    def update_product(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        payload = self._json_body()
+        branch_config = self._swift_get_branch_config(payload.get("branchId") or payload.get("config_id") or "")
+        tmpl_vals = self._swift_write_product_from_payload(product.product_tmpl_id, payload, branch_config=branch_config)
+        if tmpl_vals:
+            product.product_tmpl_id.sudo().write(tmpl_vals)
+        if "stockQuantity" in payload:
+            self._swift_apply_initial_stock(product, payload.get("stockQuantity"), branch_config)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/products/<int:product_id>", type="http", auth="user", methods=["DELETE"], csrf=False)
+    def delete_product(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        try:
+            product.product_tmpl_id.sudo().unlink()
+            return self._ok({"message": _("Deleted successfully")})
+        except Exception as e:
+            return self._error(str(e), status=500)
+
+    @http.route("/api/swift/v1/products/<int:product_id>/change-status", type="http", auth="user", methods=["POST"], csrf=False)
+    def change_product_status(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        payload = self._json_body()
+        status = (payload.get("status") or "").strip().lower()
+        if status not in ("active", "inactive", "draft"):
+            return self._error(_("Invalid status"))
+        product.product_tmpl_id.sudo().write({"active": status == "active"})
+        branch_id = payload.get("branchId") or payload.get("config_id") or ""
+        branch_config = self._swift_get_branch_config(branch_id)
+        qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
+        return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
+
+    @http.route("/api/swift/v1/products/<int:product_id>/stock-history", type="http", auth="user", methods=["GET"], csrf=False)
+    def product_stock_history(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        stock_items, _price_items = self._swift_product_history_payload(product)
+        return self._ok({"items": stock_items})
+
+    @http.route("/api/swift/v1/products/<int:product_id>/price-history", type="http", auth="user", methods=["GET"], csrf=False)
+    def product_price_history(self, product_id, **kwargs):
+        product = request.env["product.product"].sudo().browse(product_id).exists()
+        if not product:
+            return self._error(_("Product not found"), status=404)
+        _stock_items, price_items = self._swift_product_history_payload(product)
+        return self._ok({"items": price_items})
+
+    @http.route("/api/swift/v1/brands", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_brands(self, **kwargs):
+        templates = request.env["product.template"].sudo().search([])
+        brand_names = set()
+        for template in templates:
+            brand = self._swift_brand_name(template)
+            if brand:
+                brand_names.add(brand)
+        res = [{"id": name, "name": name} for name in sorted(brand_names, key=lambda v: v.lower())]
+        return self._ok({"items": res})
+
+    @http.route("/api/swift/v1/product-attributes", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_product_attributes(self, **kwargs):
+        uoms = request.env["uom.uom"].sudo().search([])
+        res = [{"id": u.id, "name": u.name} for u in uoms]
+        return self._ok({"items": res})
+
+    @http.route("/api/swift/v1/product-attributes", type="http", auth="user", methods=["POST"], csrf=False)
+    def create_product_attribute(self, **kwargs):
+        payload = self._json_body()
+        name = (payload.get("name") or "").strip()
+        if not name:
+            return self._error(_("Name is required"))
+        category = request.env.ref("uom.product_uom_categ_unit", raise_if_not_found=False)
+        if not category:
+            category = request.env["uom.category"].sudo().search([], limit=1)
+        vals = {"name": name}
+        if category:
+            vals["category_id"] = category.id
+        if "uom_type" in request.env["uom.uom"]._fields:
+            vals["uom_type"] = "reference"
+        if "measure_type" in request.env["uom.uom"]._fields:
+            vals["measure_type"] = "unit"
+        if "factor" in request.env["uom.uom"]._fields:
+            vals["factor"] = 1.0
+        uom = request.env["uom.uom"].sudo().create(vals)
+        return self._ok({"id": uom.id, "name": uom.name})
+
+    @http.route("/api/swift/v1/uploads/images", type="http", auth="user", methods=["POST"], csrf=False)
+    def upload_product_image(self, **kwargs):
+        file_storage = (
+            request.httprequest.files.get("file")
+            or request.httprequest.files.get("image")
+            or request.httprequest.files.get("upload")
+        )
+        if not file_storage:
+            return self._error(_("Image file is required"))
+        content = file_storage.read()
+        if not content:
+            return self._error(_("Image file is empty"))
+        attachment = request.env["ir.attachment"].sudo().create({
+            "name": secure_filename(file_storage.filename or "product-image"),
+            "datas": base64.b64encode(content),
+            "mimetype": file_storage.mimetype or "application/octet-stream",
+            "type": "binary",
+        })
+        return self._ok({
+            "id": attachment.id,
+            "url": f"/web/content/{attachment.id}?download=false",
+        })
+
+    @http.route("/api/swift/v1/uploads/images/<int:image_id>", type="http", auth="user", methods=["DELETE"], csrf=False)
+    def delete_product_image(self, image_id, **kwargs):
+        attachment = request.env["ir.attachment"].sudo().browse(image_id).exists()
+        if not attachment:
+            return self._error(_("Image not found"), status=404)
+        attachment.sudo().unlink()
+        return self._ok({"message": _("Deleted successfully")})
 
     # 6. Transfers
     @http.route("/api/swift/v1/transfers", type="http", auth="user", methods=["GET"], csrf=False)

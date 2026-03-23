@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_theme_swift.SwiftVerifyPinPopup" owl="1">
+        <Dialog
+            title="props.title || this._t('Nhập mã PIN của bạn')"
+            size="'sm'"
+            header="false"
+            footer="false"
+            withBodyPadding="false"
+        >
+            <div class="popup popup-number" style="padding: 10px;">
+                <main class="body">
+                    <div class="d-flex justify-content-start mb-2">
+                        <button
+                            type="button"
+                            class="btn btn-link p-0 text-decoration-none"
+                            t-on-click="goBack"
+                        >
+                            <i class="fa fa-arrow-left me-1"/>
+                            <t t-esc="this._t('Quay lại')"/>
+                        </button>
+                    </div>
+                    <div class="text-center fw-bold mb-3" style="font-size: 1.1rem;">
+                        <t t-esc="props.title || this._t('Nhập mã PIN của bạn')"/>
+                    </div>
+                    <div class="text-center text-muted mb-3" t-if="props.branchName">
+                        <t t-esc="props.branchName"/>
+                    </div>
+                    <div class="pin-display" style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; margin-bottom: 20px; min-height: 3rem; background: #f8fafc; padding: 15px; border-radius: 8px;">
+                        <t t-esc="'*'.repeat(state.pin.length)"/>
+                    </div>
+                    <t t-if="state.error">
+                        <div class="error-message" style="color: #ef4444; text-align: center; margin-bottom: 15px; font-weight: 500;">
+                            <t t-esc="state.error"/>
+                        </div>
+                    </t>
+                    <div class="numpad" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('1')">1</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('2')">2</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('3')">3</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('4')">4</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('5')">5</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('6')">6</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('7')">7</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('8')">8</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('9')">9</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #fee2e2; color: #b91c1c;" t-on-click="() => this.deleteChar()">C</button>
+                        <button class="button" style="padding: 20px; font-size: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;" t-on-click="() => this.appendChar('0')">0</button>
+                        <button class="button confirm highlight" style="padding: 20px; font-size: 1.2rem; border-radius: 8px; background: #3b82f6; color: white; border: none; font-weight: bold;" t-on-click="() => this.confirm()" t-att-disabled="state.loading">
+                            <t t-if="state.loading">...</t>
+                            <t t-else="">OK</t>
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </Dialog>
+    </t>
+</templates>

@@ -10,6 +10,68 @@ class PosDashboardSwift(models.AbstractModel):
     _name = 'pos.dashboard.swift'
     _description = 'POS Dashboard Logic for Swift'
 
+    def _swift_normalize_branch_label(self, value):
+        return (value or '').strip().casefold()
+
+    def _swift_get_session_branch_name(self, pos_session_or_config_id):
+        if not pos_session_or_config_id:
+            return ''
+        branch = self.env['pos.config'].sudo().browse(int(pos_session_or_config_id)).exists()
+        if branch:
+            return branch.name or branch.display_name or ''
+
+        session = self.env['pos.session'].sudo().browse(int(pos_session_or_config_id)).exists()
+        if session and session.config_id:
+            return session.config_id.name or session.config_id.display_name or ''
+
+        return ''
+
+    def _swift_get_employee_branch_name(self, profile):
+        if not profile:
+            return ''
+        return profile.work_branch or ''
+
+    def _swift_get_job_title_options(self):
+        try:
+            job_model = self.env['hr.job']
+        except Exception:
+            job_model = False
+
+        if job_model:
+            jobs = job_model.sudo().search([], order='name asc')
+            rows = []
+            for job in jobs:
+                rows.append({
+                    'id': job.id,
+                    'name': job.name or '',
+                })
+            return rows
+
+        profiles = self.env['swift.employee.profile'].sudo().search([])
+        job_titles = sorted({(profile.job_title or '').strip() for profile in profiles if (profile.job_title or '').strip()})
+        return [{'id': title, 'name': title} for title in job_titles]
+
+    def _swift_log_pos_access(self, employee_id, pos_session_or_config_id, status='success'):
+        try:
+            pos_session = False
+            if pos_session_or_config_id:
+                session = self.env['pos.session'].sudo().browse(int(pos_session_or_config_id)).exists()
+                if session:
+                    pos_session = session.id
+                else:
+                    config = self.env['pos.config'].sudo().browse(int(pos_session_or_config_id)).exists()
+                    if config:
+                        session = self.env['pos.session'].sudo().search([('config_id', '=', config.id)], limit=1, order='id desc')
+                        pos_session = session.id if session else False
+            self.env['swift.pos.access.log'].sudo().create({
+                'employee_id': int(employee_id),
+                'pos_session_id': pos_session,
+                'access_time': fields.Datetime.now(),
+                'status': status,
+            })
+        except Exception as e:
+            _logger.warning('Failed to log POS access: %s', e)
+
     def _partner_phone_value(self, partner):
         if not partner:
             return ''
@@ -1730,6 +1792,7 @@ class PosDashboardSwift(models.AbstractModel):
                 'advancedSetting': profile.advanced_setting,
                 'overtimeEnabled': profile.overtime_enabled,
                 'debtAdvance': profile.debt_advance_balance,
+                'posPin': profile.pos_pin or '',
             },
             'days': days,
             'scheduleShifts': shifts,
@@ -1786,7 +1849,7 @@ class PosDashboardSwift(models.AbstractModel):
         ])
         branch_rows = self.get_employee_branch_options().get('rows', [])
         departments = sorted({(profile.department or '').strip() for profile in profiles if (profile.department or '').strip()})
-        job_titles = sorted({(profile.job_title or '').strip() for profile in profiles if (profile.job_title or '').strip()})
+        job_titles = self._swift_get_job_title_options()
         pay_branches = sorted({(profile.pay_branch or '').strip() for profile in profiles if (profile.pay_branch or '').strip()})
 
         known_branch_names = {row['name'] for row in branch_rows}
@@ -1801,7 +1864,7 @@ class PosDashboardSwift(models.AbstractModel):
             'workBranches': branch_rows,
             'payBranches': branch_rows,
             'departments': [{'id': name, 'name': name} for name in departments],
-            'jobTitles': [{'id': name, 'name': name} for name in job_titles],
+            'jobTitles': job_titles,
         }
 
     @api.model
@@ -1814,6 +1877,20 @@ class PosDashboardSwift(models.AbstractModel):
                 return {'ok': False, 'message': _('Name is required')}
 
             phone = (vals.get('phone') or '').strip()
+            pos_pin = (vals.get('posPin') or '').strip()
+            birth_date = self._to_date_value(vals.get('birthDate'))
+            salary_amount = self._to_float_amount(vals.get('salaryAmount'), 0.0)
+            job_title = (vals.get('jobTitle') or '').strip()
+            if not phone:
+                return {'ok': False, 'message': _('Phone Number is required')}
+            if not pos_pin:
+                return {'ok': False, 'message': _('POS PIN is required')}
+            if not birth_date:
+                return {'ok': False, 'message': _('Birth Date is required')}
+            if salary_amount <= 0:
+                return {'ok': False, 'message': _('Salary Amount is required')}
+            if not job_title:
+                return {'ok': False, 'message': _('Job Title is required')}
             if selected_user_id:
                 user = self.env['res.users'].sudo().browse(int(selected_user_id))
                 if not user.exists():
@@ -1849,21 +1926,90 @@ class PosDashboardSwift(models.AbstractModel):
             profile.sudo().write({
                 'phone': phone,
                 'id_number': vals.get('idNumber') or '',
-                'birth_date': self._to_date_value(vals.get('birthDate')),
+                'birth_date': birth_date,
                 'gender': vals.get('gender') or False,
+                'department': vals.get('department') or '',
+                'job_title': job_title,
                 'work_branch': vals.get('workBranch') or _('Chi nhánh trung tâm'),
                 'pay_branch': vals.get('payBranch') or _('Chi nhánh trung tâm'),
                 'status': 'working',
                 'salary_type': vals.get('salaryType') or 'hour',
-                'salary_amount': self._to_float_amount(vals.get('salaryAmount'), 0.0),
+                'salary_amount': salary_amount,
                 'advanced_setting': bool(vals.get('advancedSetting')),
                 'overtime_enabled': bool(vals.get('overtimeEnabled')),
+                'pos_pin': pos_pin,
             })
             return {'ok': True, 'userId': user.id, 'createdNewUser': not bool(selected_user_id)}
         except Exception as e:
             self.env.cr.rollback()
             _logger.exception("create_employee_record failed: %s", e)
             return {'ok': False, 'message': _('Cannot create employee')}
+
+    @api.model
+    def update_employee_record(self, user_id, vals):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
+
+        vals = vals or {}
+        job_title = (vals.get('jobTitle') or '').strip()
+        phone = (vals.get('phone') or '').strip()
+        pos_pin = (vals.get('posPin') or '').strip()
+        birth_date = self._to_date_value(vals.get('birthDate'))
+        salary_amount = self._to_float_amount(vals.get('salaryAmount'), profile.salary_amount)
+        if not (vals.get('name') or '').strip():
+            return {'ok': False, 'message': _('Name is required')}
+        if not phone:
+            return {'ok': False, 'message': _('Phone Number is required')}
+        if not pos_pin:
+            return {'ok': False, 'message': _('POS PIN is required')}
+        if not birth_date:
+            return {'ok': False, 'message': _('Birth Date is required')}
+        if salary_amount <= 0:
+            return {'ok': False, 'message': _('Salary Amount is required')}
+        if job_title and job_title.isdigit():
+            job = False
+            try:
+                job = self.env['hr.job'].sudo().browse(int(job_title)).exists()
+            except Exception:
+                job = False
+            job_title = job.name if job else job_title
+
+        try:
+            user_vals = {}
+            if vals.get('name'):
+                user_vals['name'] = vals.get('name')
+            if user_vals:
+                user.sudo().write(user_vals)
+
+            phone = (vals.get('phone') or '').strip()
+            if phone:
+                self._write_partner_phone(user.partner_id, phone)
+
+            profile.sudo().write({
+                'phone': phone,
+                'id_number': vals.get('idNumber') or profile.id_number or '',
+                'birth_date': birth_date,
+                'gender': vals.get('gender') or profile.gender or False,
+                'work_branch': vals.get('workBranch') or profile.work_branch or _('Chi nhánh trung tâm'),
+                'pay_branch': vals.get('payBranch') or profile.pay_branch or _('Chi nhánh trung tâm'),
+                'department': vals.get('department') or profile.department or '',
+                'job_title': job_title or profile.job_title or '',
+                'pos_pin': pos_pin,
+                'salary_type': vals.get('salaryType') or profile.salary_type,
+                'salary_amount': salary_amount,
+                'advanced_setting': bool(vals.get('advancedSetting')) if 'advancedSetting' in vals else profile.advanced_setting,
+                'overtime_enabled': bool(vals.get('overtimeEnabled')) if 'overtimeEnabled' in vals else profile.overtime_enabled,
+            })
+            return {'ok': True}
+        except Exception as e:
+            self.env.cr.rollback()
+            _logger.exception("update_employee_record failed: %s", e)
+            return {'ok': False, 'message': _('Cannot update employee')}
 
     @api.model
     def update_employee_salary_setup(self, user_id, vals):
@@ -1880,6 +2026,67 @@ class PosDashboardSwift(models.AbstractModel):
             'overtime_enabled': bool(vals.get('overtimeEnabled')),
         })
         return {'ok': True}
+
+    @api.model
+    def update_employee_pin(self, user_id, pos_pin):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
+
+        profile.sudo().write({
+            'pos_pin': pos_pin,
+        })
+        return {'ok': True}
+
+    @api.model
+    def verify_employee_pin(self, pos_pin, pos_session_or_config_id=False):
+        if not pos_pin:
+            return {'ok': False, 'message': _('PIN code is required.')}
+
+        profile = self.env['swift.employee.profile'].sudo().search([('pos_pin', '=', pos_pin)], limit=1)
+        if profile:
+            session_branch_name = self._swift_get_session_branch_name(pos_session_or_config_id)
+            employee_branch_name = self._swift_get_employee_branch_name(profile)
+            if not session_branch_name:
+                self._swift_log_pos_access(profile.user_id.id, pos_session_or_config_id, status='failed')
+                return {'ok': False, 'message': _('Unable to determine the POS branch for this session.')}
+
+            if self._swift_normalize_branch_label(employee_branch_name) != self._swift_normalize_branch_label(session_branch_name):
+                self._swift_log_pos_access(profile.user_id.id, pos_session_or_config_id, status='failed')
+                return {
+                    'ok': False,
+                    'code': 'branch_mismatch',
+                    'message': _(
+                        "This employee is assigned to '%(employee_branch)s' and cannot open POS '%(session_branch)s'."
+                    ) % {
+                        'employee_branch': employee_branch_name or _('Unassigned'),
+                        'session_branch': session_branch_name,
+                    },
+                    'employee_branch': employee_branch_name or _('Unassigned'),
+                    'session_branch': session_branch_name,
+                }
+
+            try:
+                self._swift_log_pos_access(profile.user_id.id, pos_session_or_config_id, status='success')
+            except Exception:
+                pass
+
+            admin_group = self.env.ref('base.group_system', raise_if_not_found=False)
+            admin_users = admin_group.user_ids if admin_group and 'user_ids' in admin_group._fields else (
+                admin_group.users if admin_group else self.env['res.users']
+            )
+
+            return {
+                'ok': True,
+                'user_id': profile.user_id.id,
+                'user_name': profile.user_id.name,
+                'avatarUrl': f"/web/image/res.users/{profile.user_id.id}/avatar_128",
+                'is_admin': bool(admin_group and profile.user_id in admin_users),
+            }
+        return {'ok': False, 'message': _('Incorrect PIN code.')}
 
     @api.model
     def add_employee_finance_entry(self, user_id, line_type, amount, note=''):

@@ -8,6 +8,18 @@ class ProductTemplate(models.Model):
 
     standard_price = fields.Float(string="Giá vốn")
 
+    swift_brand_name = fields.Char(string="Brand")
+    swift_warehouse_location = fields.Char(string="Warehouse Location")
+    swift_min_stock_threshold = fields.Float(string="Minimum Stock Threshold", default=0.0)
+    swift_max_stock_threshold = fields.Float(string="Maximum Stock Threshold", default=0.0)
+
+    uom_ids = fields.Many2many(
+        "uom.uom",
+        "swift_product_template_uom_rel",
+        "product_tmpl_id",
+        "uom_id",
+        string="Attributes / Units",
+    )
 
     swift_is_low_stock = fields.Boolean(
         string="Low Stock (Swift)",
@@ -33,6 +45,9 @@ class ProductTemplate(models.Model):
         fields = super()._load_pos_data_fields(config)
         if 'uom_ids' not in fields:
             fields.append('uom_ids')
+        for field_name in ("swift_brand_name", "swift_warehouse_location", "swift_min_stock_threshold", "swift_max_stock_threshold"):
+            if field_name not in fields:
+                fields.append(field_name)
         return fields
 
     swift_branch_qty_html = fields.Html(
@@ -497,4 +512,7 @@ class ProductProduct(models.Model):
         fields = super()._load_pos_data_fields(config)
         if 'uom_ids' not in fields:
             fields.append('uom_ids')
+        for field_name in ("swift_brand_name", "swift_warehouse_location", "swift_min_stock_threshold", "swift_max_stock_threshold"):
+            if field_name not in fields:
+                fields.append(field_name)
         return fields

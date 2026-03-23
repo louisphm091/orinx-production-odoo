@@ -25,6 +25,7 @@ class SwiftEmployeeProfile(models.Model):
     pay_branch = fields.Char(string="Pay Branch")
     department = fields.Char(string="Department")
     job_title = fields.Char(string="Job Title")
+    pos_pin = fields.Char(string="POS PIN")
 
     salary_type = fields.Selection([
         ("hour", "Theo giờ làm việc"),
@@ -78,3 +79,17 @@ class SwiftEmployeeFinanceLine(models.Model):
     ], required=True, default="advance")
     amount = fields.Float(required=True)
     note = fields.Char()
+
+class SwiftPosAccessLog(models.Model):
+    _name = "swift.pos.access.log"
+    _description = "Swift POS Access Log"
+    _order = "access_time desc, id desc"
+
+    employee_id = fields.Many2one("res.users", string="Employee", required=True)
+    pos_session_id = fields.Many2one("pos.session", string="POS Session")
+    access_time = fields.Datetime(string="Access Time", default=fields.Datetime.now, required=True)
+    ip_address = fields.Char(string="IP Address")
+    status = fields.Selection([
+        ('success', 'Success'),
+        ('failed', 'Failed'),
+    ], string="Status", default='success')

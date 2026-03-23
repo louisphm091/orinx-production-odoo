@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_theme_swift.SwiftBranchSelectPopup" owl="1">
+        <Dialog
+            title="this._t('Select POS branch')"
+            size="'md'"
+            header="false"
+            footer="false"
+            withBodyPadding="false"
+        >
+            <div class="popup popup-number" style="padding: 10px;">
+                <main class="body">
+                    <div class="text-center fw-bold mb-2" style="font-size: 1.1rem;">
+                        <t t-esc="this._t('Please select the branch you want to open.')"/>
+                    </div>
+                    <div class="text-muted text-center mb-3" t-if="props.currentBranchName">
+                        <t t-esc="props.currentBranchName"/>
+                        <span> · </span>
+                        <t t-esc="this._t('Current branch')"/>
+                    </div>
+
+                    <t t-if="state.loading">
+                        <div class="text-center py-4">
+                            <t t-esc="this._t('Loading branches...')"/>
+                        </div>
+                    </t>
+                    <t t-elif="state.error">
+                        <div class="text-center py-4 text-danger">
+                            <t t-esc="state.error"/>
+                        </div>
+                    </t>
+                    <t t-elif="!state.branches.length">
+                        <div class="text-center py-4 text-muted">
+                            <t t-esc="this._t('No POS branch available.')"/>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="d-grid gap-2">
+                            <t t-foreach="state.branches" t-as="branch" t-key="branch.id">
+                                <button
+                                    type="button"
+                                    class="btn btn-lg text-start d-flex justify-content-between align-items-center"
+                                    t-att-class="props.currentBranchId === branch.id ? 'btn btn-primary text-white' : 'btn btn-outline-primary'"
+                                    t-on-click="() => this.selectBranch(branch)"
+                                >
+                                    <span>
+                                        <t t-esc="branch.name"/>
+                                    </span>
+                                    <span t-if="props.currentBranchId === branch.id" class="badge bg-light text-primary">
+                                        <t t-esc="this._t('Current branch')"/>
+                                    </span>
+                                </button>
+                            </t>
+                        </div>
+                    </t>
+                </main>
+            </div>
+        </Dialog>
+    </t>
+</templates>

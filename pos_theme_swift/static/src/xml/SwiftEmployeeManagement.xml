@@ -106,11 +106,12 @@
                     <i class="fa fa-search"/>
                     <input type="text" t-att-placeholder="this._t('Search by code, employee name')" t-model="state.keyword" t-on-input="onSearchInput"/>
                 </div>
-                <div class="sem-actions">
-                    <button class="sem-primaryBtn" t-on-click="openCreate"><i class="fa fa-plus me-1"/> <t t-out="this._t('Employee')"/></button>
-                    <t t-if="state.status === 'working'">
-                        <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
-                    </t>
+                    <div class="sem-actions">
+                        <button class="sem-primaryBtn" t-on-click="openCreate"><i class="fa fa-plus me-1"/> <t t-out="this._t('Employee')"/></button>
+                        <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="openEditEmployee" t-out="this._t('Edit Employee')"/>
+                        <t t-if="state.status === 'working'">
+                            <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
+                        </t>
                     <t t-else="">
                         <button class="sem-lightBtn" t-att-disabled="!state.selectedUserId" t-on-click="markSelectedWorking" t-out="this._t('Mark as Working')"/>
                     </t>
@@ -220,8 +221,14 @@
                                                         <div><span t-out="this._t('Pay Branch')"/><strong><t t-esc="state.detail.profile.payBranch"/></strong></div>
                                                         <div><span t-out="this._t('Department')"/><strong><t t-esc="state.detail.profile.department || '-'"/></strong></div>
                                                         <div><span t-out="this._t('Job Title')"/><strong><t t-esc="state.detail.profile.jobTitle || '-'"/></strong></div>
+                                                        <div class="sem-pinRow" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                                                            <span t-out="this._t('POS PIN')" style="font-weight: 600; font-size: 0.85rem; color: #64748b;"/>
+                                                            <input type="password" class="sem-input" t-model="state.pinDraft" autocomplete="new-password" placeholder="••••••" style="width: 150px; display: inline-block; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#e2e8f0'"/>
+                                                            <button class="sem-primaryBtn sem-miniBtn" t-on-click="savePin" t-out="this._t('Update PIN')"/>
+                                                        </div>
                                                     </div>
                                                     <div class="sem-actionsRow">
+                                                        <button class="sem-lightBtn" t-on-click="openEditEmployee" t-out="this._t('Edit Employee')"/>
                                                         <t t-if="state.status === 'working'">
                                                             <button class="sem-lightBtn" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
                                                         </t>
@@ -367,21 +374,42 @@
                 <div class="sem-modalBackdrop" t-on-click="closeCreate"/>
                 <div class="sem-modal">
                     <button class="sem-modalClose" t-on-click="closeCreate">×</button>
-                    <h3 t-out="this._t('Add New Employee')"/>
+                    <h3 t-out="state.formMode === 'edit' ? this._t('Edit Employee') : this._t('Add New Employee')"/>
                     <div class="sem-formGrid">
-                        <label t-out="this._t('Select from existing users')"/>
-                        <select t-att-value="state.createForm.userId" t-on-change="onSelectAvailableUser">
-                            <option value="" t-out="this._t('-- Create New Employee --')"/>
-                            <t t-foreach="state.availableUsers" t-as="u" t-key="u.userId">
-                                <option t-att-value="u.userId"><t t-esc="u.name"/> (<t t-esc="u.login"/>)</option>
-                            </t>
-                        </select>
+                        <t t-if="state.formMode === 'create'">
+                            <label t-out="this._t('Select from existing users')"/>
+                            <select t-att-value="state.createForm.userId" t-on-change="onSelectAvailableUser">
+                                <option value="" t-out="this._t('-- Create New Employee --')"/>
+                                <t t-foreach="state.availableUsers" t-as="u" t-key="u.userId">
+                                    <option t-att-value="u.userId"><t t-esc="u.name"/> (<t t-esc="u.login"/>)</option>
+                                </t>
+                            </select>
+                        </t>
+                        <t t-else="">
+                            <label t-out="this._t('Employee')"/>
+                            <input type="text" t-att-value="state.createForm.name" readonly="readonly"/>
+                        </t>
                         <label t-out="this._t('Employee Name')"/><input type="text" t-model="state.createForm.name"/>
                         <label t-out="this._t('Phone Number')"/><input type="text" t-model="state.createForm.phone"/>
                         <label t-out="this._t('ID Number')"/><input type="text" t-model="state.createForm.idNumber"/>
+                        <label t-out="this._t('POS PIN')"/><input type="password" autocomplete="new-password" t-model="state.createForm.posPin"/>
                         <label t-out="this._t('Birth Date')"/><input type="date" t-model="state.createForm.birthDate"/>
                         <label t-out="this._t('Gender')"/>
                         <select t-model="state.createForm.gender"><option value="">--</option><option value="male" t-out="this._t('Male')"/><option value="female" t-out="this._t('Female')"/></select>
+                        <label t-out="this._t('Department')"/>
+                        <input type="text" t-model="state.createForm.department"/>
+                        <label t-out="this._t('Position')"/>
+                        <select t-model="state.createForm.jobTitle">
+                            <option value="" t-out="this._t('Select position')"/>
+                            <t t-if="state.filterOptions.jobTitles.length">
+                                <t t-foreach="state.filterOptions.jobTitles" t-as="jobTitle" t-key="'create-job-' + jobTitle.id">
+                                    <option t-att-value="jobTitle.id"><t t-esc="jobTitle.name"/></option>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <option value="" t-out="this._t('No position available.')"/>
+                            </t>
+                        </select>
                         <label t-out="this._t('Work Branch')"/>
                         <select t-model="state.createForm.workBranch">
                             <option value="" t-out="this._t('Select branch')"/>
@@ -406,7 +434,7 @@
                     </div>
                     <div class="sem-actionsRow">
                         <button class="sem-lightBtn" t-on-click="closeCreate" t-out="this._t('Cancel')"/>
-                        <button class="sem-primaryBtn" t-on-click="saveCreate" t-out="this._t('Save')"/>
+                        <button class="sem-primaryBtn" t-on-click="saveCreate" t-out="state.formMode === 'edit' ? this._t('Update Employee') : this._t('Save')"/>
                     </div>
                 </div>
             </t>

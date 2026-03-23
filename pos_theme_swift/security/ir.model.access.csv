@@ -13,3 +13,4 @@ access_swift_work_schedule_line,swift.work.schedule.line,model_swift_work_schedu
 access_swift_employee_profile,swift.employee.profile,model_swift_employee_profile,,1,1,1,1
 access_swift_employee_finance_line,swift.employee.finance.line,model_swift_employee_finance_line,,1,1,1,1
 access_swift_branch_product_wizard,swift.branch.product.wizard,model_swift_branch_product_wizard,point_of_sale.group_pos_manager,1,1,1,1
+access_swift_pos_access_log,swift.pos.access.log,model_swift_pos_access_log,,1,1,1,1

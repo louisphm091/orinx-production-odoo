@@ -109,13 +109,13 @@ msgstr "Lịch Làm Việc"
 #: model:ir.actions.client,name:pos_theme_swift.action_swift_pos_employee_management
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_employee
 msgid "Employee Management"
-msgstr "Quản Lý Nhân Viên"
+msgstr "Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
 #: model:ir.ui.menu,name:pos_theme_swift.menu_swift_pos_shift_root
 msgid "Employee Management"
-msgstr "Quản Lý Nhân Viên"
+msgstr "Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
@@ -2612,6 +2612,12 @@ msgstr "Sản phẩm '%s' đang có tồn kho thấp: %s (ngưỡng: %s)."
 #, python-format
 msgid "%s [%s]"
 msgstr "%s [%s]"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Employee Management"
+msgstr "Quản Lý Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
