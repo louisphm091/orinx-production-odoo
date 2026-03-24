@@ -26,6 +26,7 @@ export class SalePlanningDashboard extends Component {
 
         this.state = useState({
             loading: true,
+            loading_first_time: true,
             creating: false,
             error: null,
             filters: {
@@ -113,6 +114,36 @@ export class SalePlanningDashboard extends Component {
         try {
             this.state.loading = true;
             this.state.error = null;
+
+            // Kiểm tra context nếu được chuyển từ trang Dự báo
+            const context = this.props.action.context || {};
+            if (context.from_forecast && context.initial_demand_data && this.state.loading_first_time !== false) {
+                const data = await this.orm.call(
+                    "sale.planning.dashboard", 
+                    "get_dashboard_data", 
+                    [], 
+                    { filters: this.state.filters || {}, context: context }
+                );
+                this.state.kpis = data.kpis;
+                this.state.main_chart = data.main_chart;
+                this.state.order_suggestions = data.order_suggestions;
+                this.state.warehouses = data.warehouses;
+                this.state.categories = data.categories;
+
+                // Ghi đè demand bằng data từ forecast
+                this.state.order_suggestions.forEach(s => {
+                    const forecasted = context.initial_demand_data[s.sku];
+                    if (forecasted !== undefined) {
+                        s.demand = forecasted;
+                        s.plan_buy = Math.max(0, s.demand - s.onhand);
+                        s.status = s.plan_buy > 0 ? _t("Out of Stock Risk") : _t("Stable");
+                    }
+                });
+
+                this._scheduleRenderAllCharts();
+                this.state.loading_first_time = false;
+                return;
+            }
 
             const data = await this.orm.call(
                 "sale.planning.dashboard",

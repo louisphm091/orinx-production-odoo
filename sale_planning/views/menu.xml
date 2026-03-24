@@ -71,5 +71,16 @@
               parent="menu_sale_planning_root"
               action="action_sale_planning_analytics"
               sequence="30"/>
+
+    <record id="action_mrp_production_plan_dashboard" model="ir.actions.client">
+      <field name="name">Kế hoạch sản xuất tổng thể</field>
+      <field name="tag">mrp_production_plan.dashboard</field>
+    </record>
+
+    <menuitem id="menu_mrp_production_plan_dashboard"
+              name="Lập kế hoạch sản xuất"
+              parent="mrp.menu_mrp_root"
+              action="action_mrp_production_plan_dashboard"
+              sequence="5"/>
   </data>
 </odoo>

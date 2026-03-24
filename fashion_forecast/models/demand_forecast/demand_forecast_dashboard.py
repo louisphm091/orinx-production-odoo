@@ -5,6 +5,11 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
 class DemandForecastDashboard(models.AbstractModel):
     _name = "demand.forecast.dashboard"
     _description = "Demand Forecast Dashboard Service"
@@ -181,6 +186,8 @@ class DemandForecastDashboard(models.AbstractModel):
         today = fields.Date.today()
         date_start = today - relativedelta(months=3)
         
+        _logger.info("Generating dynamic forecast: filters=%s, date_start=%s", filters, date_start)
+        
         SaleLine = env["sale.order.line"].sudo()
         PosLine = env["pos.order.line"].sudo() if "pos.order.line" in env.registry else False
         
@@ -190,10 +197,9 @@ class DemandForecastDashboard(models.AbstractModel):
             ("order_id.date_order", ">=", fields.Datetime.to_string(date_start)),
         ]
         
-        # Branch context (similar to DashboardProgress mapping)
+        # Branch context
         wh_id = filters.get("warehouse_id")
         if wh_id:
-            # Check if wh_id is a pos.config or warehouse
             config = env["pos.config"].sudo().browse(int(wh_id)).exists()
             if config and config.swift_warehouse_id:
                 sale_domain.append(("order_id.warehouse_id", "=", config.swift_warehouse_id.id))
@@ -217,6 +223,7 @@ class DemandForecastDashboard(models.AbstractModel):
                 "revenue": subtotal_sum or 0.0,
                 "qty": qty_sum or 0.0
             }
+        _logger.info("Sale lines processed: %d products", len(metrics))
             
         # 2. POS Line Aggregation
         if PosLine:
@@ -246,9 +253,21 @@ class DemandForecastDashboard(models.AbstractModel):
                     }
                 metrics[product.id]["revenue"] += subtotal_sum or 0.0
                 metrics[product.id]["qty"] += qty_sum or 0.0
+            _logger.info("POS data merged with sales: metrics total=%d", len(metrics))
                 
         # 3. Calculate 30-day average (3-month total / 3)
         product_list = list(metrics.values())
+        
+        # Category Filter (mock category in UI screenshot)
+        cat_id = filters.get("category_id")
+        if cat_id:
+            cat_id = int(cat_id)
+            # Fetch products with category filter
+            Product = env['product.product'].sudo()
+            valid_pids_in_cat = Product.search([('categ_id', 'child_of', cat_id)]).ids
+            product_list = [m for m in product_list if m['id'] in valid_pids_in_cat]
+            _logger.info("Filtered by category %d: resulting total=%d", cat_id, len(product_list))
+        
         total_monthly_revenue = 0.0
         for m in product_list:
             m["avg_revenue"] = m["revenue"] / 3.0
@@ -260,6 +279,8 @@ class DemandForecastDashboard(models.AbstractModel):
         top_sku = top_skus[0] if top_skus else None
         top_sku_name = top_sku["name"] if top_sku else "-"
         top_sku_share = f"{(top_sku['avg_revenue'] / total_monthly_revenue * 100.0):.1f}%" if top_sku and total_monthly_revenue else "0%"
+        
+        _logger.info("Calculation complete: total_revenue=%f, top_sku=%s", total_monthly_revenue, top_sku_name)
         
         kpis = {
             "sku_forecast": int(round(total_monthly_revenue)),

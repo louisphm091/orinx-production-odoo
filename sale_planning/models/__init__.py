@@ -5,3 +5,4 @@ from . import dashboard_progress
 from . import manufacture_tracking
 from . import replenishment_dashboard
 from . import analytics_dashboard
+from . import production_plan_dashboard

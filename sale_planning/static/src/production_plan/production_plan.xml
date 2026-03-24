@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="mrp_production_plan.Dashboard" owl="1">
+    <div class="mpp_wrap o_action p-3">
+      
+      <!-- HEADER -->
+      <div class="mpp_header d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm">Thêm một sản phẩm</button>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" type="button">Tháng</button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Tuần</a>
+                <a class="dropdown-item" href="#">Tháng</a>
+                <a class="dropdown-item" href="#">Quý</a>
+              </div>
+            </div>
+            <h4 class="mb-0 ms-3 fw-bold mpp_title_main">Kế hoạch sản xuất tổng thể</h4>
+        </div>
+        <div class="mpp_search d-flex align-items-center">
+            <i class="fa fa-search me-2 text-muted"/>
+            <input type="text" class="form-control form-control-sm" placeholder="Tìm kiếm..."/>
+        </div>
+      </div>
+
+      <t t-if="state.loading">
+        <div class="alert alert-info">Đang tải dữ liệu...</div>
+      </t>
+      <t t-else="">
+        <div class="mpp_table_container">
+            <table class="table table-bordered mpp_table">
+                <thead>
+                    <tr>
+                        <th class="mpp_sticky_col mpp_product_head">
+                            <input type="checkbox" class="form-check-input me-2"/>
+                        </th>
+                        <t t-foreach="state.months" t-as="m" t-key="m">
+                            <th class="text-center small fw-semibold"><t t-esc="m"/></th>
+                        </t>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="state.rows" t-as="row" t-key="row.id">
+                        <!-- Product Title Row -->
+                        <tr class="mpp_main_row">
+                            <td class="mpp_sticky_col">
+                                <div class="d-flex align-items-center">
+                                    <input type="checkbox" class="form-check-input me-2 mb-0"/>
+                                    <span class="mpp_product_name fw-bold"><t t-esc="row.name"/></span>
+                                    <i class="fa fa-pencil ms-2 text-muted small mpp_pencil_always"/>
+                                </div>
+                            </td>
+                            <t t-foreach="state.months" t-as="m" t-key="m_index">
+                                <td class="text-center">
+                                    <span class="mpp_val_zero">0</span>
+                                </td>
+                            </t>
+                        </tr>
+                        <!-- Sub Rows -->
+                        <t t-foreach="row.sub_rows" t-as="sr" t-key="sr.label">
+                            <tr t-att-class="'mpp_sub_row mpp_row_' + (sr.label.indexOf('Nhu cầu') === 0 ? 'forecast' : sr.label.indexOf('Bổ sung') === 0 ? 'replenish' : sr.label.indexOf('Tồn kho') === 0 ? 'stock' : 'indirect')">
+                                <td class="mpp_sticky_col ps-4 small">
+                                    <div class="d-flex align-items-center">
+                                        <span class="mpp_sign_icon me-2 text-muted"><t t-esc="sr.icon"/></span>
+                                        <span class="mpp_row_label"><t t-esc="sr.label"/></span>
+                                        <t t-if="sr.label.indexOf('Nhu cầu') === 0">
+                                            <i class="fa fa-pencil ms-2 text-muted small mpp_pencil_always"/>
+                                        </t>
+                                    </div>
+                                </td>
+                                <t t-foreach="sr.values" t-as="val" t-key="val_index">
+                                    <td class="text-center p-1">
+                                        <t t-if="sr.label.indexOf('Bổ sung') === 0">
+                                            <div class="mpp_input_cell">
+                                                <span t-att-class="val == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(val)"/></span>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <span t-att-class="val == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(val)"/></span>
+                                        </t>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+      </t>
+    </div>
+  </t>
+
+</templates>

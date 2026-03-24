@@ -27,7 +27,7 @@
             </div>
 
                         <!-- nếu muốn gọi RPC thì đổi thành: t-on-click="load" -->
-            <button class="btn btn-primary" type="button">
+            <button t-on-click="load" class="btn btn-primary" type="button">
               <t t-out="this.tr('Refresh Forecast')"/>
             </button>
           </div>
@@ -299,21 +299,25 @@
                 </div>
 
                 <div class="d-flex flex-column gap-3 mt-3">
-                  <div class="d-flex align-items-center gap-3">
-                    <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
-                          style="width:36px;height:36px;">
-                      <i class="fa fa-briefcase text-success"/>
-                    </span>
-                    <span class="fw-semibold" t-out="this.tr('Purchase Planning')"/>
-                  </div>
+                  <a href="#" class="text-decoration-none text-dark" t-on-click="openPurchasePlanning" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
+                            style="width:36px;height:36px;">
+                        <i class="fa fa-briefcase text-success"/>
+                      </span>
+                      <span class="fw-semibold" t-out="this.tr('Purchase Planning')"/>
+                    </div>
+                  </a>
 
-                  <div class="d-flex align-items-center gap-3">
-                    <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
-                          style="width:36px;height:36px;">
-                      <i class="fa fa-industry text-success"/>
-                    </span>
-                    <span class="fw-semibold" t-out="this.tr('Production Planning')"/>
-                  </div>
+                  <a href="#" class="text-decoration-none text-dark" t-on-click="openProductionPlanning" style="cursor: pointer;">
+                    <div class="d-flex align-items-center gap-3">
+                      <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"
+                            style="width:36px;height:36px;">
+                        <i class="fa fa-industry text-success"/>
+                      </span>
+                      <span class="fw-semibold" t-out="this.tr('Production Planning')"/>
+                    </div>
+                  </a>
 
                   <div class="d-flex align-items-center gap-3">
                     <span class="d-inline-flex align-items-center justify-content-center rounded-3 bg-light"

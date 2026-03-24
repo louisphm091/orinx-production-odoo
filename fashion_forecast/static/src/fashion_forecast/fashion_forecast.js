@@ -112,6 +112,7 @@ export class FashionForecastDashboard extends Component {
             return _t(text);
         };
         this.orm = useService("orm");
+        this.action = useService("action");
         this.notification = useService("notification");
 
         this.chartRef = useRef("forecastChart");
@@ -260,6 +261,27 @@ export class FashionForecastDashboard extends Component {
         const n = Number(value);
         if (Number.isNaN(n)) return String(value);
         return n.toLocaleString("en-US"); // 12,500
+    }
+
+    openProductionPlanning(ev) {
+        if (ev) ev.preventDefault();
+        this.action.doAction("sale_planning.action_mrp_production_plan_dashboard");
+    }
+
+    openPurchasePlanning(ev) {
+        if (ev) ev.preventDefault();
+        // Gửi data sang phần lập kế hoạch đặt hàng
+        const initial_demand_data = {};
+        (this.state.forecast_rows || []).forEach(row => {
+            initial_demand_data[row.product_id || row.name] = row.demand;
+        });
+
+        this.action.doAction("sale_planning.action_sale_planning_dashboard", {
+            additionalContext: {
+                initial_demand_data: initial_demand_data,
+                from_forecast: true
+            }
+        });
     }
 }
 

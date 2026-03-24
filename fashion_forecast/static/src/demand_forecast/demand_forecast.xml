@@ -20,7 +20,7 @@
         </div>
         <div class="ff_header_right">
           <div class="ff_header_actions d-flex gap-2 align-items-center">
-            <button class="btn btn-primary" type="button">
+            <button t-on-click="load" class="btn btn-primary" type="button">
               <t t-out="this.tr('Refresh Forecast')"/>
             </button>
 

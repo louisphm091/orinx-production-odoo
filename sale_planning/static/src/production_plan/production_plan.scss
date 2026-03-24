@@ -1,0 +1,132 @@
+.mpp_wrap {
+    background-color: #fff;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #495057;
+}
+
+.mpp_header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px 15px;
+    background-color: #fff;
+}
+
+.mpp_table_container {
+    overflow: auto;
+    border: 1px solid #dee2e6;
+}
+
+.mpp_table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+    border: none;
+}
+
+.mpp_table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    font-size: 13px;
+    text-align: center;
+    width: 100px;
+    font-weight: bold;
+}
+
+.mpp_table td {
+    padding: 4px 8px;
+    border: 1px solid #dee2e6;
+    font-size: 13px;
+    min-width: 100px;
+    height: 32px;
+}
+
+.mpp_sticky_col {
+    position: sticky;
+    left: 0;
+    width: 280px;
+    background-color: #f8f9fa;
+    z-index: 10;
+    border-right: 1px solid #dee2e6 !important;
+}
+
+/* Rows for Demand - Shaded style in screenshot (Purple/Pinkish tint) */
+.mpp_row_forecast td, .mpp_row_indirect td {
+    background-color: #f3f0f7 !important;
+}
+.mpp_row_forecast .mpp_sticky_col, .mpp_row_indirect .mpp_sticky_col {
+    background-color: #f3f0f7 !important;
+}
+
+/* Row for Bổ sung hàng (Replenish) - White with inputs */
+.mpp_row_replenish td {
+    background-color: #fff;
+}
+.mpp_row_replenish .mpp_input_cell {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 2px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Other sub rows */
+.mpp_row_indirect td, .mpp_row_stock td {
+    background-color: #fff;
+}
+
+/* Product title row */
+.mpp_main_row {
+    background-color: #f8f9fa;
+}
+
+.mpp_product_name {
+    color: #008784; /* Odoo Tealish color from screenshot */
+    font-size: 13px;
+}
+
+.mpp_val_zero {
+    color: #ced4da;
+}
+
+.mpp_val_active {
+    color: #212529;
+    font-weight: bold;
+}
+
+.mpp_sign_icon {
+    width: 12px;
+    display: inline-block;
+}
+
+.mpp_search input {
+    border-radius: 4px;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    padding: 4px 8px 4px 30px;
+}
+
+.mpp_search i {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    color: #adb5bd;
+}
+
+/* Pencil icon visibility */
+.mpp_pencil_always {
+    visibility: visible !important;
+    opacity: 0.6;
+}
+
+.fa-pencil:hover {
+    opacity: 1;
+}
+
+.form-check-input {
+    margin-top: 0;
+}

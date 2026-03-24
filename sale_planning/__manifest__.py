@@ -44,6 +44,9 @@ track, and balance demand against supply. Developed by https://group.orinx.com.v
             "sale_planning/static/src/analytics_dashboard/analytics_dashboard.xml",
             "sale_planning/static/src/analytics_dashboard/analytics_dashboard.js",
             "sale_planning/static/src/analytics_dashboard/analytics_dashboard.scss",
+            "sale_planning/static/src/production_plan/production_plan.xml",
+            "sale_planning/static/src/production_plan/production_plan.js",
+            "sale_planning/static/src/production_plan/production_plan.scss",
 
         ],
     },
