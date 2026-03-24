@@ -8,6 +8,7 @@ from . import swift_work_schedule
 from . import swift_employee
 from . import swift_pos_config
 from . import swift_product_template
+from . import swift_sales
 from . import swift_branch_product_wizard
 from . import swift_stock_move
 from . import ir_http
