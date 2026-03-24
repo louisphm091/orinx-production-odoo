@@ -20,12 +20,22 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         prev_month_end = first_day_month - timedelta(days=1)
 
         # --- Master Data for Filters ---
-        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        pos_configs = env["pos.config"].sudo().search([
+            ("active", "=", True),
+            ("company_id", "=", env.company.id),
+        ])
+        warehouses_data = [
+            {"id": config.id, "name": config.name, "warehouse_id": config.swift_warehouse_id.id if config.swift_warehouse_id else False}
+            for config in pos_configs
+        ]
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         # --- Filter Processing ---
-        wh_id = filters.get("warehouse_id")
-        cat_id = filters.get("category_id")
+        branch_id = self._safe_int(filters.get("warehouse_id"))
+        cat_id = self._safe_int(filters.get("category_id"))
+
+        selected_config = pos_configs.filtered(lambda c: c.id == branch_id)[:1] if branch_id else False
+        target_warehouse_id = selected_config.swift_warehouse_id.id if selected_config and selected_config.swift_warehouse_id else False
 
         # ---- Top products to track ----
         Product = env['product.product'].sudo()
@@ -33,15 +43,21 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         
         product_domain = [('active', '=', True), ('type', '=', 'consu')]
         if cat_id:
-            product_domain.append(('categ_id', 'child_of', int(cat_id)))
+            product_domain.append(('categ_id', 'child_of', cat_id))
             
         all_products = Product.search(product_domain)
         product_ids = all_products.ids
 
+        # Common Line Domain
+        line_domain = [
+            ('state', 'in', ['sale', 'done']),
+            ('product_id', 'in', product_ids),
+        ]
+        if target_warehouse_id and 'warehouse_id' in env['sale.order']._fields:
+            line_domain.append(('order_id.warehouse_id', '=', target_warehouse_id))
+
         top_lines = SaleLine.read_group(
-            [('state', 'in', ['sale', 'done']), 
-             ('order_id.date_order', '>=', str(today - timedelta(days=60))),
-             ('product_id', 'in', product_ids)],
+            line_domain + [('order_id.date_order', '>=', str(today - timedelta(days=60)))],
             ['product_id', 'product_uom_qty'],
             ['product_id'],
             limit=10,
@@ -55,16 +71,14 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         overall = []
         for p in products:
             # Query this month
-            this_month_qty = sum(SaleLine.search([
+            this_month_qty = sum(SaleLine.search(line_domain + [
                 ('product_id', '=', p.id),
-                ('state', 'in', ['sale', 'done']),
                 ('order_id.date_order', '>=', str(first_day_month))
             ]).mapped('product_uom_qty'))
 
             # Query last month (as 'Plan')
-            last_month_qty = sum(SaleLine.search([
+            last_month_qty = sum(SaleLine.search(line_domain + [
                 ('product_id', '=', p.id),
-                ('state', 'in', ['sale', 'done']),
                 ('order_id.date_order', '>=', str(prev_month_start)),
                 ('order_id.date_order', '<=', str(prev_month_end))
             ]).mapped('product_uom_qty'))
@@ -99,17 +113,15 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         # Mini cards
         sku_cards = []
         for i, p in enumerate(products[:3]):
-            this_month_lines = SaleLine.search([
+            this_month_lines = SaleLine.search(line_domain + [
                 ('product_id', '=', p.id),
-                ('state', 'in', ['sale', 'done']),
                 ('order_id.date_order', '>=', str(first_day_month))
             ])
             rev = sum(this_month_lines.mapped('price_subtotal'))
             qty = sum(this_month_lines.mapped('product_uom_qty'))
 
-            last_month_qty = sum(SaleLine.search([
+            last_month_qty = sum(SaleLine.search(line_domain + [
                 ('product_id', '=', p.id),
-                ('state', 'in', ['sale', 'done']),
                 ('order_id.date_order', '>=', str(prev_month_start)),
                 ('order_id.date_order', '<=', str(prev_month_end))
             ]).mapped('product_uom_qty')) or 1
@@ -135,9 +147,7 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
             hist_labels.append(_("Week %s") % (6-i))
 
             # Total qty across all top products for this week
-            week_qty = sum(SaleLine.search([
-                ('product_id', 'in', product_ids),
-                ('state', 'in', ['sale', 'done']),
+            week_qty = sum(SaleLine.search(line_domain + [
                 ('order_id.date_order', '>=', str(w_start)),
                 ('order_id.date_order', '<', str(w_end))
             ]).mapped('product_uom_qty')) or 0
@@ -172,7 +182,13 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
                 "values": hist_values,
                 "note": note,
             },
-            "warehouses": warehouses,
+            "warehouses": warehouses_data,
             "categories": categories,
             "last_update": fields.Datetime.now(),
         }
+
+    def _safe_int(self, value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return False

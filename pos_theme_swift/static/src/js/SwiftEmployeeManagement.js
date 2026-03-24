@@ -119,6 +119,12 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Cannot generate verification code"),
     _t("Verification code copied"),
     _t("Copy"),
+    _t("Confirm Check In"),
+    _t("Confirm Check Out"),
+    _t("Not Checked In"),
+    _t("Employee code"),
+    _t("Image"),
+    _t("Attendance Code"),
 ];
 
 void EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS;
@@ -229,6 +235,17 @@ export class SwiftEmployeeManagement extends Component {
             await Promise.all([this.loadFilterOptions(), this.loadData(), this.loadAttendanceBoard()]);
         });
         onWillUnmount(() => this._clearAccessCodeTimer());
+    }
+
+    _swiftLangCode() {
+        return (this.env?.context?.lang || document.documentElement.lang || navigator.language || "en_US")
+            .replace("-", "_")
+            .slice(0, 5)
+            .toLowerCase();
+    }
+
+    _swiftText(text) {
+        return this._t(text);
     }
 
     formatMoney(v) {

@@ -81,7 +81,7 @@ export class SalePlanningDashboardProgress extends Component {
       _t("Progress by SKU / Order"),
       _t("Execution History & Trends"),
       _t("Category"),
-      _t("Warehouse"),
+      _t("Branch"),
       _t("All"),
   ];
 

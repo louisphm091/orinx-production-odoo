@@ -430,7 +430,6 @@
 
 .sem-table tr.is-selected td {
   background: #f6f9ff;
-  box-shadow: inset 3px 0 0 #2f80ff;
 }
 
 .w-check {

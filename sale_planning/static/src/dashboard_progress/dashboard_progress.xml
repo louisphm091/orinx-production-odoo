@@ -21,7 +21,7 @@
 
           <!-- Warehouse Filter -->
           <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
-              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <option value=""><t t-out="this._t('Branch')"/>: <t t-out="this._t('All')"/></option>
               <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
                   <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
               </t>

@@ -14,6 +14,27 @@ class PosDashboardSwift(models.AbstractModel):
     _swift_access_code_length = 6
     _swift_access_code_validity_minutes = 5
 
+    def _swift_is_vietnamese(self):
+        ctx_lang = self.env.context.get('lang') or ''
+        user_lang = self.env.user.lang or ''
+        return ctx_lang.lower().startswith('vi') or user_lang.lower().startswith('vi')
+
+    def _swift_translate_status_label(self, text):
+        if not self._swift_is_vietnamese():
+            return text
+        # Direct map as safety fallback if Odoo _() fails
+        vi_map = {
+            'Checked In': 'Đã chấm công vào',
+            'Checked Out': 'Đã chấm công ra',
+            'Not Checked In': 'Chưa chấm công vào',
+            'Active': 'Đang làm việc',
+            'Off': 'Đã nghỉ',
+        }
+        translated = _(text)
+        if translated == text:
+            return vi_map.get(text, text)
+        return translated
+
     def _swift_normalize_branch_label(self, value):
         return (value or '').strip().casefold()
 
@@ -1837,13 +1858,13 @@ class PosDashboardSwift(models.AbstractModel):
                     total_hours += max((fields.Datetime.now() - active_shift.check_in).total_seconds(), 0.0) / 3600.0
 
                 if active_shift:
-                    status_label = _('Checked In')
+                    status_label = self._swift_translate_status_label(_('Checked In'))
                     status_tone = 'warning'
                 elif first_shift:
-                    status_label = _('Checked Out')
+                    status_label = self._swift_translate_status_label(_('Checked Out'))
                     status_tone = 'success'
                 else:
-                    status_label = _('Not Checked In')
+                    status_label = self._swift_translate_status_label(_('Not Checked In'))
                     status_tone = 'muted'
 
                 check_in_local = fields.Datetime.context_timestamp(self, first_shift.check_in) if first_shift and first_shift.check_in else False

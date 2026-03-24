@@ -81,7 +81,7 @@
                                     <td><span class="sem-timeBadge"><t t-esc="row.checkIn"/></span></td>
                                     <td><span class="sem-timeBadge is-out"><t t-esc="row.checkOut"/></span></td>
                                     <td><t t-esc="row.hours"/>h</td>
-                                    <td><span class="sem-statusPill" t-att-class="getAttendanceToneClass(row.statusTone)"><t t-esc="row.statusLabel"/></span></td>
+                                    <td><span class="sem-statusPill" t-att-class="getAttendanceToneClass(row.statusTone)"><t t-esc="this._t(row.statusLabel)"/></span></td>
                                     <td><t t-esc="row.note || '--'"/></td>
                                     <td class="text-right">
                                         <div class="sem-inlineActions">

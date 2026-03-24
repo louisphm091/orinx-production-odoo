@@ -119,13 +119,39 @@ msgstr "Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
 msgid "Edit Employee"
 msgstr "Chỉnh sửa nhân viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
 msgid "Get Verification Code"
 msgstr "Lấy mã xác nhận"
+
+#. module: pos_theme_swift
+#. odoo-python
+#: code:addons/pos_theme_swift/models/pos_dashboard.py:0
+msgid "Not Checked In"
+msgstr "Chưa chấm công vào"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+#: code:addons/pos_theme_swift/static/src/xml/SwiftEmployeeManagement.xml:0
+msgid "Not Checked In"
+msgstr "Chưa chấm công vào"
+
+#. module: pos_theme_swift
+#. odoo-python
+#: code:addons/pos_theme_swift/models/pos_dashboard.py:0
+msgid "Checked In"
+msgstr "Đã chấm công vào"
+
+#. module: pos_theme_swift
+#. odoo-python
+#: code:addons/pos_theme_swift/models/pos_dashboard.py:0
+msgid "Checked Out"
+msgstr "Đã chấm công ra"
 
 #. module: pos_theme_swift
 #. odoo-javascript
