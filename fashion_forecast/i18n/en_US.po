@@ -1,0 +1,226 @@
+#. module: fashion_forecast
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English (US)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en_US\n"
+
+#. module: fashion_forecast
+#: model:ir.actions.client,name:fashion_forecast.action_fashion_forecast_dashboard_demand
+#: model:ir.ui.menu,name:fashion_forecast.menu_fashion_forecast_dashboard_demand
+msgid "Demand Forecast"
+msgstr ""
+
+#. module: fashion_forecast
+#: model:ir.actions.client,name:fashion_forecast.action_fashion_forecast_dashboard_sales
+#: model:ir.ui.menu,name:fashion_forecast.menu_fashion_forecast_dashboard_sales
+msgid "Revenue Forecast"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "DEMAND FORECAST"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Month"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "This Month"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Next Month"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Refresh Forecast"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Women's Fashion"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Men's Fashion"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "SKU Group / SKU"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "SKU Group"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "SKU"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Week"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Quarter"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Loading data..."
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Forecast Demand"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid " compared to last period"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Highest Demand SKU"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid " total demand"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Stockout Risk"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Manually Adjusted"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Yes"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "No"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Last update:"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Demand Forecast over time"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Demand Forecast by SKU"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Category"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Demand"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Actual"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "No data yet"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "View Details"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Forecast by SKU"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Top"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Shortage"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "7 days"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Use forecast results for:"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Purchase Planning"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Production Planning"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-xml
+msgid "Inventory Balancing"
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-javascript
+msgid "Cannot load Forecast dashboard data."
+msgstr ""
+
+#. module: fashion_forecast
+#. odoo-javascript
+msgid "Forecast"
+msgstr ""

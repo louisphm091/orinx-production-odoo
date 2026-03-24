@@ -1,0 +1,212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_planning
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English (US)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en_US\n"
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Supply / Purchase Plan"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Plan and track purchase/supply plans based on demand and production plans for the fashion industry"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "SKU / SKU Group"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Refresh"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Category"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "All"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Warehouse"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Time"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Create Supply Plan"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Loading data..."
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Total Supply Demand"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "units"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "vs previous period"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Planned Purchase"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "of demand"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Out of Stock Risk"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "SKUs"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Expected shortage in 14 days"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Waiting for Delivery"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "orders"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Updated today"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Purchase Recommendations"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Updated:"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Inventory Forecast"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Forecast Revenue by Category"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "No data"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "System uses historical data to adjust revenue forecasts"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Purchase Suggestions (SKU)"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Create Purchase Recommendation"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "No."
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "SKU"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Demand"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "On Hand"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Rec. Purchase"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Status"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Stable"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "Today"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "This Week"
+msgstr ""
+
+#. module: sale_planning
+#. odoo-javascript
+msgid "This Month"
+msgstr ""

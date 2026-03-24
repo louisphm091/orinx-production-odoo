@@ -3,11 +3,108 @@
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
+
+const FASHION_FORECAST_TRANSLATION_TERMS = [
+    _t("DEMAND FORECAST"),
+    _t("Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry"),
+    _t("Month"),
+    _t("This Month"),
+    _t("Next Month"),
+    _t("Refresh Forecast"),
+    _t("Women's Fashion"),
+    _t("Men's Fashion"),
+    _t("SKU Group / SKU"),
+    _t("SKU Group"),
+    _t("SKU"),
+    _t("Week"),
+    _t("Quarter"),
+    _t("Loading data..."),
+    _t("Forecast Demand"),
+    _t(" compared to last period"),
+    _t("Highest Demand SKU"),
+    _t(" total demand"),
+    _t("Stockout Risk"),
+    _t("Manually Adjusted"),
+    _t("Yes"),
+    _t("No"),
+    _t("Last update:"),
+    _t("Demand Forecast over time"),
+    _t("Demand Forecast by SKU"),
+    _t("Category"),
+    _t("Demand"),
+    _t("Actual"),
+    _t("No data yet"),
+    _t("View Details"),
+    _t("Forecast by SKU"),
+    _t("Top"),
+    _t("Shortage"),
+    _t("7 days"),
+    _t("Use forecast results for:"),
+    _t("Purchase Planning"),
+    _t("Production Planning"),
+    _t("Inventory Balancing"),
+    _t("Cannot load Forecast dashboard data."),
+    _t("Forecast"),
+];
+
+void FASHION_FORECAST_TRANSLATION_TERMS;
+
+const VI_VN_FASHION_FORECAST_TRANSLATIONS = {
+    "DEMAND FORECAST": "DỰ BÁO NHU CẦU",
+    "Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry": "Dự báo số lượng nhu cầu theo sản phẩm, thời gian và kịch bản để phục vụ kế hoạch cung ứng ngành thời trang",
+    "Month": "Tháng",
+    "This Month": "Tháng này",
+    "Next Month": "Tháng sau",
+    "Refresh Forecast": "Làm mới dự báo",
+    "Women's Fashion": "Thời trang nữ",
+    "Men's Fashion": "Thời trang nam",
+    "SKU Group / SKU": "Nhóm SKU / SKU",
+    "SKU Group": "Nhóm SKU",
+    "SKU": "Mã hàng",
+    "Week": "Tuần",
+    "Quarter": "Quý",
+    "Loading data...": "Đang tải dữ liệu...",
+    "Forecast Demand": "Nhu cầu dự báo",
+    " compared to last period": " so với kỳ trước",
+    "Highest Demand SKU": "SKU nhu cầu cao nhất",
+    " total demand": " tổng nhu cầu",
+    "Stockout Risk": "Nguy cơ thiếu hàng",
+    "Manually Adjusted": "Đã điều chỉnh thủ công",
+    "Yes": "Có",
+    "No": "Không",
+    "Last update:": "Lần cập nhật:",
+    "Demand Forecast over time": "Dự báo nhu cầu theo thời gian",
+    "Demand Forecast by SKU": "Dự báo nhu cầu theo SKU",
+    "Category": "Danh mục",
+    "Demand": "Nhu cầu",
+    "Actual": "Thực tế",
+    "No data yet": "Chưa có dữ liệu",
+    "View Details": "Xem chi tiết",
+    "Forecast by SKU": "Dự báo theo SKU",
+    "Top": "Đầu trang",
+    "Shortage": "Thiếu",
+    "7 days": "7 ngày",
+    "Use forecast results for:": "Sử dụng kết quả dự báo cho:",
+    "Purchase Planning": "Lập kế hoạch đặt hàng",
+    "Production Planning": "Lập kế hoạch sản xuất",
+    "Inventory Balancing": "Cân đối tồn kho",
+    "Cannot load Forecast dashboard data.": "Không tải được dữ liệu bảng điều khiển dự báo.",
+    "Forecast": "Dự báo",
+};
 
 export class FashionForecastDashboard extends Component {
     static template = "fashion_forecast.Dashboard";
 
     setup() {
+        const lang = (globalThis.odoo && globalThis.odoo.__session_info__ && globalThis.odoo.__session_info__.user_context && globalThis.odoo.__session_info__.user_context.lang) || "";
+        const isVietnamese = typeof lang === "string" && lang.toLowerCase().startsWith("vi");
+        this._t = (text) => {
+            if (isVietnamese && VI_VN_FASHION_FORECAST_TRANSLATIONS[text]) {
+                return VI_VN_FASHION_FORECAST_TRANSLATIONS[text];
+            }
+            return _t(text);
+        };
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -85,13 +182,13 @@ export class FashionForecastDashboard extends Component {
                 labels,
                 datasets: [
                     {
-                        label: "Forecast",
+                        label: this._t("Forecast"),
                         data: forecast,
                         tension: 0.35,
                         fill: false,
                     },
                     {
-                        label: "Actual",
+                        label: this._t("Actual"),
                         data: actual,
                         tension: 0.35,
                         fill: false,
@@ -145,7 +242,7 @@ export class FashionForecastDashboard extends Component {
             this.renderChart();
         } catch (e) {
             console.error(e);
-            this.state.error = "Không tải được dữ liệu Forecast dashboard.";
+            this.state.error = this._t("Cannot load Forecast dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;

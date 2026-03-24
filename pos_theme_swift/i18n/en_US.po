@@ -1,0 +1,57 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* pos_theme_swift
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-24 00:00+0000\n"
+"PO-Revision-Date: 2026-03-24 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English (US)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en_US\n"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Edit Employee"
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Get Verification Code"
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Verification Code"
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "This verification code expires in %s."
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Code expired. Please generate a new verification code."
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Cannot generate verification code"
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Verification code copied"
+msgstr ""
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Copy"
+msgstr ""

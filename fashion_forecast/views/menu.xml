@@ -7,12 +7,12 @@
         ========================== -->
 
         <record id="action_fashion_forecast_dashboard_demand" model="ir.actions.client">
-            <field name="name">Dự Báo Nhu Cầu</field>
+            <field name="name">Demand Forecast</field>
             <field name="tag">fashion_forecast.dashboard</field>
         </record>
 
         <record id="action_fashion_forecast_dashboard_sales" model="ir.actions.client">
-            <field name="name">Dự Báo Doanh Thu</field>
+            <field name="name">Revenue Forecast</field>
             <field name="tag">demand_forecast.dashboard</field>
         </record>
 
@@ -21,13 +21,13 @@
         ========================== -->
 
         <menuitem id="menu_fashion_forecast_dashboard_demand"
-                  name="Dự Báo Nhu Cầu"
+                  name="Demand Forecast"
                   parent="sale_planning.menu_sale_planning_root"
                   action="action_fashion_forecast_dashboard_demand"
                   sequence="80"/>
 
         <menuitem id="menu_fashion_forecast_dashboard_sales"
-                  name="Dự Báo Doanh Thu"
+                  name="Revenue Forecast"
                   parent="sale_planning.menu_sale_planning_root"
                   action="action_fashion_forecast_dashboard_sales"
                   sequence="90"/>

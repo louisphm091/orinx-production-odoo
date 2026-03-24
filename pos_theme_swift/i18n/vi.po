@@ -129,6 +129,36 @@ msgstr "Lấy mã xác nhận"
 
 #. module: pos_theme_swift
 #. odoo-javascript
+msgid "Verification Code"
+msgstr "Mã xác minh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "This verification code expires in %s."
+msgstr "Mã xác minh này sẽ hết hạn sau %s."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Code expired. Please generate a new verification code."
+msgstr "Mã đã hết hạn. Vui lòng tạo mã xác minh mới."
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Cannot generate verification code"
+msgstr "Không thể tạo mã xác minh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Verification code copied"
+msgstr "Đã sao chép mã xác minh"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Copy"
+msgstr "Sao chép"
+
+#. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Inventory Count"
 msgstr "Kiểm Kho"

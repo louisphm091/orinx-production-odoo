@@ -18,8 +18,8 @@
   box-shadow: 0 6px 18px rgba(15, 23, 42, .06);
 }
 
-/* fix trường hợp d-flex làm khoá scroll */
-.o_action {
+/* Keep the scroll fix scoped to this dashboard only */
+.fashion_forecast_dashboard.o_action {
     overflow-y: auto !important;
 }
 
@@ -78,6 +78,30 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.fashion_forecast_dashboard .dropdown-menu {
+  min-width: max-content;
+}
+
+@media (max-width: 992px) {
+  .fashion_forecast_dashboard .ff_header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fashion_forecast_dashboard .ff_header_left {
+    min-width: 0;
+  }
+
+  .fashion_forecast_dashboard .ff_header_right {
+    align-items: stretch;
+  }
+
+  .fashion_forecast_dashboard .ff_filter_group {
+    justify-content: center;
+  }
 }
 
 .ff_pill {
