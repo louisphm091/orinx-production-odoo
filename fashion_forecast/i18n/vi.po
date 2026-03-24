@@ -263,3 +263,84 @@ msgstr "Không tải được dữ liệu bảng điều khiển dự báo."
 #: code:addons/fashion_forecast/static/src/fashion_forecast/fashion_forecast.js:0
 msgid "Forecast"
 msgstr "Dự báo"
+
+#. module: fashion_forecast
+msgid "REVENUE FORECAST"
+msgstr "DỰ BÁO DOANH THU"
+
+#. module: fashion_forecast
+msgid "Fashion Industry"
+msgstr "Ngành Thời Trang"
+
+#. module: fashion_forecast
+msgid "Advanced Settings"
+msgstr "Cài Đặt Nâng Cao"
+
+#. module: fashion_forecast
+msgid "Forecast Revenue"
+msgstr "Doanh Thu Dự Báo"
+
+#. module: fashion_forecast
+msgid "Highest Contributing SKU"
+msgstr "SKU Đóng Góp Cao Nhất"
+
+#. module: fashion_forecast
+msgid "Adjust forecast"
+msgstr "Điều chỉnh dự báo"
+
+#. module: fashion_forecast
+msgid "based on actual business"
+msgstr "theo thực tế kinh doanh"
+
+#. module: fashion_forecast
+msgid "Adjustment factor"
+msgstr "Hệ số điều chỉnh"
+
+#. module: fashion_forecast
+msgid "Reason for adjustment"
+msgstr "Lý do điều chỉnh"
+
+#. module: fashion_forecast
+msgid "Enter reason for adjustment..."
+msgstr "Nhập lý do điều chỉnh..."
+
+#. module: fashion_forecast
+msgid "Save adjustment"
+msgstr "Lưu điều chỉnh"
+
+#. module: fashion_forecast
+msgid "Re-forecast"
+msgstr "Tái dự báo"
+
+#. module: fashion_forecast
+msgid "Forecast revenue by category"
+msgstr "Doanh thu dự báo theo danh mục"
+
+#. module: fashion_forecast
+msgid "Export Report"
+msgstr "Xuất báo cáo"
+
+#. module: fashion_forecast
+msgid "System uses historical data to adjust revenue forecasts"
+msgstr "Hệ thống sử dụng dữ liệu lịch sử để điều chỉnh dự báo doanh thu"
+
+#. module: fashion_forecast
+msgid "Corresponding inventory forecast"
+msgstr "Dự báo tồn kho tương ứng"
+
+#. module: fashion_forecast
+msgid "Set threshold"
+msgstr "Thiết lập ngưỡng"
+
+#. module: fashion_forecast
+msgid "Women's jeans"
+msgstr "Quần jean nữ"
+
+#. module: fashion_forecast
+msgid "Out of stock after 18 days if current"
+msgstr "Hết hàng sau 18 ngày nếu hiện tại"
+
+#. module: fashion_forecast
+msgid "Increase 18% at housewife 16% SS current"
+msgstr "Tăng 18% tại nội trợ 16% SS hiện tại"
+

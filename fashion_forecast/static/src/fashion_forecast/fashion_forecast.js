@@ -2,6 +2,7 @@
 
 import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { session } from "@web/session";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -52,6 +53,8 @@ void FASHION_FORECAST_TRANSLATION_TERMS;
 
 const VI_VN_FASHION_FORECAST_TRANSLATIONS = {
     "DEMAND FORECAST": "DỰ BÁO NHU CẦU",
+    "Demand Forecast": "Dự báo nhu cầu",
+    "Revenue Forecast": "Dự báo doanh thu",
     "Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry": "Dự báo số lượng nhu cầu theo sản phẩm, thời gian và kịch bản để phục vụ kế hoạch cung ứng ngành thời trang",
     "Month": "Tháng",
     "This Month": "Tháng này",
@@ -97,11 +100,14 @@ export class FashionForecastDashboard extends Component {
     static template = "fashion_forecast.Dashboard";
 
     setup() {
-        const lang = (globalThis.odoo && globalThis.odoo.__session_info__ && globalThis.odoo.__session_info__.user_context && globalThis.odoo.__session_info__.user_context.lang) || "";
-        const isVietnamese = typeof lang === "string" && lang.toLowerCase().startsWith("vi");
-        this._t = (text) => {
-            if (isVietnamese && VI_VN_FASHION_FORECAST_TRANSLATIONS[text]) {
-                return VI_VN_FASHION_FORECAST_TRANSLATIONS[text];
+        const localization = useService("localization");
+        this.tr = (text) => {
+            if (!text) return "";
+            const isVi = (localization.code && localization.code.startsWith("vi")) || 
+                         (document.documentElement.lang && document.documentElement.lang.startsWith("vi")) ||
+                         (_t.database && _t.database.lang && _t.database.lang.startsWith("vi"));
+            if (isVi && VI_VN_FASHION_FORECAST_TRANSLATIONS[text.trim()]) {
+                return VI_VN_FASHION_FORECAST_TRANSLATIONS[text.trim()];
             }
             return _t(text);
         };
@@ -182,13 +188,13 @@ export class FashionForecastDashboard extends Component {
                 labels,
                 datasets: [
                     {
-                        label: this._t("Forecast"),
+                        label: this.tr("Forecast"),
                         data: forecast,
                         tension: 0.35,
                         fill: false,
                     },
                     {
-                        label: this._t("Actual"),
+                        label: this.tr("Actual"),
                         data: actual,
                         tension: 0.35,
                         fill: false,
@@ -242,7 +248,7 @@ export class FashionForecastDashboard extends Component {
             this.renderChart();
         } catch (e) {
             console.error(e);
-            this.state.error = this._t("Cannot load Forecast dashboard data.");
+            this.state.error = this.tr("Cannot load Forecast dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;

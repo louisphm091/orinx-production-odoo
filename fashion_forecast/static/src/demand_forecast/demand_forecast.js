@@ -10,7 +10,106 @@ import {
     useRef,
     useState,
 } from "@odoo/owl";
+import { session } from "@web/session";
 import { useService } from "@web/core/utils/hooks";
+import { _t } from "@web/core/l10n/translation";
+
+const DEMAND_FORECAST_TRANSLATION_TERMS = [
+    _t("REVENUE FORECAST"),
+    _t("Fashion Industry"),
+    _t("Refresh Forecast"),
+    _t("Advanced Settings"),
+    _t("Loading data..."),
+    _t("Forecast Revenue"),
+    _t(" compared to last period"),
+    _t("Highest Contributing SKU"),
+    _t(" total demand"),
+    _t("Stockout Risk"),
+    _t("SKU"),
+    _t("Manually Adjusted"),
+    _t("Yes"),
+    _t("No"),
+    _t("Last update:"),
+    _t("Revenue Forecast over time"),
+    _t("Month"),
+    _t("Week"),
+    _t("Quarter"),
+    _t("Adjust forecast"),
+    _t("based on actual business"),
+    _t("Adjustment factor"),
+    _t("Reason for adjustment"),
+    _t("Enter reason for adjustment..."),
+    _t("Save adjustment"),
+    _t("Re-forecast"),
+    _t("Forecast revenue by category"),
+    _t("View Details"),
+    _t("Export Report"),
+    _t("System uses historical data to adjust revenue forecasts"),
+    _t("Forecast by SKU"),
+    _t("Top"),
+    _t("Category"),
+    _t("Demand"),
+    _t("Actual"),
+    _t("No data yet"),
+    _t("Corresponding inventory forecast"),
+    _t("Set threshold"),
+    _t("Cannot load Forecast dashboard data."),
+    _t("Forecast"),
+    _t("Women's jeans"),
+    _t("Out of stock after 18 days if current"),
+    _t("Increase 18% at housewife 16% SS current")
+];
+
+void DEMAND_FORECAST_TRANSLATION_TERMS;
+
+const VI_VN_DEMAND_FORECAST_TRANSLATIONS = {
+    "REVENUE FORECAST": "DỰ BÁO DOANH THU",
+    "Revenue Forecast": "Dự báo doanh thu",
+    "Demand Forecast": "Dự báo nhu cầu",
+    "Fashion Industry": "Ngành thời trang",
+    "Refresh Forecast": "Làm mới dự báo",
+    "Advanced Settings": "Cài Đặt Nâng Cao",
+    "Loading data...": "Đang tải dữ liệu...",
+    "Forecast Revenue": "Doanh Thu Dự Báo",
+    " compared to last period": " so với kỳ trước",
+    "Highest Contributing SKU": "SKU Đóng Góp Cao Nhất",
+    " total demand": " tổng nhu cầu",
+    "Stockout Risk": "Rủi Ro Thiếu Hàng",
+    "SKU": "SKU",
+    "Manually Adjusted": "Đã Điều Chỉnh Thủ Công",
+    "Yes": "Có",
+    "No": "Không",
+    "Last update:": "Lần cập nhật:",
+    "Revenue Forecast over time": "Dự báo doanh thu theo thời gian",
+    "Month": "Tháng",
+    "Week": "Tuần",
+    "Quarter": "Quý",
+    "Adjust forecast": "Điều chỉnh dự báo",
+    "based on actual business": "theo thực tế kinh doanh",
+    "Adjustment factor": "Hệ số điều chỉnh",
+    "Reason for adjustment": "Lý do điều chỉnh",
+    "Enter reason for adjustment...": "Nhập lý do điều chỉnh...",
+    "Save adjustment": "Lưu điều chỉnh",
+    "Re-forecast": "Tái dự báo",
+    "Forecast revenue by category": "Doanh thu dự báo theo danh mục",
+    "View Details": "Xem chi tiết",
+    "Export Report": "Xuất báo cáo",
+    "System uses historical data to adjust revenue forecasts": "Hệ thống sử dụng dữ liệu lịch sử để điều chỉnh dự báo doanh thu",
+    "Forecast by SKU": "Dự báo theo SKU",
+    "Top": "Top",
+    "Category": "Danh Mục",
+    "Demand": "Nhu Cầu",
+    "Actual": "Thực Tế",
+    "No data yet": "Chưa có dữ liệu",
+    "Corresponding inventory forecast": "Dự báo tồn kho tương ứng",
+    "Set threshold": "Thiết lập ngưỡng",
+    "Cannot load Forecast dashboard data.": "Không tải được dữ liệu Forecast dashboard.",
+    "Forecast": "Dự báo",
+    "Women's jeans": "Quần jean nữ",
+    "Out of stock after 18 days if current": "Hết hàng sau 18 ngày nếu hiện tại",
+    "Increase 18% at housewife 16% SS current": "Tăng 18% tại nội trợ 16% SS hiện tại"
+};
+
 
 function afterPaint(cb) {
     // chạy sau khi browser vẽ xong frame hiện tại (DOM ready hơn)
@@ -21,6 +120,17 @@ export class DemandForecastDashboard extends Component {
     static template = "demand_forecast.Dashboard";
 
     setup() {
+        const localization = useService("localization");
+        this.tr = (text) => {
+            if (!text) return "";
+            const isVi = (localization.code && localization.code.startsWith("vi")) || 
+                         (document.documentElement.lang && document.documentElement.lang.startsWith("vi")) ||
+                         (_t.database && _t.database.lang && _t.database.lang.startsWith("vi"));
+            if (isVi && VI_VN_DEMAND_FORECAST_TRANSLATIONS[text.trim()]) {
+                return VI_VN_DEMAND_FORECAST_TRANSLATIONS[text.trim()];
+            }
+            return _t(text);
+        };
         this.orm = useService("orm");
         this.notification = useService("notification");
 
@@ -126,8 +236,8 @@ export class DemandForecastDashboard extends Component {
             data: {
                 labels,
                 datasets: [
-                    { label: "Forecast", data: this.state.series.forecast || [], tension: 0.35, fill: false },
-                    { label: "Actual", data: this.state.series.actual || [], tension: 0.35, fill: false, borderDash: [6, 4] },
+                    { label: this.tr("Forecast"), data: this.state.series.forecast || [], tension: 0.35, fill: false },
+                    { label: this.tr("Actual"), data: this.state.series.actual || [], tension: 0.35, fill: false, borderDash: [6, 4] },
                 ],
             },
             options: {
@@ -236,7 +346,7 @@ export class DemandForecastDashboard extends Component {
             // chart sẽ render ở onMounted/onPatched
         } catch (e) {
             console.error(e);
-            this.state.error = "Không tải được dữ liệu Forecast dashboard.";
+            this.state.error = this.tr("Cannot load Forecast dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;
