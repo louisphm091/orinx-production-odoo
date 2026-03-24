@@ -572,24 +572,26 @@
 }
 
 .sem-modalBackdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: rgba(8, 18, 34, 0.38);
-  z-index: 30;
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.16);
+  z-index: 1000;
+  backdrop-filter: blur(2px);
 }
 
 .sem-modal {
-  position: absolute;
+  position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   width: min(940px, calc(100% - 20px));
+  max-height: calc(100vh - 40px);
+  overflow: auto;
   background: linear-gradient(180deg, #ffffff, #f8fbff);
   border: 1px solid #d7e2f3;
   border-radius: 24px;
   padding: 20px;
-  z-index: 31;
+  z-index: 1001;
   box-shadow: 0 24px 60px rgba(15, 35, 72, 0.25);
 }
 
@@ -610,6 +612,35 @@
   margin: 0 0 14px;
   font-size: 28px;
   font-weight: 800;
+}
+
+.sem-accessCodeModal {
+  width: min(520px, calc(100% - 32px));
+  text-align: center;
+}
+
+.sem-accessCodeBody {
+  padding: 10px 4px 2px;
+}
+
+.sem-accessCodeValue {
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: 0.45rem;
+  color: #0f172a;
+  line-height: 1.15;
+}
+
+.sem-accessCodeHint {
+  margin-top: 16px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.sem-accessCodeActions {
+  justify-content: center;
+  margin-top: 18px;
 }
 
 .sem-formGrid {

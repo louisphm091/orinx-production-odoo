@@ -15,7 +15,7 @@ class StockMove(models.Model):
         # Note: We do this POST-move to get accurate 'on-hand' including the new items.
 
         for move in res:
-            if move.state != 'done' or not move.product_id or move.product_id.type != 'product':
+            if move.state != 'done' or not move.product_id or not move.product_id.is_storable:
                 continue
 
             dest_location = move.location_dest_id

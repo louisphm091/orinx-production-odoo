@@ -47,6 +47,149 @@ msgid "Analytics & Reports"
 msgstr "Phân tích & Báo cáo"
 
 #. module: sale_planning
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_manufacture_tracking
+msgid "Manufacture Tracking"
+msgstr "Theo dõi sản xuất"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "MANUFACTURING TRACKING"
+msgstr "THEO DÕI SẢN XUẤT"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Loading..."
+msgstr "Đang tải..."
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "DAILY PROD"
+msgstr "Sản lượng ngày"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "WEEKLY PROD"
+msgstr "Sản lượng tuần"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "MONTHLY PROD"
+msgstr "Sản lượng tháng"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "RATE"
+msgstr "Tỷ lệ"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "PLAN"
+msgstr "Kế hoạch"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "TARGET"
+msgstr "Mục tiêu"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "RESULT"
+msgstr "Kết quả"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delay Orders"
+msgstr "Lệnh trễ"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delayed manufacturing orders"
+msgstr "Lệnh sản xuất bị trễ"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Bottleneck"
+msgstr "Công đoạn nghẽn"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Critical work center"
+msgstr "Công đoạn quan trọng"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "PRODUCTION PROGRESS BY LINE"
+msgstr "TIẾN ĐỘ SẢN XUẤT THEO CHUYỀN"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "No data"
+msgstr "Không có dữ liệu"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Line"
+msgstr "Chuyền"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Product"
+msgstr "Sản phẩm"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delay"
+msgstr "Trễ"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Load"
+msgstr "Tải"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Status"
+msgstr "Trạng thái"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "On track"
+msgstr "Đạt tiến độ"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Near capacity"
+msgstr "Gần đầy tải"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Overloaded / delayed"
+msgstr "Quá tải / bị trễ"
+
+#. module: sale_planning
 #: model:ir.actions.client,name:sale_planning.action_sale_schedule_dashboard
 #: model:ir.ui.menu,name:sale_planning.menu_sale_schedule_dashboard
 msgid "Sale Scheduling"

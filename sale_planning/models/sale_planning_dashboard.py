@@ -53,7 +53,8 @@ class SalePlanningDashboard(models.AbstractModel):
         Product = env["product.product"].sudo()
         domain = [
             ("active", "=", True),
-            ("type", "in", ["product", "consu"]),
+            ("type", "=", "consu"),
+            ("is_storable", "=", True),
         ]
         if filters.get("category_id"):
             domain.append(("categ_id", "child_of", int(filters["category_id"])))

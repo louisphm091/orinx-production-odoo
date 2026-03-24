@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, onMounted, useState } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 
@@ -109,10 +109,16 @@ const EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS = [
     _t("Cannot update employee"),
     _t("Name is required"),
     _t("Phone Number is required"),
-    _t("POS PIN is required"),
     _t("Birth Date is required"),
     _t("Salary Amount is required"),
     _t("Job Title is required"),
+    _t("Get Verification Code"),
+    _t("Verification Code"),
+    _t("This verification code expires in %s."),
+    _t("Code expired. Please generate a new verification code."),
+    _t("Cannot generate verification code"),
+    _t("Verification code copied"),
+    _t("Copy"),
 ];
 
 void EMPLOYEE_MANAGEMENT_TRANSLATION_TERMS;
@@ -169,9 +175,9 @@ export class SwiftEmployeeManagement extends Component {
                 salaryAmount: 0,
                 advancedSetting: false,
                 overtimeEnabled: false,
-                posPin: "",
             },
-            pinDraft: "",
+            showAccessCodeModal: false,
+            accessCodeData: null,
             financeForm: {
                 type: "advance",
                 amount: 0,
@@ -202,7 +208,9 @@ export class SwiftEmployeeManagement extends Component {
         this.closeCreate = this.closeCreate.bind(this);
         this.saveCreate = this.saveCreate.bind(this);
         this.saveSalary = this.saveSalary.bind(this);
-        this.savePin = this.savePin.bind(this);
+        this.generateAccessCode = this.generateAccessCode.bind(this);
+        this.closeAccessCodeModal = this.closeAccessCodeModal.bind(this);
+        this.copyAccessCode = this.copyAccessCode.bind(this);
         this.openFinance = this.openFinance.bind(this);
         this.closeFinance = this.closeFinance.bind(this);
         this.saveFinance = this.saveFinance.bind(this);
@@ -215,10 +223,12 @@ export class SwiftEmployeeManagement extends Component {
         this.loadBranches = this.loadBranches.bind(this);
         this.loadFilterOptions = this.loadFilterOptions.bind(this);
         this.onSelectAvailableUser = this.onSelectAvailableUser.bind(this);
+        this._accessCodeTimer = null;
 
         onMounted(async () => {
             await Promise.all([this.loadFilterOptions(), this.loadData(), this.loadAttendanceBoard()]);
         });
+        onWillUnmount(() => this._clearAccessCodeTimer());
     }
 
     formatMoney(v) {
@@ -241,6 +251,16 @@ export class SwiftEmployeeManagement extends Component {
 
     getAttendanceToneClass(tone) {
         return `is-${tone || "muted"}`;
+    }
+
+    getGenderLabel(gender) {
+        if (gender === "male") {
+            return this._t("Male");
+        }
+        if (gender === "female") {
+            return this._t("Female");
+        }
+        return gender || "-";
     }
 
     getWorkingCount() {
@@ -386,8 +406,8 @@ export class SwiftEmployeeManagement extends Component {
         }
         this.state.selectedUserId = row.userId;
         this.state.activeTab = "info";
+        this.closeAccessCodeModal();
         try {
-            this.state.pinDraft = "";
             const data = await this.orm.call("pos.dashboard.swift", "get_employee_detail_data", [row.userId]);
             if (!data || !data.ok) {
                 this.notification.add((data && data.message) || _t("Cannot load employee detail"), { type: "warning" });
@@ -423,7 +443,6 @@ export class SwiftEmployeeManagement extends Component {
             salaryAmount: 0,
             advancedSetting: false,
             overtimeEnabled: false,
-            posPin: "",
         };
     }
 
@@ -463,7 +482,6 @@ export class SwiftEmployeeManagement extends Component {
             salaryAmount: this.parseCurrencyInput(profile.salaryAmount),
             advancedSetting: Boolean(profile.advancedSetting),
             overtimeEnabled: Boolean(profile.overtimeEnabled),
-            posPin: profile.posPin || "",
         };
         this.state.showCreateModal = true;
         await Promise.all([this.loadFilterOptions(), this.loadBranches()]);
@@ -541,7 +559,6 @@ export class SwiftEmployeeManagement extends Component {
             const requiredFields = [
                 { key: "name", label: _t("Name is required") },
                 { key: "phone", label: _t("Phone Number is required") },
-                { key: "posPin", label: _t("POS PIN is required") },
                 { key: "birthDate", label: _t("Birth Date is required") },
                 { key: "salaryAmount", label: _t("Salary Amount is required") },
             ];
@@ -631,28 +648,83 @@ export class SwiftEmployeeManagement extends Component {
         }
     }
 
-    async savePin() {
-        if (!this.state.selectedUserId || !this.state.detail) {
+    _clearAccessCodeTimer() {
+        if (this._accessCodeTimer) {
+            clearInterval(this._accessCodeTimer);
+            this._accessCodeTimer = null;
+        }
+    }
+
+    _syncAccessCodeCountdown() {
+        const data = this.state.accessCodeData;
+        if (!data) {
+            this._clearAccessCodeTimer();
             return;
         }
-        const newPin = String(this.state.pinDraft || "").trim();
-        if (!newPin) {
-            this.notification.add(_t("Please enter a new PIN"), { type: "warning" });
+        if ((data.remainingSeconds || 0) <= 0) {
+            this.state.accessCodeData = {
+                ...data,
+                remainingSeconds: 0,
+            };
+            this._clearAccessCodeTimer();
+            return;
+        }
+        this.state.accessCodeData.remainingSeconds -= 1;
+    }
+
+    _startAccessCodeTimer() {
+        this._clearAccessCodeTimer();
+        if (!this.state.accessCodeData || !this.state.accessCodeData.remainingSeconds) {
+            return;
+        }
+        this._accessCodeTimer = setInterval(() => this._syncAccessCodeCountdown(), 1000);
+    }
+
+    formatAccessCodeCountdown(seconds) {
+        const total = Math.max(Number(seconds || 0), 0);
+        const mins = String(Math.floor(total / 60)).padStart(2, "0");
+        const secs = String(total % 60).padStart(2, "0");
+        return `${mins}:${secs}`;
+    }
+
+    async generateAccessCode() {
+        if (!this.state.selectedUserId || !this.state.detail) {
+            this.notification.add(_t("Please select an employee"), { type: "warning" });
             return;
         }
         try {
-            const p = this.state.detail.profile;
-            const res = await this.orm.call("pos.dashboard.swift", "update_employee_pin", [this.state.selectedUserId, newPin]);
+            const res = await this.orm.call("pos.dashboard.swift", "generate_employee_access_code", [this.state.selectedUserId]);
             if (!res || !res.ok) {
-                this.notification.add((res && res.message) || _t("Cannot save PIN"), { type: "warning" });
+                this.notification.add((res && res.message) || _t("Cannot generate verification code"), { type: "warning" });
                 return;
             }
-            this.notification.add(_t("PIN updated successfully"), { type: "success" });
-            this.state.pinDraft = "";
-            await this.selectRow({ userId: this.state.selectedUserId });
+            this.state.accessCodeData = res.accessCode || null;
+            this.state.showAccessCodeModal = true;
+            if (this.state.detail?.profile) {
+                this.state.detail.profile.accessCode = res.accessCode || null;
+            }
+            this._startAccessCodeTimer();
         } catch (e) {
-            console.error("savePin failed", e);
-            this.notification.add(_t("Cannot save PIN"), { type: "danger" });
+            console.error("generateAccessCode failed", e);
+            this.notification.add(_t("Cannot generate verification code"), { type: "danger" });
+        }
+    }
+
+    closeAccessCodeModal() {
+        this.state.showAccessCodeModal = false;
+        this._clearAccessCodeTimer();
+    }
+
+    async copyAccessCode() {
+        const code = this.state.accessCodeData?.code;
+        if (!code) {
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(code);
+            this.notification.add(_t("Verification code copied"), { type: "success" });
+        } catch {
+            // Ignore clipboard issues in unsupported browsers.
         }
     }
 

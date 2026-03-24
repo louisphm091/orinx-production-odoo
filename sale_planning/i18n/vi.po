@@ -47,6 +47,149 @@ msgid "Analytics & Reports"
 msgstr "Phân tích & Báo cáo"
 
 #. module: sale_planning
+#: model:ir.ui.menu,name:sale_planning.menu_sale_planning_manufacture_tracking
+msgid "Manufacture Tracking"
+msgstr "Theo dõi sản xuất"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "MANUFACTURING TRACKING"
+msgstr "THEO DOI SAN XUAT"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Loading..."
+msgstr "Dang tai..."
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "DAILY PROD"
+msgstr "San luong ngay"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "WEEKLY PROD"
+msgstr "San luong tuan"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "MONTHLY PROD"
+msgstr "San luong thang"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "RATE"
+msgstr "Ty le"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "PLAN"
+msgstr "Ke hoach"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "TARGET"
+msgstr "Muc tieu"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "RESULT"
+msgstr "Ket qua"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delay Orders"
+msgstr "Lenh tre"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delayed manufacturing orders"
+msgstr "Lenh san xuat bi tre"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Bottleneck"
+msgstr "Cong doan nghen"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Critical work center"
+msgstr "Cong doan quan trong"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "PRODUCTION PROGRESS BY LINE"
+msgstr "Tien do san xuat theo chuyen"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "No data"
+msgstr "Khong co du lieu"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Line"
+msgstr "Chuyen"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Product"
+msgstr "San pham"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Delay"
+msgstr "Tre"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Load"
+msgstr "Tai"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Status"
+msgstr "Trang thai"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "On track"
+msgstr "Dat tien do"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Near capacity"
+msgstr "Gan day tai"
+
+#. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/manufacture_tracking/manufacture_tracking.js:0
+msgid "Overloaded / delayed"
+msgstr "Qua tai / bi tre"
+
+#. module: sale_planning
 #: model:ir.actions.client,name:sale_planning.action_sale_schedule_dashboard
 #: model:ir.ui.menu,name:sale_planning.menu_sale_schedule_dashboard
 msgid "Sale Scheduling"

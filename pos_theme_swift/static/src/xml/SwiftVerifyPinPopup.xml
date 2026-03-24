@@ -2,7 +2,7 @@
 <templates id="template" xml:space="preserve">
     <t t-name="pos_theme_swift.SwiftVerifyPinPopup" owl="1">
         <Dialog
-            title="props.title || this._t('Nhập mã PIN của bạn')"
+            title="props.title || this._t('Nhập mã xác nhận của bạn')"
             size="'sm'"
             header="false"
             footer="false"
@@ -21,13 +21,13 @@
                         </button>
                     </div>
                     <div class="text-center fw-bold mb-3" style="font-size: 1.1rem;">
-                        <t t-esc="props.title || this._t('Nhập mã PIN của bạn')"/>
+                        <t t-esc="props.title || this._t('Nhập mã xác nhận của bạn')"/>
                     </div>
                     <div class="text-center text-muted mb-3" t-if="props.branchName">
                         <t t-esc="props.branchName"/>
                     </div>
                     <div class="pin-display" style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; margin-bottom: 20px; min-height: 3rem; background: #f8fafc; padding: 15px; border-radius: 8px;">
-                        <t t-esc="'*'.repeat(state.pin.length)"/>
+                        <t t-esc="'*'.repeat(state.accessCode.length)"/>
                     </div>
                     <t t-if="state.error">
                         <div class="error-message" style="color: #ef4444; text-align: center; margin-bottom: 15px; font-weight: 500;">

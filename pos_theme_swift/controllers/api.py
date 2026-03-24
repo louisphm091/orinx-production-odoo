@@ -97,16 +97,15 @@ class SwiftZaloApiController(http.Controller):
         ]
         if location:
             quant_domain.append(("location_id", "child_of", location.id))
-        grouped = request.env["stock.quant"].sudo().read_group(
+        grouped = request.env["stock.quant"].sudo()._read_group(
             quant_domain,
-            ["quantity:sum", "product_id"],
-            ["product_id"],
+            groupby=["product_id"],
+            aggregates=["quantity:sum"],
         )
         qty_map = {}
-        for row in grouped:
-            product_ref = row.get("product_id")
-            if product_ref:
-                qty_map[product_ref[0]] = row.get("quantity", 0.0) or 0.0
+        for product, quantity_sum in grouped:
+            if product:
+                qty_map[product.id] = quantity_sum or 0.0
         return qty_map, location
 
     def _swift_product_payload(self, product, qty_map=None, location=False):
@@ -243,10 +242,10 @@ class SwiftZaloApiController(http.Controller):
             if branch_ids:
                 vals["swift_branch_config_ids"] = [(6, 0, branch_ids)]
 
-        if "detailed_type" in tmpl._fields:
-            vals.setdefault("detailed_type", "product")
-        elif "type" in tmpl._fields:
-            vals.setdefault("type", "product")
+        if "type" in tmpl._fields:
+            vals.setdefault("type", "consu")
+        if "is_storable" in tmpl._fields:
+            vals.setdefault("is_storable", True)
 
         return vals
 

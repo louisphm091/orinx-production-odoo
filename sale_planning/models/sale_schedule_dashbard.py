@@ -27,7 +27,7 @@ class SaleScheduleDashboard(models.AbstractModel):
 
         product_domain = [
             ("active", "=", True),
-            ("type", "in", ["product", "consu"]),
+            ("type", "=", "consu"),
             ("sale_ok", "=", True),
         ]
         category_id = self._safe_int(filters.get("category_id"))

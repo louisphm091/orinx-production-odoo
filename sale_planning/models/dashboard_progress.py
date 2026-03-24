@@ -31,7 +31,7 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         Product = env['product.product'].sudo()
         SaleLine = env['sale.order.line'].sudo()
         
-        product_domain = [('active', '=', True), ('type', 'in', ['product', 'consu'])]
+        product_domain = [('active', '=', True), ('type', '=', 'consu')]
         if cat_id:
             product_domain.append(('categ_id', 'child_of', int(cat_id)))
             

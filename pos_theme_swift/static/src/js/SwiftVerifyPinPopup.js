@@ -10,13 +10,13 @@ const SWIFT_RETURN_URL_KEY = "pos_theme_swift.return_url";
 const SWIFT_VERIFY_PIN_TRANSLATION_TERMS = [
     _t("User login successfully"),
     _t("Quay lại"),
-    _t("Vui lòng nhập mã PIN"),
-    _t("Mã PIN không hợp lệ"),
+    _t("Vui lòng nhập mã xác nhận"),
+    _t("Mã xác nhận không hợp lệ"),
     _t("Lỗi kết nối"),
     _t("Nhân viên này thuộc chi nhánh '%s' và không thể mở POS '%s'."),
     _t("Chưa gán"),
     _t("Không xác định"),
-    _t("Nhập mã PIN của bạn"),
+    _t("Nhập mã xác nhận của bạn"),
 ];
 
 void SWIFT_VERIFY_PIN_TRANSLATION_TERMS;
@@ -43,7 +43,7 @@ export class SwiftVerifyPinPopup extends Component {
         this.pos = useService("pos");
         this.notification = useService("notification");
         this.state = useState({
-            pin: "",
+            accessCode: "",
             error: "",
             loading: false,
         });
@@ -51,12 +51,12 @@ export class SwiftVerifyPinPopup extends Component {
 
     appendChar(char) {
         this.state.error = "";
-        this.state.pin += char;
+        this.state.accessCode += char;
     }
 
     deleteChar() {
         this.state.error = "";
-        this.state.pin = this.state.pin.slice(0, -1);
+        this.state.accessCode = this.state.accessCode.slice(0, -1);
     }
 
     goBack() {
@@ -78,23 +78,34 @@ export class SwiftVerifyPinPopup extends Component {
     }
 
     async confirm() {
-        if (!this.state.pin) {
-            this.state.error = _t("Vui lòng nhập mã PIN");
+        if (!this.state.accessCode) {
+            this.state.error = _t("Vui lòng nhập mã xác nhận");
             return;
         }
         this.state.loading = true;
         this.state.error = "";
         try {
             const branchId = this.props.branchId || (this.pos.config ? this.pos.config.id : false);
-            const result = await this.orm.call("pos.dashboard.swift", "verify_employee_pin", [this.state.pin, branchId]);
+            const result = await this.orm.call("pos.dashboard.swift", "verify_employee_access_code", [this.state.accessCode, branchId]);
             if (result && result.ok) {
-                const cashierUser =
-                    this.pos.models?.["res.users"]?.get(result.user_id) || {
-                        id: result.user_id,
-                        name: result.user_name || "",
-                        role: "cashier",
-                        raw: { role: "cashier" },
-                };
+                let cashierUser = null;
+                if (this.pos.config?.module_pos_hr) {
+                    cashierUser =
+                        this.pos.models?.["hr.employee"]?.get(result.employee_id) ||
+                        this.pos.models?.["hr.employee"]?.find((employee) => employee.user_id?.id === result.user_id);
+                    if (!cashierUser) {
+                        this.state.error = _t("Không tìm thấy hồ sơ nhân viên trong POS.");
+                        return;
+                    }
+                } else {
+                    cashierUser =
+                        this.pos.models?.["res.users"]?.get(result.user_id) || {
+                            id: result.user_id,
+                            name: result.user_name || "",
+                            role: "cashier",
+                            raw: { role: "cashier" },
+                        };
+                }
                 this.pos.setSwiftEmployee(cashierUser, result.avatarUrl || "", Boolean(result.is_admin));
                 sessionStorage.removeItem(SWIFT_RETURN_URL_KEY);
                 this.notification.add(_t("User login successfully"), { type: "success" });
@@ -104,9 +115,9 @@ export class SwiftVerifyPinPopup extends Component {
                 if (result && result.code === "branch_mismatch") {
                     this.state.error = this.formatBranchMismatchMessage(result);
                 } else {
-                    this.state.error = result ? result.message : _t("Mã PIN không hợp lệ");
+                    this.state.error = result ? result.message : _t("Mã xác nhận không hợp lệ");
                 }
-                this.state.pin = "";
+                this.state.accessCode = "";
             }
         } catch (error) {
             console.error(error);

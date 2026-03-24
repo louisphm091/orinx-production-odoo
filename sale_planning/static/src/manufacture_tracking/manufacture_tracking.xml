@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="sale_planning.ManufactureTracking" owl="1">
+    <div class="mt_wrap o_action">
+      <div class="mt_header"><t t-out="this._t('MANUFACTURING TRACKING')"/></div>
+
+      <t t-if="state.loading">
+        <div class="mt_loading"><t t-out="this._t('Loading...')"/></div>
+      </t>
+
+      <t t-else="">
+        <div class="mt_kpis">
+          <div class="mt_card">
+            <div class="mt_card_title"><t t-out="this._t('DAILY PROD')"/></div>
+            <div class="mt_card_body">
+              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.daily.rate || 0)) + ';'">
+                <div class="mt_donut_inner">
+                  <div class="mt_donut_value"><t t-esc="state.kpis.daily.rate"/>%</div>
+                  <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
+                </div>
+              </div>
+              <div class="mt_kpi_rows">
+                <div class="mt_kpi_row"><span><t t-out="this._t('PLAN')"/></span><b t-esc="state.kpis.daily.plan"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('TARGET')"/></span><b t-esc="state.kpis.daily.target"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('RESULT')"/></span><b t-esc="state.kpis.daily.result"/></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt_card">
+            <div class="mt_card_title"><t t-out="this._t('WEEKLY PROD')"/></div>
+            <div class="mt_card_body">
+              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.weekly.rate || 0)) + ';'">
+                <div class="mt_donut_inner">
+                  <div class="mt_donut_value"><t t-esc="state.kpis.weekly.rate"/>%</div>
+                  <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
+                </div>
+              </div>
+              <div class="mt_kpi_rows">
+                <div class="mt_kpi_row"><span><t t-out="this._t('PLAN')"/></span><b t-esc="state.kpis.weekly.plan"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('RESULT')"/></span><b t-esc="state.kpis.weekly.result"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('RATE')"/></span><b><t t-esc="state.kpis.weekly.rate"/>%</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt_card">
+            <div class="mt_card_title"><t t-out="this._t('MONTHLY PROD')"/></div>
+            <div class="mt_card_body">
+              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.monthly.rate || 0)) + ';'">
+                <div class="mt_donut_inner">
+                  <div class="mt_donut_value"><t t-esc="state.kpis.monthly.rate"/>%</div>
+                  <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
+                </div>
+              </div>
+              <div class="mt_kpi_rows">
+                <div class="mt_kpi_row"><span><t t-out="this._t('PLAN')"/></span><b t-esc="state.kpis.monthly.plan"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('RESULT')"/></span><b t-esc="state.kpis.monthly.result"/></div>
+                <div class="mt_kpi_row"><span><t t-out="this._t('RATE')"/></span><b><t t-esc="state.kpis.monthly.rate"/>%</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt_alerts">
+          <div class="mt_alert">
+            <div class="mt_alert_left">
+              <div class="mt_alert_title"><t t-out="this._t('Delay Orders')"/></div>
+              <div class="mt_alert_sub"><t t-out="this._t('Delayed manufacturing orders')"/></div>
+            </div>
+            <div class="mt_alert_value" t-esc="state.delay.count"/>
+          </div>
+
+          <div class="mt_alert">
+            <div class="mt_alert_left">
+              <div class="mt_alert_title"><t t-out="this._t('Bottleneck')"/></div>
+              <div class="mt_pill"><t t-esc="state.bottleneck.name"/></div>
+            </div>
+            <div class="mt_alert_sub"><t t-out="this._t('Critical work center')"/></div>
+          </div>
+        </div>
+
+        <div class="mt_table_wrap">
+          <div class="mt_table_title"><t t-out="this._t('PRODUCTION PROGRESS BY LINE')"/></div>
+
+          <t t-if="!state.table || state.table.length === 0">
+            <div class="mt_loading"><t t-out="this._t('No data')"/></div>
+          </t>
+
+          <t t-else="">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th><t t-out="this._t('No')"/></th>
+                  <th><t t-out="this._t('Line')"/></th>
+                  <th><t t-out="this._t('Product')"/></th>
+                  <th><t t-out="this._t('PLAN')"/></th>
+                  <th><t t-out="this._t('TARGET')"/></th>
+                  <th><t t-out="this._t('RESULT')"/></th>
+                  <th><t t-out="this._t('Delay')"/></th>
+                  <th><t t-out="this._t('Load')"/></th>
+                  <th><t t-out="this._t('RATE')"/></th>
+                  <th><t t-out="this._t('Status')"/></th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="state.table" t-as="row" t-key="row.no">
+                  <tr>
+                    <td t-esc="row.no"/>
+                    <td t-esc="row.line"/>
+                    <td>
+                      <span class="mt_dot"></span>
+                      <t t-esc="row.product"/>
+                    </td>
+                    <td t-esc="row.plan"/>
+                    <td t-esc="row.target"/>
+                    <td t-esc="row.result"/>
+                    <td t-esc="row.delay"/>
+                    <td><t t-esc="row.loadUsed"/> / <t t-esc="row.loadCap"/></td>
+                    <td><t t-esc="row.rate"/>%</td>
+                    <td>
+                      <span
+                        t-att-class="'mt_status_dot ' + (row.status === 'green' ? 'mt_status_green' : (row.status === 'yellow' ? 'mt_status_yellow' : 'mt_status_red'))"/>
+                    </td>
+                  </tr>
+                </t>
+              </tbody>
+            </table>
+
+            <div class="mt_legend">
+              <div class="mt_legend_item">
+                <span class="mt_legend_dot mt_status_green"></span>
+                <span><t t-out="this._t('On track')"/></span>
+              </div>
+              <div class="mt_legend_item">
+                <span class="mt_legend_dot mt_status_yellow"></span>
+                <span><t t-out="this._t('Near capacity')"/></span>
+              </div>
+              <div class="mt_legend_item">
+                <span class="mt_legend_dot mt_status_red"></span>
+                <span><t t-out="this._t('Overloaded / delayed')"/></span>
+              </div>
+            </div>
+          </t>
+        </div>
+      </t>
+    </div>
+  </t>
+
+</templates>

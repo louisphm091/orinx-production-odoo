@@ -20,21 +20,17 @@
              MENUS
         ========================== -->
 
-        <menuitem id="menu_fashion_forecast_root"
-                  name="Forecast"
-                  sequence="10"/>
-
         <menuitem id="menu_fashion_forecast_dashboard_demand"
                   name="Dự Báo Nhu Cầu"
-                  parent="menu_fashion_forecast_root"
+                  parent="sale_planning.menu_sale_planning_root"
                   action="action_fashion_forecast_dashboard_demand"
-                  sequence="10"/>
+                  sequence="80"/>
 
         <menuitem id="menu_fashion_forecast_dashboard_sales"
                   name="Dự Báo Doanh Thu"
-                  parent="menu_fashion_forecast_root"
+                  parent="sale_planning.menu_sale_planning_root"
                   action="action_fashion_forecast_dashboard_sales"
-                  sequence="20"/>
+                  sequence="90"/>
 
     </data>
 </odoo>

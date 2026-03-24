@@ -41,7 +41,8 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         Product = env["product.product"].sudo()
         product_domain = [
             ("active", "=", True),
-            ("type", "in", ["product", "consu"]),
+            ("type", "=", "consu"),
+            ("is_storable", "=", True),
         ]
         if "available_in_pos" in Product._fields:
             product_domain.append(("available_in_pos", "=", True))

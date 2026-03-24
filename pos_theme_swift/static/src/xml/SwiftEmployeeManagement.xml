@@ -216,19 +216,15 @@
                                                         <div><span t-out="this._t('Phone Number')"/><strong><t t-esc="state.detail.profile.phone"/></strong></div>
                                                         <div><span t-out="this._t('ID Number')"/><strong><t t-esc="state.detail.profile.idNumber"/></strong></div>
                                                         <div><span t-out="this._t('Birth Date')"/><strong><t t-esc="state.detail.profile.birthDate || '-'"/></strong></div>
-                                                        <div><span t-out="this._t('Gender')"/><strong><t t-esc="state.detail.profile.gender || '-'"/></strong></div>
+                                                        <div><span t-out="this._t('Gender')"/><strong><t t-esc="getGenderLabel(state.detail.profile.gender)"/></strong></div>
                                                         <div><span t-out="this._t('Work Branch')"/><strong><t t-esc="state.detail.profile.workBranch"/></strong></div>
                                                         <div><span t-out="this._t('Pay Branch')"/><strong><t t-esc="state.detail.profile.payBranch"/></strong></div>
                                                         <div><span t-out="this._t('Department')"/><strong><t t-esc="state.detail.profile.department || '-'"/></strong></div>
                                                         <div><span t-out="this._t('Job Title')"/><strong><t t-esc="state.detail.profile.jobTitle || '-'"/></strong></div>
-                                                        <div class="sem-pinRow" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                                                            <span t-out="this._t('POS PIN')" style="font-weight: 600; font-size: 0.85rem; color: #64748b;"/>
-                                                            <input type="password" class="sem-input" t-model="state.pinDraft" autocomplete="new-password" placeholder="••••••" style="width: 150px; display: inline-block; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#e2e8f0'"/>
-                                                            <button class="sem-primaryBtn sem-miniBtn" t-on-click="savePin" t-out="this._t('Update PIN')"/>
-                                                        </div>
                                                     </div>
                                                     <div class="sem-actionsRow">
                                                         <button class="sem-lightBtn" t-on-click="openEditEmployee" t-out="this._t('Edit Employee')"/>
+                                                        <button class="sem-primaryBtn" t-on-click="generateAccessCode" t-out="this._t('Get Verification Code')"/>
                                                         <t t-if="state.status === 'working'">
                                                             <button class="sem-lightBtn" t-on-click="markSelectedOff" t-out="this._t('Mark as Off')"/>
                                                         </t>
@@ -392,7 +388,6 @@
                         <label t-out="this._t('Employee Name')"/><input type="text" t-model="state.createForm.name"/>
                         <label t-out="this._t('Phone Number')"/><input type="text" t-model="state.createForm.phone"/>
                         <label t-out="this._t('ID Number')"/><input type="text" t-model="state.createForm.idNumber"/>
-                        <label t-out="this._t('POS PIN')"/><input type="password" autocomplete="new-password" t-model="state.createForm.posPin"/>
                         <label t-out="this._t('Birth Date')"/><input type="date" t-model="state.createForm.birthDate"/>
                         <label t-out="this._t('Gender')"/>
                         <select t-model="state.createForm.gender"><option value="">--</option><option value="male" t-out="this._t('Male')"/><option value="female" t-out="this._t('Female')"/></select>
@@ -457,6 +452,34 @@
                     <div class="sem-actionsRow">
                         <button class="sem-lightBtn" t-on-click="closeFinance" t-out="this._t('Cancel')"/>
                         <button class="sem-primaryBtn" t-on-click="saveFinance" t-out="this._t('Save')"/>
+                    </div>
+                </div>
+            </t>
+
+            <t t-if="state.showAccessCodeModal and state.accessCodeData">
+                <div class="sem-modalBackdrop" t-on-click="closeAccessCodeModal"/>
+                <div class="sem-modal sem-accessCodeModal">
+                    <button class="sem-modalClose" t-on-click="closeAccessCodeModal">×</button>
+                    <h3 t-out="this._t('Verification Code')"/>
+                    <div class="sem-accessCodeBody">
+                        <div class="sem-accessCodeValue">
+                            <t t-esc="state.accessCodeData.displayCode || '-'"/>
+                        </div>
+                        <div class="sem-accessCodeHint">
+                            <t t-if="state.accessCodeData.remainingSeconds > 0">
+                                <t t-esc="this._t('This verification code expires in %s.').replace('%s', formatAccessCodeCountdown(state.accessCodeData.remainingSeconds))"/>
+                            </t>
+                            <t t-else="">
+                                <t t-esc="this._t('Code expired. Please generate a new verification code.')"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="sem-actionsRow sem-accessCodeActions">
+                        <button class="sem-lightBtn" t-on-click="copyAccessCode" t-att-disabled="state.accessCodeData.remainingSeconds &lt;= 0">
+                            <i class="fa fa-copy me-1"/>
+                            <span t-out="this._t('Copy')"/>
+                        </button>
+                        <button class="sem-primaryBtn" t-on-click="generateAccessCode" t-out="this._t('Get Verification Code')"/>
                     </div>
                 </div>
             </t>

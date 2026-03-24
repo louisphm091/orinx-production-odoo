@@ -17,6 +17,11 @@
       <field name="tag">sale_planning.dashboard_progress</field>
     </record>
 
+    <record id="action_sale_planning_manufacture_tracking" model="ir.actions.client">
+      <field name="name">Manufacture Tracking</field>
+      <field name="tag">sale_planning.manufacture_tracking</field>
+    </record>
+
     <record id="action_sale_planning_analytics" model="ir.actions.client">
       <field name="name">Analytics &amp; Reports</field>
       <field name="tag">sale_planning.analytics</field>
@@ -48,6 +53,12 @@
             parent="menu_sale_planning_root"
             action="action_sale_planning_replenishment"
             sequence="40"/>
+
+    <menuitem id="menu_sale_planning_manufacture_tracking"
+              name="Manufacture Tracking"
+              parent="mrp.menu_mrp_root"
+              action="action_sale_planning_manufacture_tracking"
+              sequence="50"/>
 
     <menuitem id="menu_sale_planning_dashboard_progress"
               name="Progress Tracking"

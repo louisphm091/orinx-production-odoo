@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import random
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
@@ -9,6 +11,8 @@ _logger = logging.getLogger(__name__)
 class PosDashboardSwift(models.AbstractModel):
     _name = 'pos.dashboard.swift'
     _description = 'POS Dashboard Logic for Swift'
+    _swift_access_code_length = 6
+    _swift_access_code_validity_minutes = 5
 
     def _swift_normalize_branch_label(self, value):
         return (value or '').strip().casefold()
@@ -30,6 +34,96 @@ class PosDashboardSwift(models.AbstractModel):
         if not profile:
             return ''
         return profile.work_branch or ''
+
+    def _swift_get_pos_company_id(self, pos_session_or_config_id):
+        if not pos_session_or_config_id:
+            return False
+        config = self.env['pos.config'].sudo().browse(int(pos_session_or_config_id)).exists()
+        if config:
+            return config.company_id.id
+
+        session = self.env['pos.session'].sudo().browse(int(pos_session_or_config_id)).exists()
+        if session and session.config_id:
+            return session.config_id.company_id.id
+
+        return False
+
+    def _swift_get_employee_record(self, user, pos_session_or_config_id=False):
+        if not user:
+            return self.env['hr.employee']
+        employee_model = self.env['hr.employee'].sudo()
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if profile and profile.hr_employee_id:
+            employee = profile.hr_employee_id.sudo().exists()
+            if employee:
+                return employee
+        company_id = self._swift_get_pos_company_id(pos_session_or_config_id)
+        domain = [('user_id', '=', user.id)]
+        if company_id:
+            employee = employee_model.search(domain + [('company_id', '=', company_id)], limit=1)
+            if employee:
+                return employee
+        return employee_model.search(domain, limit=1)
+
+    def _swift_format_access_code(self, code):
+        digits = ''.join(ch for ch in str(code or '') if ch.isdigit())
+        return ' '.join(digits) if digits else ''
+
+    def _swift_access_code_remaining_seconds(self, profile):
+        expiry = profile.pos_access_code_expiry if profile else False
+        if not expiry:
+            return 0
+        now_dt = fields.Datetime.now()
+        return max(int((expiry - now_dt).total_seconds()), 0)
+
+    def _swift_access_code_payload(self, profile):
+        remaining_seconds = self._swift_access_code_remaining_seconds(profile)
+        if not profile or not profile.pos_access_code or remaining_seconds <= 0:
+            return {
+                'code': '',
+                'displayCode': '',
+                'expiresAt': '',
+                'remainingSeconds': 0,
+            }
+        return {
+            'code': profile.pos_access_code,
+            'displayCode': self._swift_format_access_code(profile.pos_access_code),
+            'expiresAt': fields.Datetime.to_string(profile.pos_access_code_expiry),
+            'remainingSeconds': remaining_seconds,
+        }
+
+    def _swift_clear_access_code(self, profile):
+        if profile:
+            profile.sudo().write({
+                'pos_access_code': False,
+                'pos_access_code_expiry': False,
+            })
+
+    def _swift_get_profile_by_access_code(self, access_code):
+        clean_code = ''.join(ch for ch in str(access_code or '') if ch.isdigit())
+        if not clean_code:
+            return False
+        profile = self.env['swift.employee.profile'].sudo().search([
+            ('pos_access_code', '=', clean_code),
+        ], limit=1)
+        if not profile:
+            return False
+        if self._swift_access_code_remaining_seconds(profile) <= 0:
+            self._swift_clear_access_code(profile)
+            return False
+        return profile
+
+    def _swift_generate_unique_access_code(self):
+        profile_model = self.env['swift.employee.profile'].sudo()
+        for _attempt in range(20):
+            code = ''.join(random.choices('0123456789', k=self._swift_access_code_length))
+            duplicate = profile_model.search([
+                ('pos_access_code', '=', code),
+                ('pos_access_code_expiry', '>', fields.Datetime.now()),
+            ], limit=1)
+            if not duplicate:
+                return code
+        return ''.join(random.choices('0123456789', k=self._swift_access_code_length))
 
     def _swift_get_job_title_options(self):
         try:
@@ -1509,6 +1603,113 @@ class PosDashboardSwift(models.AbstractModel):
                 values['attendance_code'] = values['employee_code']
                 return profile_model.create(values)
 
+    def _normalize_job_title_value(self, job_title):
+        job_title = (job_title or '').strip()
+        if not job_title:
+            return ''
+        if job_title.isdigit() and 'hr.job' in self.env:
+            job = self.env['hr.job'].sudo().browse(int(job_title)).exists()
+            if job:
+                return job.name or ''
+        return job_title
+
+    def _swift_employee_company(self, user=False):
+        company = self.env.company
+        if user and user.company_id:
+            company = user.company_id
+        return company
+
+    def _swift_get_or_create_department(self, department_name, company):
+        department_name = (department_name or '').strip()
+        if not department_name or 'hr.department' not in self.env:
+            return self.env['hr.department']
+        department_model = self.env['hr.department'].sudo()
+        domain = [('name', '=', department_name)]
+        if company and 'company_id' in department_model._fields:
+            department = department_model.search(domain + [('company_id', '=', company.id)], limit=1)
+            if department:
+                return department
+        department = department_model.search(domain, limit=1)
+        if department:
+            return department
+        create_vals = {'name': department_name}
+        if company and 'company_id' in department_model._fields:
+            create_vals['company_id'] = company.id
+        return department_model.create(create_vals)
+
+    def _swift_get_or_create_job(self, job_title, department=False, company=False):
+        job_title = (job_title or '').strip()
+        if not job_title or 'hr.job' not in self.env:
+            return self.env['hr.job']
+        job_model = self.env['hr.job'].sudo()
+        domain = [('name', '=', job_title)]
+        if company and 'company_id' in job_model._fields:
+            job = job_model.search(domain + [('company_id', '=', company.id)], limit=1)
+            if job:
+                return job
+        job = job_model.search(domain, limit=1)
+        if job:
+            return job
+        create_vals = {'name': job_title}
+        if department and 'department_id' in job_model._fields:
+            create_vals['department_id'] = department.id
+        if company and 'company_id' in job_model._fields:
+            create_vals['company_id'] = company.id
+        return job_model.create(create_vals)
+
+    def _swift_sync_hr_employee(self, user, profile):
+        if 'hr.employee' not in self.env or not user or not profile:
+            return self.env['hr.employee']
+
+        employee_model = self.env['hr.employee'].sudo()
+        company = self._swift_employee_company(user)
+        employee = profile.hr_employee_id.sudo().exists() if profile.hr_employee_id else self.env['hr.employee']
+        if not employee:
+            domain = [('user_id', '=', user.id)]
+            if company and 'company_id' in employee_model._fields:
+                employee = employee_model.search(domain + [('company_id', '=', company.id)], limit=1)
+            if not employee:
+                employee = employee_model.search(domain, limit=1)
+
+        department = self._swift_get_or_create_department(profile.department, company)
+        job = self._swift_get_or_create_job(profile.job_title, department=department, company=company)
+
+        employee_vals = {
+            'name': user.name or profile.employee_code,
+            'user_id': user.id,
+            'company_id': company.id if company else self.env.company.id,
+            'barcode': profile.attendance_code or profile.employee_code or False,
+            'identification_id': profile.id_number or False,
+            'birthday': profile.birth_date or False,
+            'sex': profile.gender or False,
+            'mobile_phone': profile.phone or False,
+            'work_phone': profile.phone or False,
+            'work_email': user.email or user.partner_id.email or False,
+            'department_id': department.id if department else False,
+            'job_id': job.id if job else False,
+            'job_title': (job.name if job else profile.job_title) or False,
+            'active': profile.status == 'working',
+        }
+
+        if employee:
+            employee.write(employee_vals)
+        else:
+            employee = employee_model.create(employee_vals)
+
+        if profile.hr_employee_id != employee:
+            profile.sudo().write({'hr_employee_id': employee.id})
+        return employee
+
+    def _swift_archive_hr_employee(self, profile):
+        employee = profile.hr_employee_id.sudo().exists() if profile and profile.hr_employee_id else self.env['hr.employee']
+        if not employee and profile and profile.user_id and 'hr.employee' in self.env:
+            employee = self._swift_get_employee_record(profile.user_id)
+        if employee:
+            employee.sudo().write({'active': False})
+            if profile and profile.hr_employee_id != employee:
+                profile.sudo().write({'hr_employee_id': employee.id})
+        return employee
+
     def _ensure_employee_internal_user(self, user):
         user = user.sudo()
         internal_group = self.env.ref('base.group_user', raise_if_not_found=False)
@@ -1722,6 +1923,7 @@ class PosDashboardSwift(models.AbstractModel):
         profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
         if not profile:
             return {'ok': False, 'message': _('Employee record not found')}
+        employee = self._swift_get_employee_record(user)
 
         # schedule matrix this week
         week_start, week_end = self._get_week_range_from_offset(0)
@@ -1792,7 +1994,9 @@ class PosDashboardSwift(models.AbstractModel):
                 'advancedSetting': profile.advanced_setting,
                 'overtimeEnabled': profile.overtime_enabled,
                 'debtAdvance': profile.debt_advance_balance,
-                'posPin': profile.pos_pin or '',
+                'accessCode': self._swift_access_code_payload(profile),
+                'hrEmployeeId': employee.id if employee else False,
+                'hrEmployeeActive': bool(employee and employee.active),
             },
             'days': days,
             'scheduleShifts': shifts,
@@ -1877,14 +2081,11 @@ class PosDashboardSwift(models.AbstractModel):
                 return {'ok': False, 'message': _('Name is required')}
 
             phone = (vals.get('phone') or '').strip()
-            pos_pin = (vals.get('posPin') or '').strip()
             birth_date = self._to_date_value(vals.get('birthDate'))
             salary_amount = self._to_float_amount(vals.get('salaryAmount'), 0.0)
-            job_title = (vals.get('jobTitle') or '').strip()
+            job_title = self._normalize_job_title_value(vals.get('jobTitle'))
             if not phone:
                 return {'ok': False, 'message': _('Phone Number is required')}
-            if not pos_pin:
-                return {'ok': False, 'message': _('POS PIN is required')}
             if not birth_date:
                 return {'ok': False, 'message': _('Birth Date is required')}
             if salary_amount <= 0:
@@ -1937,8 +2138,8 @@ class PosDashboardSwift(models.AbstractModel):
                 'salary_amount': salary_amount,
                 'advanced_setting': bool(vals.get('advancedSetting')),
                 'overtime_enabled': bool(vals.get('overtimeEnabled')),
-                'pos_pin': pos_pin,
             })
+            self._swift_sync_hr_employee(user, profile)
             return {'ok': True, 'userId': user.id, 'createdNewUser': not bool(selected_user_id)}
         except Exception as e:
             self.env.cr.rollback()
@@ -1956,29 +2157,18 @@ class PosDashboardSwift(models.AbstractModel):
             return {'ok': False, 'message': _('Employee record not found')}
 
         vals = vals or {}
-        job_title = (vals.get('jobTitle') or '').strip()
+        job_title = self._normalize_job_title_value(vals.get('jobTitle'))
         phone = (vals.get('phone') or '').strip()
-        pos_pin = (vals.get('posPin') or '').strip()
         birth_date = self._to_date_value(vals.get('birthDate'))
         salary_amount = self._to_float_amount(vals.get('salaryAmount'), profile.salary_amount)
         if not (vals.get('name') or '').strip():
             return {'ok': False, 'message': _('Name is required')}
         if not phone:
             return {'ok': False, 'message': _('Phone Number is required')}
-        if not pos_pin:
-            return {'ok': False, 'message': _('POS PIN is required')}
         if not birth_date:
             return {'ok': False, 'message': _('Birth Date is required')}
         if salary_amount <= 0:
             return {'ok': False, 'message': _('Salary Amount is required')}
-        if job_title and job_title.isdigit():
-            job = False
-            try:
-                job = self.env['hr.job'].sudo().browse(int(job_title)).exists()
-            except Exception:
-                job = False
-            job_title = job.name if job else job_title
-
         try:
             user_vals = {}
             if vals.get('name'):
@@ -1999,12 +2189,12 @@ class PosDashboardSwift(models.AbstractModel):
                 'pay_branch': vals.get('payBranch') or profile.pay_branch or _('Chi nhánh trung tâm'),
                 'department': vals.get('department') or profile.department or '',
                 'job_title': job_title or profile.job_title or '',
-                'pos_pin': pos_pin,
                 'salary_type': vals.get('salaryType') or profile.salary_type,
                 'salary_amount': salary_amount,
                 'advanced_setting': bool(vals.get('advancedSetting')) if 'advancedSetting' in vals else profile.advanced_setting,
                 'overtime_enabled': bool(vals.get('overtimeEnabled')) if 'overtimeEnabled' in vals else profile.overtime_enabled,
             })
+            self._swift_sync_hr_employee(user, profile)
             return {'ok': True}
         except Exception as e:
             self.env.cr.rollback()
@@ -2042,11 +2232,34 @@ class PosDashboardSwift(models.AbstractModel):
         return {'ok': True}
 
     @api.model
-    def verify_employee_pin(self, pos_pin, pos_session_or_config_id=False):
-        if not pos_pin:
-            return {'ok': False, 'message': _('PIN code is required.')}
+    def generate_employee_access_code(self, user_id):
+        user = self.env['res.users'].sudo().browse(int(user_id))
+        if not user.exists():
+            return {'ok': False, 'message': _('Employee not found')}
+        profile = self.env['swift.employee.profile'].sudo().search([('user_id', '=', user.id)], limit=1)
+        if not profile:
+            return {'ok': False, 'message': _('Employee record not found')}
 
-        profile = self.env['swift.employee.profile'].sudo().search([('pos_pin', '=', pos_pin)], limit=1)
+        code = self._swift_generate_unique_access_code()
+        expiry = fields.Datetime.now() + timedelta(minutes=self._swift_access_code_validity_minutes)
+        profile.sudo().write({
+            'pos_access_code': code,
+            'pos_access_code_expiry': expiry,
+        })
+        payload = self._swift_access_code_payload(profile)
+        payload['validityMinutes'] = self._swift_access_code_validity_minutes
+        return {
+            'ok': True,
+            'message': _('Access code generated successfully.'),
+            'accessCode': payload,
+        }
+
+    @api.model
+    def verify_employee_access_code(self, access_code, pos_session_or_config_id=False):
+        if not access_code:
+            return {'ok': False, 'message': _('Verification code is required.')}
+
+        profile = self._swift_get_profile_by_access_code(access_code)
         if profile:
             session_branch_name = self._swift_get_session_branch_name(pos_session_or_config_id)
             employee_branch_name = self._swift_get_employee_branch_name(profile)
@@ -2078,15 +2291,18 @@ class PosDashboardSwift(models.AbstractModel):
             admin_users = admin_group.user_ids if admin_group and 'user_ids' in admin_group._fields else (
                 admin_group.users if admin_group else self.env['res.users']
             )
+            employee = self._swift_get_employee_record(profile.user_id, pos_session_or_config_id)
 
             return {
                 'ok': True,
                 'user_id': profile.user_id.id,
                 'user_name': profile.user_id.name,
+                'employee_id': employee.id if employee else False,
+                'employee_name': employee.name if employee else profile.user_id.name,
                 'avatarUrl': f"/web/image/res.users/{profile.user_id.id}/avatar_128",
                 'is_admin': bool(admin_group and profile.user_id in admin_users),
             }
-        return {'ok': False, 'message': _('Incorrect PIN code.')}
+        return {'ok': False, 'message': _('Incorrect or expired verification code.')}
 
     @api.model
     def add_employee_finance_entry(self, user_id, line_type, amount, note=''):
@@ -2114,6 +2330,11 @@ class PosDashboardSwift(models.AbstractModel):
         if not profile:
             return {'ok': False, 'message': _('Employee record not found')}
         profile.sudo().write({'status': status_value})
+        if status_value == 'working':
+            self._swift_sync_hr_employee(user, profile)
+            user.sudo().write({'active': True})
+        else:
+            self._swift_archive_hr_employee(profile)
         return {'ok': True, 'status': status_value}
 
     @api.model
@@ -2128,5 +2349,7 @@ class PosDashboardSwift(models.AbstractModel):
         if not profile:
             return {'ok': False, 'message': _('Employee record not found')}
 
-        profile.sudo().unlink()
+        self._swift_clear_access_code(profile)
+        self._swift_archive_hr_employee(profile)
+        profile.sudo().write({'status': 'off'})
         return {'ok': True}

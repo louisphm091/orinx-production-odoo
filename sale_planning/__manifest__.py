@@ -18,7 +18,7 @@ track, and balance demand against supply. Developed by https://group.orinx.com.v
     'version': '0.1.5',
 
     # any module necessary for this one to work correctly
-    "depends": ["base", "web", "product", "stock", "sale", "purchase"],
+    "depends": ["base", "web", "product", "stock", "sale", "purchase", "mrp"],
     "data": [
         "security/ir.model.access.csv",
         "views/menu.xml",
@@ -35,6 +35,9 @@ track, and balance demand against supply. Developed by https://group.orinx.com.v
             "sale_planning/static/src/dashboard_progress/dashboard_progress.xml",
             "sale_planning/static/src/dashboard_progress/dashboard_progress.js",
             "sale_planning/static/src/dashboard_progress/dashboard_progress.scss",
+            "sale_planning/static/src/manufacture_tracking/manufacture_tracking.xml",
+            "sale_planning/static/src/manufacture_tracking/manufacture_tracking.js",
+            "sale_planning/static/src/manufacture_tracking/manufacture_tracking.scss",
             "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.xml",
             "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.js",
             "sale_planning/static/src/replenishment_dashboard/replenishment_dashboard.scss",

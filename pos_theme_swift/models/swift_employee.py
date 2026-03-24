@@ -6,6 +6,7 @@ class SwiftEmployeeProfile(models.Model):
     _description = "Swift Employee Profile"
 
     user_id = fields.Many2one("res.users", required=True, ondelete="cascade", index=True)
+    hr_employee_id = fields.Many2one("hr.employee", string="HR Employee", copy=False, ondelete="set null", index=True)
     employee_code = fields.Char(string="Employee Code", required=True, copy=False, index=True, default=lambda self: _("New"))
     attendance_code = fields.Char(string="Attendance Code")
     status = fields.Selection([
@@ -26,6 +27,8 @@ class SwiftEmployeeProfile(models.Model):
     department = fields.Char(string="Department")
     job_title = fields.Char(string="Job Title")
     pos_pin = fields.Char(string="POS PIN")
+    pos_access_code = fields.Char(string="POS Access Code", copy=False)
+    pos_access_code_expiry = fields.Datetime(string="POS Access Code Expiry", copy=False)
 
     salary_type = fields.Selection([
         ("hour", "Theo giờ làm việc"),

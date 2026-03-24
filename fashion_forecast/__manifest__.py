@@ -17,7 +17,7 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    "depends": ["base", "web", "product", "stock", "mrp"],
+    "depends": ["base", "web", "product", "stock", "mrp", "sale_planning"],
 
     "assets": {
         "web.assets_backend": [
@@ -40,4 +40,3 @@ Long description of module's purpose
     "application": True,
     "license": "LGPL-3",
 }
-

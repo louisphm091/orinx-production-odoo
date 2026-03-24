@@ -119,6 +119,16 @@ msgstr "Nhân Viên"
 
 #. module: pos_theme_swift
 #. odoo-javascript
+msgid "Edit Employee"
+msgstr "Chỉnh sửa nhân viên"
+
+#. module: pos_theme_swift
+#. odoo-javascript
+msgid "Get Verification Code"
+msgstr "Lấy mã xác nhận"
+
+#. module: pos_theme_swift
+#. odoo-javascript
 #: code:addons/pos_theme_swift/static/src/xml/inventory/SwiftInventoryForm.xml:0
 msgid "Inventory Count"
 msgstr "Kiểm Kho"
