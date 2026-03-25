@@ -80,7 +80,7 @@
     <menuitem id="menu_mrp_production_plan_dashboard"
               name="Lập kế hoạch sản xuất"
               parent="mrp.menu_mrp_root"
-              action="action_mrp_production_plan_dashboard"
+              action="action_production_plan"
               sequence="5"/>
   </data>
 </odoo>

@@ -20,6 +20,9 @@
         </div>
         <div class="ff_header_right">
           <div class="ff_header_actions d-flex gap-2 align-items-center">
+            <button t-on-click="onPlanProduction" class="btn btn-success" type="button">
+              Lập kế hoạch sản xuất
+            </button>
             <button t-on-click="load" class="btn btn-primary" type="button">
               <t t-out="this.tr('Refresh Forecast')"/>
             </button>
@@ -185,18 +188,18 @@
                     <div class="col-12 col-lg-4">
                         <div class="card h-100 mb-3 p-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="mb-0" t-out="this.tr('Forecast by SKU')"/>
+                      <h5 class="mb-0 fw-bold">Dự báo nhu cầu theo SKU</h5>
                       <span class="text-muted small" t-out="this.tr('Top')"/>
                     </div>
 
                     <div class="table-responsive">
                       <table class="table table-sm align-middle mb-0">
-                        <thead class="text-muted">
+                        <thead>
                           <tr>
-                            <th t-out="this.tr('SKU')"/>
-                            <th class="text-end" t-out="this.tr('Category')"/>
-                            <th class="text-end" t-out="this.tr('Demand')"/>
-                            <th class="text-end" t-out="this.tr('Actual')"/>
+                            <th>Mã hàng</th>
+                            <th class="text-end">Danh mục</th>
+                            <th class="text-end">Nhu cầu</th>
+                            <th class="text-end">Thực tế</th>
                           </tr>
                         </thead>
 
@@ -222,8 +225,14 @@
                         </tbody>
                       </table>
                     </div>
-                  </div>
+                    <div class="mt-auto pt-3 d-flex gap-2">
+                        <button t-on-click="onPlanProduction" class="btn btn-success flex-fill">
+                             Lập kế hoạch sản xuất
+                        </button>
+                        <button class="btn btn-primary flex-fill">Xem chi tiết</button>
                     </div>
+                  </div>
+                </div>
 
                     <!-- CARD 3: Dự báo tồn kho tương ứng -->
                     <div class="col-12 col-lg-4">

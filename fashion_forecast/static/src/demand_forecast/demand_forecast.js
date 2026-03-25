@@ -179,6 +179,7 @@ export class DemandForecastDashboard extends Component {
             afterPaint(() => this.renderAllCharts());
         });
 
+        this.onPlanProduction = this.onPlanProduction.bind(this);
         onPatched(() => {
             if (this.state.loading) return;
             afterPaint(() => this.renderAllCharts());
@@ -350,6 +351,37 @@ export class DemandForecastDashboard extends Component {
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
             this.state.loading = false;
+        }
+    }
+
+    async onPlanProduction() {
+        const productIds = (this.state.forecast_rows || []).map(r => {
+            if (!r.product_id) return null;
+            if (Array.isArray(r.product_id)) return r.product_id[0];
+            return r.product_id;
+        }).filter(id => id);
+        console.log("PLAN PRODUCTION DEBUG: sending productIds", productIds);
+        const result = await this.orm.call(
+            "production.plan",
+            "create_from_forecast",
+            [],
+            {
+                forecast_id: this.state.filters.forecast_id || 0,
+                product_ids: productIds,
+            }
+        );
+        const planId = result?.context?.plan_id || result?.params?.plan_id;
+        console.log("PLAN PRODUCTION DEBUG: got planId =", planId, "| full result:", result);
+        
+        if (planId) {
+            // Store in sessionStorage AND navigate using direct URL to force fresh mount
+            sessionStorage.setItem("mpp_target_plan_id", String(planId));
+            // Navigate to production plan with plan_id in hash – forces fresh component mount
+            const actionId = 1318; // sale_planning.action_mrp_production_plan_dashboard
+            window.location.href = `/web#action=${actionId}&mpp_plan_id=${planId}`;
+        } else {
+            // Fallback: doAction normally
+            this.action.doAction(result);
         }
     }
 }

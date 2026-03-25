@@ -1,17 +1,110 @@
-# from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api, _
 
+class ProductionPlan(models.Model):
+    _name = "production.plan"
+    _description = "Production Plan"
+    _order = "date desc, id desc"
 
-# class /volumes/dev/workspace/orinx-odoo/fashion-orinx-odoo/sale_planning(models.Model):
-#     _name = '/volumes/dev/workspace/orinx-odoo/fashion-orinx-odoo/sale_planning./volumes/dev/workspace/orinx-odoo/fashion-orinx-odoo/sale_planning'
-#     _description = '/volumes/dev/workspace/orinx-odoo/fashion-orinx-odoo/sale_planning./volumes/dev/workspace/orinx-odoo/fashion-orinx-odoo/sale_planning'
+    name = fields.Char(string="Tên kế hoạch", required=True, default=lambda self: self._get_default_name())
+    date = fields.Date(string="Ngày lập", default=fields.Date.today, required=True)
+    user_id = fields.Many2one("res.users", string="Người lập", default=lambda self: self.env.user)
+    state = fields.Selection([
+        ("draft", "Dự thảo"),
+        ("done", "Hoàn tất")
+    ], string="Trạng thái", default="draft")
+    line_ids = fields.One2many("production.plan.line", "plan_id", string="Chi tiết sản phẩm")
 
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         for record in self:
-#             record.value2 = float(record.value) / 100
+    def _get_default_name(self):
+        count = self.search_count([])
+        return f"Kế hoạch #{count + 1}"
 
+    def action_done(self):
+        self.write({"state": "done"})
+
+    def action_draft(self):
+        self.write({"state": "draft"})
+
+    @api.model
+    def create_from_forecast(self, **kwargs):
+        forecast_id = kwargs.get("forecast_id")
+        product_ids = kwargs.get("product_ids")
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.info("CREATING PLAN FROM FORECAST: id=%s, products=%s", forecast_id, product_ids)
+        
+        plan = self.create({
+            "name": f"Kế hoạch #{self.search_count([]) + 1}",
+        })
+        
+        final_product_ids = []
+        if product_ids is not None and len(product_ids) > 0:
+            final_product_ids = product_ids
+        elif forecast_id and forecast_id != 0:
+            forecast_lines = self.env["demand.forecast.line"].search([("forecast_id", "=", int(forecast_id))])
+            final_product_ids = forecast_lines.mapped("product_id").ids
+            
+        _logger.info("FINAL PRODUCT IDS: %s", final_product_ids)
+        for p_id_raw in final_product_ids:
+            try:
+                p_id = int(p_id_raw)
+                # check if line already exists for this product in this plan
+                if not self.env["production.plan.line"].search([("plan_id", "=", plan.id), ("product_id", "=", p_id)]):
+                    self.env["production.plan.line"].create({
+                        "plan_id": plan.id,
+                        "product_id": p_id,
+                    })
+            except Exception as e:
+                _logger.error("Error creating plan line for product %s: %s", p_id_raw, e)
+        return {
+            "type": "ir.actions.client",
+            "tag": "mrp_production_plan.dashboard",
+            "name": "Lập kế hoạch sản xuất",
+            "context": {"plan_id": plan.id},
+        }
+
+class ProductionPlanLine(models.Model):
+    _name = "production.plan.line"
+    _description = "Production Plan Configuration Row"
+    _order = "id desc"
+
+    plan_id = fields.Many2one("production.plan", string="Kế hoạch", ondelete="cascade")
+    product_id = fields.Many2one("product.product", string="Sản phẩm", required=True)
+    is_indirect_demand = fields.Boolean(string="Nhu cầu gián tiếp")
+    material_category_id = fields.Many2one("mrp.bom", string="Danh mục vật tư")
+    route_id = fields.Many2one("stock.route", string="Tuyến cung ứng")
+    safety_stock_target = fields.Float(string="Mục tiêu tồn kho an toàn")
+    min_replenish_qty = fields.Float(string="Số lượng bổ sung tối thiểu")
+    activation_type = fields.Selection([
+        ("manual", "Thủ công"),
+        ("auto", "Tự động")
+    ], string="Kích hoạt bổ sung", default="manual")
+
+class ProductionPlanWizard(models.TransientModel):
+    _name = "production.plan.wizard"
+    _description = "Add Product to Production Plan Wizard"
+
+    plan_id = fields.Many2one("production.plan", string="Kế hoạch")
+    product_id = fields.Many2one("product.product", string="Sản phẩm", required=True)
+    is_indirect_demand = fields.Boolean(string="Nhu cầu gián tiếp")
+    material_category_id = fields.Many2one("mrp.bom", string="Danh mục vật tư")
+    route_id = fields.Many2one("stock.route", string="Tuyến cung ứng")
+    safety_stock_target = fields.Float(string="Mục tiêu tồn kho an toàn")
+    min_replenish_qty = fields.Float(string="Số lượng bổ sung tối thiểu")
+    activation_type = fields.Selection([
+        ("manual", "Thủ công"),
+        ("auto", "Tự động")
+    ], string="Kích hoạt bổ sung", default="manual")
+
+    def action_save(self):
+        self.env["production.plan.line"].create({
+            "plan_id": self.plan_id.id,
+            "product_id": self.product_id.id,
+            "is_indirect_demand": self.is_indirect_demand,
+            "material_category_id": self.material_category_id.id,
+            "route_id": self.route_id.id,
+            "safety_stock_target": self.safety_stock_target,
+            "min_replenish_qty": self.min_replenish_qty,
+            "activation_type": self.activation_type,
+        })
+        return {"type": "ir.actions.client", "tag": "reload_context"}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="production_plan_wizard_view_form" model="ir.ui.view">
+        <field name="name">production.plan.wizard.form</field>
+        <field name="model">production.plan.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Thêm một sản phẩm">
+                <group>
+                    <group>
+                        <field name="plan_id" invisible="1"/>
+                        <field name="product_id" options="{'no_create': True}"/>
+                        <field name="is_indirect_demand"/>
+                        <field name="material_category_id" domain="[('product_id', '=', product_id)]" options="{'no_create': True}" />
+                        <field name="route_id"/>
+                    </group>
+                    <group>
+                        <field name="safety_stock_target"/>
+                        <field name="min_replenish_qty"/>
+                        <field name="activation_type"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_save" string="Lưu" type="object" class="btn-primary"/>
+                    <button string="Huỷ bỏ" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_production_plan_wizard" model="ir.actions.act_window">
+        <field name="name">Thêm một sản phẩm</field>
+        <field name="res_model">production.plan.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

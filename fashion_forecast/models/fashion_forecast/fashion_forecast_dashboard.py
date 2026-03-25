@@ -102,6 +102,7 @@ class FashionForecastDashboard(models.AbstractModel):
         for l in lines.sorted(key=lambda x: x.forecast_qty or 0.0, reverse=True)[:8]:
             forecast_rows.append({
                 "key": f"f_{l.id}",
+                "product_id": l.product_id.id,
                 "name": l.product_id.display_name,
                 "category": l.categ_id.display_name if l.categ_id else "",
                 "demand": int(round(l.forecast_qty or 0.0)),
@@ -241,6 +242,7 @@ class FashionForecastDashboard(models.AbstractModel):
             "forecast_rows": [
                 {
                     "key": f"p_{m['id']}",
+                    "product_id": m["id"],
                     "name": m["name"],
                     "category": m["category"],
                     "demand": int(round(m["avg_qty"])),

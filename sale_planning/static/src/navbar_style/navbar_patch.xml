@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="sale_planning.NavBar" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//DropdownItem[contains(@class, 'o_menu_brand')]" position="replace">
+            <DropdownItem
+              t-if="!env.isSmall and currentApp"
+              class="'o_menu_brand d-flex align-items-center gap-2'"
+              onSelected="() => this.onNavBarDropdownItemSelection(currentApp)"
+              attrs="{ href: getMenuItemHref(currentApp), 'data-menu-xmlid': currentApp.xmlid, 'data-section': currentApp.id }"
+            >
+                <img t-if="currentAppIcon" t-att-src="currentAppIcon" class="o_navbar_app_icon" style="height: 24px; width: 24px; margin-right: 4px;"/>
+                <span t-esc="currentApp.name"/>
+            </DropdownItem>
+        </xpath>
+    </t>
+</templates>

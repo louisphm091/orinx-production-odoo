@@ -1,0 +1,57 @@
+.o_main_navbar {
+    background-color: #ffffff !important;
+    color: #495057 !important;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+    /* Remove purple background from all elements */
+    &, .o_menu_brand, .o_menu_sections, .o_menu_sections > *, .o_menu_systray, .o_menu_systray > * {
+        background-color: transparent !important;
+    }
+
+    /* Style for the app switcher (grid icon) */
+    .o_navbar_apps_menu button {
+        color: #1a202c !important;
+        background-color: transparent !important;
+        &:hover {
+            color: #008784 !important;
+            background-color: #f8fafc !important;
+        }
+    }
+
+    /* Text color and background for menu items */
+    .o_menu_brand, 
+    .o_menu_sections .o-dropdown,
+    .o_menu_sections .dropdown-toggle,
+    .o_menu_sections .o_nav_entry,
+    .o_menu_systray .o_systray_item .btn {
+        color: #1a202c !important;
+        background-color: transparent !important;
+        font-weight: 500;
+        border: none !important;
+        
+        &:hover, &:focus, &.show, &.active {
+            background-color: #f1f5f9 !important; /* Very light gray instead of purple */
+            color: #008784 !important;
+        }
+    }
+
+    /* Brand Logo implementation */
+    .o_menu_brand {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        padding-left: 10px !important;
+    }
+}
+
+/* Ensure no purple in the menu entry blocks shown in screenshot */
+.o_main_navbar .o_menu_sections .o_nav_entry, 
+.o_main_navbar .o_menu_sections .o-dropdown {
+    background-color: transparent !important;
+    &.active, &:hover {
+        background-color: #f1f5f9 !important;
+    }
+}

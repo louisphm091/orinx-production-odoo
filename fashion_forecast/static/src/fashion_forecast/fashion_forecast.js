@@ -263,9 +263,43 @@ export class FashionForecastDashboard extends Component {
         return n.toLocaleString("en-US"); // 12,500
     }
 
-    openProductionPlanning(ev) {
+    async openProductionPlanning(ev) {
         if (ev) ev.preventDefault();
-        this.action.doAction("sale_planning.action_mrp_production_plan_dashboard");
+        
+        // 1. Collect product IDs from the current forecast rows
+        const productIds = (this.state.forecast_rows || []).map(r => {
+            if (!r.product_id) return null;
+            if (Array.isArray(r.product_id)) return r.product_id[0];
+            return r.product_id;
+        }).filter(id => id);
+        
+        console.log("DEMAND FORECAST: openProductionPlanning calling create_from_forecast with products:", productIds);
+        
+        // 2. Call server to create the plan record
+        const result = await this.orm.call(
+            "production.plan",
+            "create_from_forecast",
+            [],
+            {
+                forecast_id: this.state.filters.forecast_id || 0,
+                product_ids: productIds,
+            }
+        );
+        
+        const planId = result?.context?.plan_id || result?.params?.plan_id;
+        console.log("DEMAND FORECAST: New Plan created, ID =", planId);
+        
+        // 3. Navigate
+        if (planId) {
+            // Store for fallback
+            sessionStorage.setItem("mpp_target_plan_id", String(planId));
+            // Navigate using URL hash which production_plan.js is now listening to
+            const actionId = 1318; // sale_planning.action_mrp_production_plan_dashboard
+            window.location.href = `/web#action=${actionId}&mpp_plan_id=${planId}`;
+        } else {
+            // Fallback
+            this.action.doAction("sale_planning.action_mrp_production_plan_dashboard");
+        }
     }
 
     openPurchasePlanning(ev) {

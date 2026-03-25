@@ -21,10 +21,15 @@ track, and balance demand against supply. Developed by https://group.orinx.com.v
     "depends": ["base", "web", "product", "stock", "sale", "purchase", "mrp"],
     "data": [
         "security/ir.model.access.csv",
+        "views/production_plan_view.xml",
         "views/menu.xml",
+        "views/wizard.xml",
     ],
     "assets": {
         "web.assets_backend": [
+            "sale_planning/static/src/scss/web_style.scss",
+            "sale_planning/static/src/navbar_style/navbar_patch.js",
+            "sale_planning/static/src/navbar_style/navbar_patch.xml",
             "sale_planning/static/src/sale_planning_dashboard/chart.umd.min.js",
             "sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.xml",
             "sale_planning/static/src/sale_planning_dashboard/sale_planning_dashboard.js",

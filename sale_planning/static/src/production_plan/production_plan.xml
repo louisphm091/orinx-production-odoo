@@ -7,7 +7,7 @@
       <!-- HEADER -->
       <div class="mpp_header d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary btn-sm">Thêm một sản phẩm</button>
+            <button class="btn btn-outline-secondary btn-sm" t-on-click="onAddProduct">Thêm một sản phẩm</button>
             <div class="dropdown">
               <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" type="button">Tháng</button>
               <div class="dropdown-menu">
@@ -16,7 +16,7 @@
                 <a class="dropdown-item" href="#">Quý</a>
               </div>
             </div>
-            <h4 class="mb-0 ms-3 fw-bold mpp_title_main">Kế hoạch sản xuất tổng thể</h4>
+            <h4 class="mb-0 ms-3 fw-bold mpp_title_main">Lập kế hoạch sản xuất</h4>
         </div>
         </div>
       
@@ -44,36 +44,60 @@
                                 <div class="d-flex align-items-center">
                                     <input type="checkbox" class="form-check-input me-2 mb-0"/>
                                     <span class="mpp_product_name fw-bold"><t t-esc="row.name"/></span>
-                                    <i class="fa fa-pencil ms-2 text-muted small mpp_pencil_always"/>
+                                    <i class="fa fa-pencil ms-2 text-muted small mpp_pencil_always" t-on-click="() => this.onAddProduct()"/>
                                 </div>
                             </td>
                             <t t-foreach="state.months" t-as="m" t-key="m_index">
-                                <td class="text-center">
-                                    <span class="mpp_val_zero">0</span>
+                                <td class="text-center p-0" t-on-click="() => this.onCellClick(row.id, 'product', m_index)">
+                                    <div t-if="this.isEditing(row.id, 'product', m_index)" class="mpp_input_wrap">
+                                        <input type="number" class="form-control form-control-sm mpp_cell_input" t-att-id="'cell_' + row.id + '_product_' + m_index" t-att-value="row.values[m_index]" t-on-blur="(ev) => this.onCellBlur(ev, row.id, 'product', m_index)" t-on-keydown="(ev) => this.onCellKeyDown(ev, row.id, 'product', m_index)" t-att-autofocus="true"/>
+                                    </div>
+                                    <div t-else="" class="mpp_cell_value">
+                                        <span t-att-class="row.values[m_index] == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(row.values[m_index])"/></span>
+                                    </div>
                                 </td>
                             </t>
                         </tr>
                         <!-- Sub Rows -->
                         <t t-foreach="row.sub_rows" t-as="sr" t-key="sr.label">
-                            <tr t-att-class="'mpp_sub_row mpp_row_' + (sr.label.indexOf('Nhu cầu') === 0 ? 'forecast' : sr.label.indexOf('Bổ sung') === 0 ? 'replenish' : sr.label.indexOf('Tồn kho') === 0 ? 'stock' : 'indirect')">
-                                <td class="mpp_sticky_col ps-4 small">
-                                    <div class="d-flex align-items-center">
-                                        <span class="mpp_sign_icon me-2 text-muted"><t t-esc="sr.icon"/></span>
-                                        <span class="mpp_row_label"><t t-esc="sr.label"/></span>
-                                        <t t-if="sr.label.indexOf('Nhu cầu') === 0">
-                                            <i class="fa fa-pencil ms-2 text-muted small mpp_pencil_always"/>
+                            <tr t-att-class="'mpp_sub_row mpp_row_' + (sr.label.indexOf('Nhu cầu') === 0 ? 'forecast' : sr.label.indexOf('Bổ sung') === 0 ? 'replenish' : sr.label.indexOf('Tồn kho') === 0 ? 'stock' : sr.label.indexOf('Mục tiêu') === 0 ? 'safety' : 'indirect')">
+                                <td class="mpp_sticky_col ps-4">
+                                    <div class="d-flex align-items-center w-100">
+                                        <div class="mpp_sign_icon_wrapper d-flex align-items-center justify-content-center me-2">
+                                            <span class="mpp_sign_icon text-dark fw-bold"><t t-esc="sr.icon"/></span>
+                                        </div>
+                                        <div class="mpp_label_wrapper d-flex align-items-center flex-grow-1 overflow-hidden">
+                                            <t t-if="sr.label.indexOf(':') !== -1">
+                                                <t t-set="parts" t-value="sr.label.split(':')"/>
+                                                <span class="mpp_row_label"><t t-esc="parts[0]"/></span>
+                                                <span class="mpp_badge_label"><t t-esc="parts[1]"/></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="mpp_row_label"><t t-esc="sr.label"/></span>
+                                            </t>
+                                        </div>
+                                        <t t-if="sr.label.indexOf('Nhu cầu') === 0 || sr.label.indexOf('Dự báo') === 0">
+                                            <i class="fa fa-pencil text-muted small mpp_pencil_always ms-1" style="flex-shrink: 0;"/>
                                         </t>
                                     </div>
                                 </td>
                                 <t t-foreach="sr.values" t-as="val" t-key="val_index">
-                                    <td class="text-center p-1">
-                                        <t t-if="sr.label.indexOf('Bổ sung') === 0">
-                                            <div class="mpp_input_cell">
+                                    <td class="text-center p-0" t-on-click="() => this.onCellClick(row.id, sr.label, val_index)">
+                                        <div t-if="sr.label.indexOf('Bổ sung') === 0" class="mpp_input_cell_container p-1">
+                                            <div t-if="isEditing(row.id, sr.label, val_index)" class="mpp_input_wrap">
+                                                <input type="number" class="form-control form-control-sm mpp_cell_input" t-att-id="'cell_' + row.id + '_' + val_index" t-att-value="val" t-on-blur="(ev) => this.onCellBlur(ev, row.id, sr.label, val_index)" t-on-keydown="(ev) => this.onCellKeyDown(ev, row.id, sr.label, val_index)" t-att-autofocus="true"/>
+                                            </div>
+                                            <div t-else="" t-att-class="'mpp_input_cell ' + (val > 0 ? 'mpp_val_highlight' : '')">
                                                 <span t-att-class="val == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(val)"/></span>
                                             </div>
-                                        </t>
+                                        </div>
                                         <t t-else="">
-                                            <span t-att-class="val == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(val)"/></span>
+                                            <div t-if="isEditing(row.id, sr.label, val_index)" class="mpp_input_wrap">
+                                                <input type="number" class="form-control form-control-sm mpp_cell_input" t-att-value="val" t-on-blur="(ev) => this.onCellBlur(ev, row.id, sr.label, val_index)" t-on-keydown="(ev) => this.onCellKeyDown(ev, row.id, sr.label, val_index)" t-att-autofocus="true"/>
+                                            </div>
+                                            <div t-else="" class="p-1">
+                                                <span t-att-class="val == 0 ? 'mpp_val_zero' : 'mpp_val_active'"><t t-esc="formatNumber(val)"/></span>
+                                            </div>
                                         </t>
                                     </td>
                                 </t>
