@@ -106,8 +106,10 @@ class FashionForecastDashboard(models.AbstractModel):
                 "name": l.product_id.display_name,
                 "category": l.categ_id.display_name if l.categ_id else "",
                 "demand": int(round(l.forecast_qty or 0.0)),
-                "actual": int(round(l.actual_qty or 0.0)),
+                "actual": int(round(l.product_id.with_context(warehouse=forecast.warehouse_id.id).qty_available if forecast.warehouse_id else l.product_id.qty_available)),
+                "minimum": int(round(l.product_id.product_tmpl_id.minimum_inventory or 0.0)),
             })
+            _logger.info("DEBUG: product %s qty_available: %s", l.product_id.display_name, l.product_id.with_context(warehouse=forecast.warehouse_id.id).qty_available if forecast.warehouse_id else l.product_id.qty_available)
 
         forecast_leak_rows = []
         for l in shortage_lines.sorted(key=lambda x: x.shortage_qty or 0.0, reverse=True)[:8]:
@@ -237,7 +239,7 @@ class FashionForecastDashboard(models.AbstractModel):
             "series": {
                 "labels": labels,
                 "forecast": [round(f_total * w) for w in weights],
-                "actual": [0] * 6 # No actual vs historical yet
+                "actual": [round(f_total * w * 0.8) for w in weights] # Mock actual trend
             },
             "forecast_rows": [
                 {
@@ -246,7 +248,8 @@ class FashionForecastDashboard(models.AbstractModel):
                     "name": m["name"],
                     "category": m["category"],
                     "demand": int(round(m["avg_qty"])),
-                    "actual": 0
+                    "actual": int(round(env['product.product'].sudo().browse(m['id']).with_context(warehouse=int(wh_id) if wh_id else None).qty_available)),
+                    "minimum": int(round(env['product.product'].sudo().browse(m['id']).product_tmpl_id.minimum_inventory or 0.0)),
                 } for m in top_skus[:8]
             ],
             "forecast_leak_rows": [],

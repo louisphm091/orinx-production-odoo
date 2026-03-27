@@ -908,14 +908,28 @@ class PosDashboardSwift(models.AbstractModel):
         if filters:
             if filters.get('states'):
                 domain.append(('state', 'in', filters['states']))
+            
+            if filters.get('keyword'):
+                domain += ['|', ('name', 'ilike', filters['keyword']), ('note', 'ilike', filters['keyword'])]
 
             # Date filter (This Month, Today, etc.)
-            if filters.get('date_range') == 'this_month':
+            date_range = filters.get('date_range')
+            if date_range == 'this_month':
                 start, end = self._get_date_range('this_month', now_local)
                 domain += [('date_transfer', '>=', start), ('date_transfer', '<=', end)]
-            elif filters.get('date_range') == 'today':
+            elif date_range == 'today':
                 start, end = self._get_date_range('today', now_local)
                 domain += [('date_transfer', '>=', start), ('date_transfer', '<=', end)]
+            elif date_range == 'last_7_days':
+                start = now_local - timedelta(days=7)
+                start_utc, end_utc = self._get_date_range('today', now_local) # reuse end_utc
+                domain += [('date_transfer', '>=', start.replace(tzinfo=None)), ('date_transfer', '<=', end_utc)]
+            elif date_range == 'last_month':
+                # calculate last month start/end
+                first_day_this_month = now_local.replace(day=1)
+                last_day_last_month = first_day_this_month - timedelta(days=1)
+                first_day_last_month = last_day_last_month.replace(day=1)
+                domain += [('date_transfer', '>=', first_day_last_month.replace(tzinfo=None)), ('date_transfer', '<=', last_day_last_month.replace(tzinfo=None))]
 
         transfers = self.env['swift.stock.transfer'].search(domain, order='date_transfer desc')
         branch_map = self._get_location_branch_name_map()

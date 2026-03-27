@@ -122,6 +122,19 @@ patch(Chrome.prototype, {
                         // Ignore invalid referrer URLs.
                     }
                 }
+
+                const storedAuth = sessionStorage.getItem("pos_theme_swift_auth");
+                if (storedAuth) {
+                    try {
+                        const authData = JSON.parse(storedAuth);
+                        this.pos.setSwiftEmployee(authData, authData.avatarUrl, authData.isAdmin);
+                        return; // Already authenticated
+                    } catch (e) {
+                        console.error("[Swift POS] Failed to parse stored auth", e);
+                        sessionStorage.removeItem("pos_theme_swift_auth");
+                    }
+                }
+
                 this.pos.dialog.add(SwiftVerifyPinPopup, {
                     title: "Nhập mã xác nhận để truy cập POS",
                     branchId: this.pos.config.id,

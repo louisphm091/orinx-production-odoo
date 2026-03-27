@@ -155,6 +155,7 @@
                             <th t-out="this.tr('SKU')"/>
                             <th class="text-end" t-out="this.tr('Category')"/>
                             <th class="text-end" t-out="this.tr('Demand')"/>
+                            <th class="text-end">Tối thiểu</th>
                             <th class="text-end" t-out="this.tr('Actual')"/>
                             </tr>
                         </thead>
@@ -162,7 +163,7 @@
                         <tbody>
                             <t t-if="!state.forecast_rows.length">
                             <tr>
-                                <td colspan="4" class="text-muted" t-out="this.tr('No data yet')"/>
+                                <td colspan="5" class="text-muted" t-out="this.tr('No data yet')"/>
                             </tr>
                             </t><t t-else="">
                             <t t-foreach="state.forecast_rows" t-as="row" t-key="row.key">
@@ -170,6 +171,7 @@
                                 <td class="fw-semibold"><t t-esc="row.name"/></td>
                                 <td class="text-end"><t t-esc="row.category"/></td>
                                 <td class="text-end"><t t-esc="formatNumber(row.demand)"/></td>
+                                <td class="text-end text-muted"><t t-esc="formatNumber(row.minimum)"/></td>
                                 <td class="text-end">
                                     <span class="badge bg-light text-dark">
                                     <t t-esc="formatNumber(row.actual)"/>
@@ -210,6 +212,7 @@
                             <th t-out="this.tr('SKU')"/>
                             <th class="text-end" t-out="this.tr('Category')"/>
                             <th class="text-end" t-out="this.tr('Demand')"/>
+                            <th class="text-end">Tối thiểu</th>
                             <th class="text-end" t-out="this.tr('Actual')"/>
                           </tr>
                         </thead>
@@ -217,7 +220,7 @@
                         <tbody>
                           <t t-if="!state.forecast_rows.length">
                             <tr>
-                              <td colspan="4" class="text-muted" t-out="this.tr('No data yet')"/>
+                              <td colspan="5" class="text-muted" t-out="this.tr('No data yet')"/>
                             </tr>
                           </t><t t-else="">
                             <t t-foreach="state.forecast_rows" t-as="row" t-key="row.key">
@@ -225,6 +228,7 @@
                                 <td class="fw-semibold"><t t-esc="row.name"/></td>
                                 <td class="text-end"><t t-esc="row.category"/></td>
                                 <td class="text-end"><t t-esc="formatNumber(row.demand)"/></td>
+                                <td class="text-end text-muted"><t t-esc="formatNumber(row.minimum)"/></td>
                                 <td class="text-end">
                                   <span class="badge bg-light text-dark">
                                     <t t-esc="formatNumber(row.actual)"/>

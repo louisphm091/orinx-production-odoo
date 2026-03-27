@@ -14,7 +14,7 @@
           <div class="mt_card">
             <div class="mt_card_title"><t t-out="this._t('DAILY PROD')"/></div>
             <div class="mt_card_body">
-              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.daily.rate || 0)) + ';'">
+              <div class="mt_donut daily" t-att-style="'--p:' + (Math.min(100, state.kpis.daily.rate || 0)) + ';'">
                 <div class="mt_donut_inner">
                   <div class="mt_donut_value"><t t-esc="state.kpis.daily.rate"/>%</div>
                   <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
@@ -31,7 +31,7 @@
           <div class="mt_card">
             <div class="mt_card_title"><t t-out="this._t('WEEKLY PROD')"/></div>
             <div class="mt_card_body">
-              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.weekly.rate || 0)) + ';'">
+              <div class="mt_donut weekly" t-att-style="'--p:' + (Math.min(100, state.kpis.weekly.rate || 0)) + ';'">
                 <div class="mt_donut_inner">
                   <div class="mt_donut_value"><t t-esc="state.kpis.weekly.rate"/>%</div>
                   <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
@@ -48,7 +48,7 @@
           <div class="mt_card">
             <div class="mt_card_title"><t t-out="this._t('MONTHLY PROD')"/></div>
             <div class="mt_card_body">
-              <div class="mt_donut" t-att-style="'--p:' + (Math.min(100, state.kpis.monthly.rate || 0)) + ';'">
+              <div class="mt_donut monthly" t-att-style="'--p:' + (Math.min(100, state.kpis.monthly.rate || 0)) + ';'">
                 <div class="mt_donut_inner">
                   <div class="mt_donut_value"><t t-esc="state.kpis.monthly.rate"/>%</div>
                   <div class="mt_donut_sub"><t t-out="this._t('RATE')"/></div>
@@ -68,6 +68,7 @@
             <div class="mt_alert_left">
               <div class="mt_alert_title"><t t-out="this._t('Delay Orders')"/></div>
               <div class="mt_alert_sub"><t t-out="this._t('Delayed manufacturing orders')"/></div>
+              <div class="mt_pill" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;">Critical Attention</div>
             </div>
             <div class="mt_alert_value" t-esc="state.delay.count"/>
           </div>
@@ -75,9 +76,10 @@
           <div class="mt_alert">
             <div class="mt_alert_left">
               <div class="mt_alert_title"><t t-out="this._t('Bottleneck')"/></div>
-              <div class="mt_pill"><t t-esc="state.bottleneck.name"/></div>
+              <div class="mt_alert_sub"><t t-out="this._t('Critical work center')"/></div>
+              <div class="mt_pill" t-esc="state.bottleneck.name"/>
             </div>
-            <div class="mt_alert_sub"><t t-out="this._t('Critical work center')"/></div>
+            <div class="mt_alert_value" style="color: #6366f1;">?</div>
           </div>
         </div>
 
@@ -85,41 +87,37 @@
           <div class="mt_table_title"><t t-out="this._t('PRODUCTION PROGRESS BY LINE')"/></div>
 
           <t t-if="!state.table || state.table.length === 0">
-            <div class="mt_loading"><t t-out="this._t('No data')"/></div>
+            <div class="mt_loading" style="text-align: center; opacity: 0.5;"><t t-out="this._t('No data available currently')"/></div>
           </t>
 
           <t t-else="">
-            <table class="table table-sm">
+            <table>
               <thead>
                 <tr>
-                  <th><t t-out="this._t('No')"/></th>
+                  <th style="width: 50px;">#</th>
                   <th><t t-out="this._t('Line')"/></th>
                   <th><t t-out="this._t('Product')"/></th>
                   <th><t t-out="this._t('PLAN')"/></th>
-                  <th><t t-out="this._t('TARGET')"/></th>
                   <th><t t-out="this._t('RESULT')"/></th>
-                  <th><t t-out="this._t('Delay')"/></th>
                   <th><t t-out="this._t('Load')"/></th>
                   <th><t t-out="this._t('RATE')"/></th>
-                  <th><t t-out="this._t('Status')"/></th>
+                  <th style="text-align: center;"><t t-out="this._t('Status')"/></th>
                 </tr>
               </thead>
               <tbody>
                 <t t-foreach="state.table" t-as="row" t-key="row.no">
                   <tr>
-                    <td t-esc="row.no"/>
-                    <td t-esc="row.line"/>
-                    <td>
-                      <span class="mt_dot"></span>
-                      <t t-esc="row.product"/>
-                    </td>
+                    <td t-esc="row.no" style="font-weight: 700; opacity: 0.5;"/>
+                    <td t-esc="row.line" style="font-weight: 600;"/>
+                    <td t-esc="row.product"/>
                     <td t-esc="row.plan"/>
-                    <td t-esc="row.target"/>
                     <td t-esc="row.result"/>
-                    <td t-esc="row.delay"/>
-                    <td><t t-esc="row.loadUsed"/> / <t t-esc="row.loadCap"/></td>
-                    <td><t t-esc="row.rate"/>%</td>
                     <td>
+                        <span style="font-weight: 600;"><t t-esc="row.loadUsed"/></span>
+                        <span style="opacity: 0.4;"> / <t t-esc="row.loadCap"/></span>
+                    </td>
+                    <td style="font-weight: 700;"><t t-esc="row.rate"/>%</td>
+                    <td style="text-align: center;">
                       <span
                         t-att-class="'mt_status_dot ' + (row.status === 'green' ? 'mt_status_green' : (row.status === 'yellow' ? 'mt_status_yellow' : 'mt_status_red'))"/>
                     </td>

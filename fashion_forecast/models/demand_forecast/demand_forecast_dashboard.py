@@ -106,8 +106,10 @@ class DemandForecastDashboard(models.AbstractModel):
                 "name": l.product_id.display_name,
                 "category": l.categ_id.display_name if l.categ_id else "",
                 "demand": int(round(l.forecast_qty or 0.0)),
-                "actual": int(round(l.actual_qty or 0.0)),
+                "actual": int(round(l.product_id.with_context(warehouse=forecast.warehouse_id.id).qty_available if forecast.warehouse_id else l.product_id.qty_available)),
+                "minimum": int(round(l.product_id.product_tmpl_id.minimum_inventory or 0.0)),
             })
+        _logger.info("DEBUG: get_dashboard_data sample row: %s", forecast_rows[0] if forecast_rows else "EMPTY")
 
         forecast_leak_rows = []
         for l in shortage_lines.sorted(key=lambda x: x.shortage_qty or 0.0, reverse=True)[:8]:
@@ -222,7 +224,8 @@ class DemandForecastDashboard(models.AbstractModel):
                 "name": product.display_name,
                 "category": product.categ_id.name or "",
                 "revenue": subtotal_sum or 0.0,
-                "qty": qty_sum or 0.0
+                "qty": qty_sum or 0.0,
+                "minimum": product.product_tmpl_id.minimum_inventory or 0.0
             }
         _logger.info("Sale lines processed: %d products", len(metrics))
             
@@ -250,7 +253,8 @@ class DemandForecastDashboard(models.AbstractModel):
                         "name": product.display_name,
                         "category": product.categ_id.name or "",
                         "revenue": 0.0,
-                        "qty": 0.0
+                        "qty": 0.0,
+                        "minimum": product.product_tmpl_id.minimum_inventory or 0.0
                     }
                 metrics[product.id]["revenue"] += subtotal_sum or 0.0
                 metrics[product.id]["qty"] += qty_sum or 0.0
@@ -309,9 +313,11 @@ class DemandForecastDashboard(models.AbstractModel):
                 "product_id": m["id"],
                 "name": m["name"],
                 "category": m["category"],
-                "demand": int(round(m["avg_revenue"])),
-                "actual": int(round(m["avg_revenue"] * 0.9)),
+                "demand": int(round(m["avg_qty"] or 0.0)),
+                "actual": int(round(env['product.product'].sudo().browse(m['id']).with_context(warehouse=int(wh_id) if wh_id else None).qty_available)),
+                "minimum": int(round(m["minimum"] or 0.0)),
             })
+        _logger.info("DEBUG: dynamic_forecast sample row: %s", forecast_rows[0] if forecast_rows else "EMPTY")
             
         rev_spark_labels = []
         rev_spark_values = []

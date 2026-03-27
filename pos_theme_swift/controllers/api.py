@@ -123,6 +123,7 @@ class SwiftZaloApiController(http.Controller):
             "id": product.id,
             "name": product.display_name or product.name or "",
             "sku": product.barcode or product.default_code or "",
+            "itemCode": product.default_code or product.barcode or "",
             "barcode": product.barcode or "",
             "price": product.lst_price or 0.0,
             "costPrice": product.standard_price or template.standard_price or 0.0,
@@ -130,6 +131,7 @@ class SwiftZaloApiController(http.Controller):
             "category": category,
             "brand": {"id": brand_name, "name": brand_name} if brand_name else {"id": "", "name": ""},
             "unitLabel": product.uom_id.name if product.uom_id else "",
+            "uom": product.uom_id.name if product.uom_id else "",
             "attributeIds": attrs,
             "status": status,
             "statusLabel": status_label,
@@ -997,44 +999,227 @@ class SwiftZaloApiController(http.Controller):
     # 6. Transfers
     @http.route("/api/swift/v1/transfers", type="http", auth="user", methods=["GET"], csrf=False)
     def get_transfers(self, **kwargs):
-        config_id = request.httprequest.args.get('branchId')
+        args = request.httprequest.args
+        branch_id = args.get('branchId')
+        period = args.get('period')
+        status = args.get('status')
+        receipt_state = args.get('receiptState')
+        keyword = args.get('keyword')
+        page = max(self._swift_to_int(args.get('page'), 1), 1)
+        page_size = max(self._swift_to_int(args.get('pageSize'), 20), 1)
+
+        filters = {}
+        if status:
+            filters['states'] = status.split(',')
+        if period:
+            filters['date_range'] = period
+        if keyword:
+            filters['keyword'] = keyword
+        if receipt_state:
+            filters['receipt_state'] = receipt_state.split(',')
+
         dashboard = request.env["pos.dashboard.swift"]
-        transfers = dashboard.get_stock_transfers(config_id=config_id)
+        # We might need to update get_stock_transfers to handle more filters
+        transfers = dashboard.get_stock_transfers(filters=filters, config_id=branch_id)
+        
         # Transform to req doc shape
         res = []
         for t in transfers:
+            # Try to get a preview product name
+            preview = ""
+            total_items = 0
+            total_qty = 0
+            received_qty = 0
+            receipt_state_val = "none"
+
+            if t.get("id"):
+                transfer_rec = request.env['swift.stock.transfer'].sudo().browse(t["id"])
+                total_items = len(transfer_rec.line_ids)
+                total_qty = sum(transfer_rec.line_ids.mapped('qty'))
+                received_qty = sum(transfer_rec.line_ids.mapped('received_qty'))
+                
+                if received_qty >= total_qty and total_qty > 0:
+                    receipt_state_val = "full"
+                elif received_qty > 0:
+                    receipt_state_val = "partial"
+                elif t["state"] in ('done', 'received'):
+                    # if done but no received_qty tracked, assume full
+                    receipt_state_val = "full"
+                else:
+                    receipt_state_val = "pending"
+
+                if transfer_rec.line_ids:
+                    first_line = transfer_rec.line_ids[0]
+                    preview = f"{first_line.product_id.display_name} x{int(first_line.qty)}"
+                    if total_items > 1:
+                        preview += f" (+{total_items - 1})"
+
+            # Filter by receiptState if provided
+            incoming_receipt_state_filter = filters.get('receipt_state', [])
+            if incoming_receipt_state_filter and receipt_state_val not in incoming_receipt_state_filter:
+                continue
+
             res.append({
                 "id": str(t["id"]),
                 "code": t["name"],
                 "status": t["state"],
-                "fromBranch": {"id": t["loc_src_id"], "name": t["loc_src"]},
-                "toBranch": {"id": t["loc_dest_id"], "name": t["loc_dest"]},
+                "fromBranch": {"id": str(t["loc_src_config_id"]), "name": t["loc_src"]},
+                "toBranch": {"id": str(t["loc_dest_config_id"]), "name": t["loc_dest"]},
                 "createdAt": int(fields.Datetime.from_string(t["date_transfer"]).timestamp() * 1000) if t["date_transfer"] else 0,
                 "amount": t["total_value"],
-                "preview": ""
+                "preview": preview,
+                "totalItems": total_items,
+                "totalQuantity": total_qty,
+                "receivedQuantity": received_qty,
+                "receiptState": receipt_state_val
             })
-        return self._ok({"items": res, "summary": {"count": len(res)}})
+
+        total = len(res)
+        start = (page - 1) * page_size
+        end = start + page_size
+        
+        return self._ok({
+            "items": res[start:end],
+            "summary": {"count": total}
+        })
+
+    @http.route("/api/swift/v1/transfers/filter-options", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_transfer_filter_options(self, **kwargs):
+        data = {
+            "periodOptions": [
+                { "value": "today", "label": _("Hôm nay") },
+                { "value": "last_7_days", "label": _("7 ngày gần đây") },
+                { "value": "this_month", "label": _("Tháng này") },
+                { "value": "last_month", "label": _("Tháng trước") }
+            ],
+            "statusOptions": [
+                { "value": "draft", "label": _("Phiếu tạm") },
+                { "value": "shipped", "label": _("Đang chuyển") },
+                { "value": "done", "label": _("Đã nhận") },
+                { "value": "cancel", "label": _("Đã huỷ") }
+            ],
+            "receiptStateOptions": [
+                { "value": "full", "label": _("Nhận đủ") },
+                { "value": "pending", "label": _("Chưa nhận đủ") },
+                { "value": "partial", "label": _("Nhận một phần") }
+            ]
+        }
+        return self._ok(data)
 
     @http.route("/api/swift/v1/transfers/<int:transfer_id>", type="http", auth="user", methods=["GET"], csrf=False)
     def get_transfer_detail(self, transfer_id, **kwargs):
+        branch_id = request.httprequest.args.get('branchId')
         dashboard = request.env["pos.dashboard.swift"]
-        t = dashboard.get_transfer_detail(transfer_id)
-        if not t: return self._error(_("Transfer not found"))
+        t = dashboard.get_transfer_detail(transfer_id, config_id=branch_id)
+        if not t: return self._error(_("Transfer not found"), status=404)
+        
+        # Ensure name is TRF...
+        t['name'] = t.get('name') or f"TRF{str(transfer_id).zfill(5)}"
+        
         return self._ok(t)
 
     @http.route("/api/swift/v1/transfers", type="http", auth="user", methods=["POST"], csrf=False)
     def create_transfer(self, **kwargs):
         payload = self._json_body()
         dashboard = request.env["pos.dashboard.swift"]
-        res = dashboard.create_or_update_transfer(payload)
-        return self._ok(res)
+        
+        # Map README fields to Odoo internal fields if different
+        processed_payload = {
+            'config_id': payload.get('fromBranchId'),
+            'dest_config_id': payload.get('toBranchId'),
+            'note': payload.get('note', ''),
+            'state': payload.get('status', 'draft'),
+            'lines': []
+        }
+        
+        for line in payload.get('lines', []):
+            processed_payload['lines'].append({
+                'product_id': line.get('productId'),
+                'qty': line.get('qty', 0)
+            })
+            
+        try:
+            res = dashboard.create_or_update_transfer(processed_payload)
+            return self._ok({
+                "id": str(res["id"]),
+                "code": res["name"],
+                "status": res["state"]
+            })
+        except Exception as e:
+            return self._error(str(e))
+
+    @http.route("/api/swift/v1/transfers/<int:transfer_id>", type="http", auth="user", methods=["PATCH"], csrf=False)
+    def update_transfer(self, transfer_id, **kwargs):
+        payload = self._json_body()
+        dashboard = request.env["pos.dashboard.swift"]
+        
+        processed_payload = {
+            'id': transfer_id,
+            'dest_config_id': payload.get('toBranchId'),
+            'note': payload.get('note'),
+            'lines': []
+        }
+        
+        if 'lines' in payload:
+            for line in payload.get('lines', []):
+                processed_payload['lines'].append({
+                    'product_id': line.get('productId'),
+                    'qty': line.get('qty', 0)
+                })
+        else:
+            # If lines not provided, we should probably keep existing lines
+            # But create_or_update_transfer might unlink them.
+            # I'll let the dashboard handle it or fetch existing lines if needed.
+            pass
+            
+        try:
+            res = dashboard.create_or_update_transfer(processed_payload)
+            return self._ok({
+                "id": str(res["id"]),
+                "code": res["name"],
+                "status": res["state"]
+            })
+        except Exception as e:
+            return self._error(str(e))
 
     @http.route("/api/swift/v1/transfers/<int:transfer_id>/receive", type="http", auth="user", methods=["POST"], csrf=False)
     def receive_transfer(self, transfer_id, **kwargs):
         payload = self._json_body()
         dashboard = request.env["pos.dashboard.swift"]
-        dashboard.action_receive_transfer(transfer_id, payload.get("items", []))
-        return self._ok({"message": "Received"})
+        
+        # Map README shape: { note, lines: [ { lineId, receivedQty } ] }
+        # to dashboard shape: dashboard.action_receive_transfer(transfer_id, lines_data)
+        lines_data = []
+        for line in payload.get('lines', []):
+            lines_data.append({
+                'line_id': line.get('lineId'),
+                'received_qty': line.get('receivedQty')
+            })
+            
+        try:
+            dashboard.action_receive_transfer(transfer_id, lines_data)
+            # Re-fetch to return new status
+            transfer = request.env['swift.stock.transfer'].sudo().browse(transfer_id)
+            return self._ok({
+                "id": str(transfer.id),
+                "status": transfer.state,
+                # We need to compute receiptState: pending, partial, full
+                "receiptState": "full" if transfer.state == 'done' else "pending"
+            })
+        except Exception as e:
+            return self._error(str(e))
+
+    @http.route("/api/swift/v1/transfers/<int:transfer_id>/cancel", type="http", auth="user", methods=["POST"], csrf=False)
+    def cancel_transfer(self, transfer_id, **kwargs):
+        transfer = request.env['swift.stock.transfer'].sudo().browse(transfer_id)
+        if not transfer.exists():
+            return self._error(_("Transfer not found"), status=404)
+        
+        try:
+            transfer.sudo().action_cancel()
+            return self._ok({"message": _("Cancelled successfully")})
+        except Exception as e:
+            return self._error(str(e))
 
     # 7. Stock Checks
     @http.route("/api/swift/v1/stock-checks", type="http", auth="user", methods=["GET"], csrf=False)

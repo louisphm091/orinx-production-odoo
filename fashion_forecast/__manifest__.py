@@ -34,6 +34,7 @@ Long description of module's purpose
     'data': [
         "security/ir.model.access.csv",
         'views/menu.xml',
+        'views/product_views.xml',
     ],
 
     "installable": True,

@@ -102,6 +102,30 @@ export class ProductionPlanDashboard extends Component {
         this.onCellBlur = this.onCellBlur.bind(this);
         this.onCellKeyDown = this.onCellKeyDown.bind(this);
         this.isEditing = this.isEditing.bind(this);
+        this.onCreateOrder = this.onCreateOrder.bind(this);
+    }
+    
+    async onCreateOrder(productId) {
+        try {
+            const result = await this.orm.call(
+                "mrp.production.plan.dashboard",
+                "create_manufacturing_orders",
+                [],
+                {
+                    plan_id: this.planId,
+                    product_id: productId,
+                }
+            );
+            if (result && result.error) {
+                this.notification.add(result.error, { type: "danger" });
+            } else if (result && result.success) {
+                this.notification.add(`Đã tạo ${result.count} lệnh sản xuất thành công.`, { type: "success" });
+                await this.load();
+            }
+        } catch (e) {
+            console.error("Failed to create order:", e);
+            this.notification.add("Không thể tạo lệnh sản xuất.", { type: "danger" });
+        }
     }
 
     formatNumber(value) {
@@ -168,12 +192,14 @@ export class ProductionPlanDashboard extends Component {
         }
     }
 
-    updateCellValue(rowId, label, monthIndex, value) {
+    async updateCellValue(rowId, label, monthIndex, value) {
         const row = this.state.rows.find(r => r.id === rowId);
         if (!row) return;
 
         const newValue = parseFloat(value) || 0;
+        const monthLabel = this.state.months[monthIndex];
         
+        // Optimistic update
         if (label === 'product') {
             row.values[monthIndex] = newValue;
         } else {
@@ -183,6 +209,26 @@ export class ProductionPlanDashboard extends Component {
         }
 
         this.recalculateRow(row);
+
+        // Persistent update
+        try {
+            await this.orm.call(
+                "mrp.production.plan.dashboard",
+                "save_cell_value",
+                [],
+                {
+                    plan_id: this.planId,
+                    product_id: rowId,
+                    month_label: monthLabel,
+                    row_label: label,
+                    value: newValue,
+                }
+            );
+        } catch (e) {
+            console.error("Failed to save cell value:", e);
+            this.notification.add("Không thể lưu giá trị. Vui lòng thử lại.", { type: "danger" });
+            // Optionally reload to revert UI to server state
+        }
     }
 
     recalculateRow(row) {
@@ -193,16 +239,19 @@ export class ProductionPlanDashboard extends Component {
 
         if (!forecastRow || !replenishRow || !stockRow) return;
 
-        // Forecasted Inventory = Previous (Actual) stock + Replenish - Forecast Demand
-        let prevStock = row.actual_stock || 0; 
+        // Forecasted Inventory: Only calculate for the first (active) month
+        const prevStock = row.actual_stock || 0; 
         
         for (let i = 0; i < this.state.months.length; i++) {
             const demand = forecastRow.values[i] || 0;
             const indirect = indirectRow ? (indirectRow.values[i] || 0) : 0;
             const replenish = replenishRow.values[i] || 0;
             
-            stockRow.values[i] = prevStock + replenish - demand - indirect;
-            prevStock = stockRow.values[i];
+            if (i === 0) {
+                stockRow.values[i] = prevStock + replenish - demand - indirect;
+            } else {
+                stockRow.values[i] = 0;
+            }
         }
     }
 }

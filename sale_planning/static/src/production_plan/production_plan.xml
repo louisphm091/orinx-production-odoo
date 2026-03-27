@@ -70,7 +70,9 @@
                                             <t t-if="sr.label.indexOf(':') !== -1">
                                                 <t t-set="parts" t-value="sr.label.split(':')"/>
                                                 <span class="mpp_row_label"><t t-esc="parts[0]"/></span>
-                                                <span class="mpp_badge_label"><t t-esc="parts[1]"/></span>
+                                                <button class="btn btn-xs btn-outline-info p-0 px-2 ms-2 mpp_order_badge_btn" style="font-size: 0.75rem; vertical-align: middle;" t-on-click="() => onCreateOrder(row.id)">
+                                                    <t t-esc="parts[1] || 'Đơn hàng'"/>
+                                                </button>
                                             </t>
                                             <t t-else="">
                                                 <span class="mpp_row_label"><t t-esc="sr.label"/></span>

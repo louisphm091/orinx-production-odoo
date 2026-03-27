@@ -23,6 +23,7 @@ class SwiftStockTransfer(models.Model):
         ('draft', 'Draft'),
         ('shipped', 'Shipped'),
         ('done', 'Received'),
+        ('cancel', 'Cancelled'),
     ], string='Status', default='draft', index=True, copy=False)
 
     note = fields.Text(string='Note')
@@ -116,6 +117,10 @@ class SwiftStockTransfer(models.Model):
     def action_done(self):
         self.write({'state': 'done', 'date_receive': fields.Datetime.now()})
         # Handle stock updates here if needed (move stock from source to dest)
+        return True
+
+    def action_cancel(self):
+        self.write({'state': 'cancel'})
         return True
 
 class SwiftStockTransferLine(models.Model):

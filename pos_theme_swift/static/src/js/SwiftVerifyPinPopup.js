@@ -107,6 +107,14 @@ export class SwiftVerifyPinPopup extends Component {
                         };
                 }
                 this.pos.setSwiftEmployee(cashierUser, result.avatarUrl || "", Boolean(result.is_admin));
+                
+                // Persist authentication state in sessionStorage
+                sessionStorage.setItem("pos_theme_swift_auth", JSON.stringify({
+                    ...cashierUser,
+                    avatarUrl: result.avatarUrl || "",
+                    isAdmin: Boolean(result.is_admin),
+                }));
+
                 sessionStorage.removeItem(SWIFT_RETURN_URL_KEY);
                 this.notification.add(_t("User login successfully"), { type: "success" });
                 this.props.getPayload?.(result);

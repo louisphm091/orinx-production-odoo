@@ -1,0 +1,21 @@
+<odoo>
+    <!-- Simple product template inherit to add minimum inventory field -->
+    <record id="product_template_form_view_inherit_fashion_forecast" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.fashion.forecast</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Hide the old Branch Inventory tab as requested -->
+            <xpath expr="//page[@name='swift_branch_inventory']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Add the individual minimum inventory field in the main Inventory tab -->
+            <xpath expr="//page[@name='inventory']" position="inside">
+                <group name="inventory_min_qty" string="Thiết lập tồn kho">
+                    <field name="minimum_inventory"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -333,6 +333,7 @@ export class DemandForecastDashboard extends Component {
             this.state.kpis = data.kpis || this.state.kpis;
             this.state.series = data.series || this.state.series;
             this.state.forecast_rows = data.forecast_rows || [];
+            console.log("DASHBOARD DATA DEBUG: forecast_rows", this.state.forecast_rows);
             this.state.forecast_leak_rows = data.forecast_leak_rows || [];
             this.state.top_rows = this.state.forecast_rows;
 
@@ -355,12 +356,17 @@ export class DemandForecastDashboard extends Component {
     }
 
     async onPlanProduction() {
-        const productIds = (this.state.forecast_rows || []).map(r => {
-            if (!r.product_id) return null;
-            if (Array.isArray(r.product_id)) return r.product_id[0];
-            return r.product_id;
-        }).filter(id => id);
-        console.log("PLAN PRODUCTION DEBUG: sending productIds", productIds);
+        const forecastData = {};
+        const productIds = [];
+        (this.state.forecast_rows || []).forEach(r => {
+            const pId = Array.isArray(r.product_id) ? r.product_id[0] : r.product_id;
+            if (pId) {
+                productIds.push(pId);
+                forecastData[pId] = r.demand || 0;
+            }
+        });
+
+        console.log("PLAN PRODUCTION DEBUG: sending productIds", productIds, "forecastData", forecastData);
         const result = await this.orm.call(
             "production.plan",
             "create_from_forecast",
@@ -368,6 +374,7 @@ export class DemandForecastDashboard extends Component {
             {
                 forecast_id: this.state.filters.forecast_id || 0,
                 product_ids: productIds,
+                forecast_values: forecastData,
             }
         );
         const planId = result?.context?.plan_id || result?.params?.plan_id;

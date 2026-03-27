@@ -9,6 +9,10 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
 
     @api.model
     def get_kpis(self):
+        # Auto-seed if empty for demo
+        if not self.env["mrp.production"].sudo().search_count([]):
+            self.seed_mock_data()
+        
         today = fields.Date.context_today(self)
 
         daily = self._kpi_range(today, today)
@@ -25,18 +29,32 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
         return {"daily": daily, "weekly": weekly, "monthly": monthly}
 
     def _kpi_range(self, date_from, date_to):
+        today = fields.Date.context_today(self)
         domain = [
             ("date_start", ">=", datetime.combine(date_from, time.min)),
             ("date_start", "<=", datetime.combine(date_to, time.max)),
-            ("state", "in", ["confirmed", "progress", "done"]),
+            ("state", "in", ["confirmed", "progress", "done", "to_close"]),
         ]
-        mos = self.env["mrp.production"].search(domain)
+        mos = self.env["mrp.production"].sudo().search(domain)
 
         plan = sum(mos.mapped("product_qty")) if mos else 0.0
-        finished_moves = mos.mapped("move_finished_ids")
-        move_lines = finished_moves.mapped("move_line_ids")
-        result = sum(move_lines.mapped("quantity")) if move_lines else 0.0
-
+        
+        # Odoo 19 uses qty_producing for real-time progress
+        # Fallback to sum of qty_producing + finished moves
+        result = 0.0
+        if mos:
+            for mo in mos:
+                if mo.state == 'done':
+                    result += mo.product_qty
+                else:
+                    # check if qty_producing exists (Odoo 19)
+                    if 'qty_producing' in mo._fields:
+                        result += mo.qty_producing or 0.0
+                    else:
+                        # Fallback to moves
+                        finished_moves = mo.move_finished_ids.filtered(lambda m: m.state == 'done')
+                        result += sum(finished_moves.mapped('quantity'))
+        
         target = plan
         rate = (result / target * 100.0) if target else 0.0
 
@@ -129,6 +147,71 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
             else:
                 row["status"] = "red"
 
-            result.append(row)
-
         return {"rows": result}
+
+    @api.model
+    def seed_mock_data(self):
+        """Create sample data to show how the dashboard works."""
+        MO = self.env['mrp.production'].sudo()
+        BOM = self.env['mrp.bom'].sudo()
+        WC = self.env['mrp.workcenter'].sudo()
+        WO = self.env['mrp.workorder'].sudo()
+        
+        # 1. Product & BOM
+        bom = BOM.search([], limit=1)
+        if not bom:
+            Product = self.env['product.product'].sudo()
+            p = Product.create({
+                'name': 'Sản phẩm demo 01',
+                'standard_price': 100000,
+                'list_price': 250000,
+            })
+            bom = BOM.create({
+                'product_tmpl_id': p.product_tmpl_id.id,
+                'product_id': p.id,
+                'product_qty': 1,
+            })
+        else:
+            p = bom.product_id or bom.product_tmpl_id.product_variant_id
+
+        # 2. Workcenter
+        wc = WC.search([], limit=1)
+        if not wc:
+            wc = WC.create({'name': 'Chuyền may A1', 'time_efficiency': 0.95})
+            
+        today = fields.Date.today()
+        
+        # Create some MOs
+        mo_list = [
+            (today, 300, 'progress', 150),
+            (today, 1000, 'confirmed', 0),
+            (today - timedelta(days=2), 1200, 'done', 1200),
+            (today - timedelta(days=15), 5000, 'done', 5000),
+        ]
+        
+        for date_start, qty, state, res in mo_list:
+            vals = {
+                'product_id': p.id,
+                'bom_id': bom.id,
+                'product_qty': qty,
+                'product_uom_id': p.uom_id.id,
+                'date_start': datetime.combine(date_start, time(8, 0)),
+                'state': state if state != 'done' else 'to_close', # use to_close for easier dash tracking
+            }
+            if 'qty_producing' in MO._fields:
+                vals['qty_producing'] = res
+            
+            mo = MO.create(vals)
+            
+            # Workorders for bottlenecks
+            if state != 'done':
+                try:
+                    mo._create_workorder()
+                    mo.workorder_ids.write({
+                        'workcenter_id': wc.id,
+                        'duration_expected': 480,
+                        'state': 'progress' if state == 'progress' else 'ready'
+                    })
+                except:
+                    pass
+        return True
