@@ -24,10 +24,6 @@
     .o_menu_sections .o-dropdown,
     .o_menu_sections .dropdown-toggle,
     .o_menu_sections .o_nav_entry,
-    .o_menu_systray .o_systray_item .btn,
-    .o_menu_systray .o_systray_item i,
-    .o_menu_systray .o_systray_item .fa-comments,
-    .o_menu_systray .o_systray_item .fa-clock-o,
     .oe_topbar_name {
         color: #000000 !important;
         background-color: transparent !important;
@@ -37,6 +33,27 @@
         &:hover, &:focus, &.show, &.active {
             background-color: #f1f5f9 !important;
             color: #008784 !important;
+        }
+    }
+
+    /* VERY AGGRESSIVE SYSTRAY FIX */
+    .o_menu_systray {
+        .o_systray_item, .o_systray_item button, .o_systray_item .btn, .o_systray_item i, .o_systray_item .fa, .o_systray_item span:not(.badge) {
+            color: #000000 !important;
+            fill: #000000 !important;
+            stroke: #000000 !important;
+            background-color: transparent !important;
+            opacity: 1 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .o_systray_item:hover, .o_systray_item:focus, .o_systray_item.show, .o_systray_item.active {
+            background-color: #f1f5f9 !important;
+            &, button, .btn, i, .fa {
+                color: #008784 !important;
+                fill: #008784 !important;
+            }
         }
     }
 

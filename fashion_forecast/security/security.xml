@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record Rule for Demand Forecast -->
+        <record id="demand_forecast_multi_company" model="ir.rule">
+            <field name="name">Demand Forecast Multi-Company</field>
+            <field name="model_id" ref="model_demand_forecast"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Record Rule for Fashion Forecast -->
+        <record id="fashion_forecast_multi_company" model="ir.rule">
+            <field name="name">Fashion Forecast Multi-Company</field>
+            <field name="model_id" ref="model_fashion_forecast"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

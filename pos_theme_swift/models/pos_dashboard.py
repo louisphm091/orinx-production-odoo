@@ -1618,6 +1618,7 @@ class PosDashboardSwift(models.AbstractModel):
         generated_code = self._generate_unique_employee_code(user)
         values = {
             'user_id': user.id,
+            'company_id': self.env.company.id,
             'employee_code': generated_code,
             'attendance_code': generated_code,
             'phone': self._partner_phone_value(user.partner_id),
@@ -1760,7 +1761,7 @@ class PosDashboardSwift(models.AbstractModel):
 
     def _build_employee_profile_domain(self, status='working', filters=None, keyword=''):
         filters = filters or {}
-        profile_domain = [('user_id.active', '=', True)]
+        profile_domain = [('user_id.active', '=', True), ('company_id', '=', self.env.company.id)]
         if status in ('working', 'off'):
             profile_domain.append(('status', '=', status))
 
@@ -2147,6 +2148,7 @@ class PosDashboardSwift(models.AbstractModel):
                     'password': vals.get('password') or '123456', # Default password if none provided
                     'active': True,
                     'share': False,
+                    'company_id': self.env.company.id,
                 }
 
                 with self.env.cr.savepoint():

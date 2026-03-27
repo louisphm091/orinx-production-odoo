@@ -6,6 +6,7 @@ class SwiftEmployeeProfile(models.Model):
     _description = "Swift Employee Profile"
 
     user_id = fields.Many2one("res.users", required=True, ondelete="cascade", index=True)
+    company_id = fields.Many2one("res.company", string="Công ty", required=True, default=lambda self: self.env.company)
     hr_employee_id = fields.Many2one("hr.employee", string="HR Employee", copy=False, ondelete="set null", index=True)
     employee_code = fields.Char(string="Employee Code", required=True, copy=False, index=True, default=lambda self: _("New"))
     attendance_code = fields.Char(string="Attendance Code")
@@ -74,6 +75,7 @@ class SwiftEmployeeFinanceLine(models.Model):
     _order = "date desc, id desc"
 
     profile_id = fields.Many2one("swift.employee.profile", required=True, ondelete="cascade", index=True)
+    company_id = fields.Many2one(related="profile_id.company_id", store=True, readonly=True)
     date = fields.Date(default=fields.Date.context_today, required=True)
     line_type = fields.Selection([
         ("debt", "Debt"),

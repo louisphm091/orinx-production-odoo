@@ -34,6 +34,7 @@ class FashionForecastDashboard(models.AbstractModel):
                 domain.append(("date_from", ">=", filters["date_from"]))
             if filters.get("date_to"):
                 domain.append(("date_to", "<=", filters["date_to"]))
+            domain.append(("company_id", "=", self.env.company.id))
             forecast = Forecast.search(domain, limit=1, order="date_from desc, id desc")
 
         if not forecast:

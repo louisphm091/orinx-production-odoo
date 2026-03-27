@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Record Rule for Swift Employee Profile -->
+        <record id="swift_employee_profile_multi_company" model="ir.rule">
+            <field name="name">Swift Employee Profile Multi-Company</field>
+            <field name="model_id" ref="model_swift_employee_profile"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Record Rule for Swift Employee Finance Line -->
+        <record id="swift_employee_finance_line_multi_company" model="ir.rule">
+            <field name="name">Swift Employee Finance Line Multi-Company</field>
+            <field name="model_id" ref="model_swift_employee_finance_line"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <!-- Record Rule for Swift Paycheck -->
+        <record id="swift_paycheck_multi_company" model="ir.rule">
+            <field name="name">Swift Paycheck Multi-Company</field>
+            <field name="model_id" ref="model_swift_paycheck"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

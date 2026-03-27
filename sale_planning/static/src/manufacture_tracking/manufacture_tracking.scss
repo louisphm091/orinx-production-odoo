@@ -1,5 +1,5 @@
 .mt_wrap {
-  padding: 32px 24px;
+  padding: 16px 20px;
   background: #f8fafc;
   min-height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -7,10 +7,10 @@
 }
 
 .mt_header {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 850;
   color: #0f172a;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   letter-spacing: -0.025em;
   display: flex;
   align-items: center;
@@ -18,8 +18,8 @@
 
   &::before {
     content: '';
-    width: 6px;
-    height: 32px;
+    width: 5px;
+    height: 24px;
     background: #6366f1;
     border-radius: 4px;
   }
@@ -28,8 +28,8 @@
 .mt_kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .mt_card,
@@ -47,7 +47,7 @@
 }
 
 .mt_card {
-  padding: 24px;
+  padding: 16px;
   position: relative;
   overflow: hidden;
 }
@@ -70,8 +70,8 @@
 
 .mt_donut {
   --p: 0;
-  --size: 130px;
-  --thickness: 10px;
+  --size: 90px;
+  --thickness: 8px;
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
@@ -95,7 +95,7 @@
 }
 
 .mt_donut_value {
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 800;
   color: #1e293b;
   line-height: 1;
@@ -128,7 +128,7 @@
   }
   
   b {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 700;
     color: #334155;
   }
@@ -137,12 +137,12 @@
 .mt_alerts {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .mt_alert {
-  padding: 32px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -156,7 +156,7 @@
 }
 
 .mt_alert_title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: #1e293b;
 }
@@ -168,11 +168,15 @@
 }
 
 .mt_alert_value {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 800;
-  color: #ef4444;
-  line-height: 0.8;
-  padding: 8px;
+  color: #6366f1; /* Default Indigo */
+  line-height: 1;
+  padding: 4px;
+
+  &.danger {
+    color: #ef4444 !important; /* Red for delays */
+  }
 }
 
 .mt_pill {
@@ -187,14 +191,14 @@
 }
 
 .mt_table_wrap {
-  padding: 32px;
+  padding: 20px;
 }
 
 .mt_table_title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .mt_table_wrap table {

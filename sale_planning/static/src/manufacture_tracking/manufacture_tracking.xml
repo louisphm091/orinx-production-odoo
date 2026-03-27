@@ -70,7 +70,7 @@
               <div class="mt_alert_sub"><t t-out="this._t('Delayed manufacturing orders')"/></div>
               <div class="mt_pill" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;">Critical Attention</div>
             </div>
-            <div class="mt_alert_value" t-esc="state.delay.count"/>
+            <div class="mt_alert_value danger" t-esc="state.delay.count"/>
           </div>
 
           <div class="mt_alert">
@@ -79,7 +79,7 @@
               <div class="mt_alert_sub"><t t-out="this._t('Critical work center')"/></div>
               <div class="mt_pill" t-esc="state.bottleneck.name"/>
             </div>
-            <div class="mt_alert_value" style="color: #6366f1;">?</div>
+            <div class="mt_alert_value" style="color: #6366f1;"><t t-esc="state.bottleneck.minutes || 0"/></div>
           </div>
         </div>
 

@@ -7,6 +7,7 @@ class ProductionPlan(models.Model):
     _order = "date desc, id desc"
 
     name = fields.Char(string="Tên kế hoạch", required=True, default=lambda self: self._get_default_name())
+    company_id = fields.Many2one("res.company", string="Công ty", required=True, default=lambda self: self.env.company)
     date = fields.Date(string="Ngày lập", default=fields.Date.today, required=True)
     user_id = fields.Many2one("res.users", string="Người lập", default=lambda self: self.env.user)
     state = fields.Selection([

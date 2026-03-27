@@ -505,12 +505,13 @@ class SwiftZaloApiController(http.Controller):
                     db = db_list[0]
             except Exception:
                 pass
+            
+            # Default fallback for Orinx
+            if not db:
+                db = "orinx-manufacturing"
 
-        username = payload.get("username")
+        username = payload.get("username") or payload.get("login")
         password = payload.get("password")
-        
-        if not db:
-            return self._error(_("Database name is required. Please provide 'db' in request body or ensure server configuration is correct."))
         
         if not username or not password:
             return self._error(_("Username and password are required"))

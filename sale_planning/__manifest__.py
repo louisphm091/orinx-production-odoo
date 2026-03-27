@@ -20,6 +20,7 @@ track, and balance demand against supply. Developed by https://group.orinx.com.v
     # any module necessary for this one to work correctly
     "depends": ["base", "web", "product", "stock", "sale", "purchase", "mrp"],
     "data": [
+        "security/security.xml",
         "security/ir.model.access.csv",
         "views/production_plan_view.xml",
         "views/menu.xml",

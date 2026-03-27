@@ -21,6 +21,7 @@ Developed and maintained by https://group.orinx.com.vn.
     'website': 'https://group.orinx.com.vn',
     'depends': ['point_of_sale', 'stock', 'purchase', 'web'],
     'data': [
+        'security/swift_security.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
         'data/stock_alert_cron.xml',

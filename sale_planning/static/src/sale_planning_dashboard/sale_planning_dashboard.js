@@ -65,6 +65,10 @@ export class SalePlanningDashboard extends Component {
             rev_spark: { labels: [], values: [], colors: [] },
             inventory_forecast: null,
             order_suggestions: [],
+            pagination: {
+                currentPage: 1,
+                pageSize: 10,
+            },
         });
 
         onWillStart(async () => {
@@ -154,8 +158,55 @@ export class SalePlanningDashboard extends Component {
         }
     }
 
+    paginatedSuggestions() {
+        const rows = this.state.order_suggestions || [];
+        const start = (this.state.pagination.currentPage - 1) * this.state.pagination.pageSize;
+        return rows.slice(start, start + this.state.pagination.pageSize);
+    }
+
+    getTotalPages() {
+        const totalRows = (this.state.order_suggestions || []).length;
+        return Math.max(1, Math.ceil(totalRows / this.state.pagination.pageSize));
+    }
+
+    getPageNumbers() {
+        const total = this.getTotalPages();
+        const current = this.state.pagination.currentPage;
+        const delta = 2;
+        const range = [];
+        const rangeWithDots = [];
+        let l;
+
+        for (let i = 1; i <= total; i++) {
+            if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+                range.push(i);
+            }
+        }
+
+        for (let i of range) {
+            if (l) {
+                if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                } else if (i - l !== 1) {
+                    rangeWithDots.push('...');
+                }
+            }
+            rangeWithDots.push(i);
+            l = i;
+        }
+
+        return rangeWithDots;
+    }
+
+    changePage(page) {
+        const totalPages = this.getTotalPages();
+        const nextPage = Math.min(Math.max(page, 1), totalPages);
+        this.state.pagination.currentPage = nextPage;
+    }
+
     onFilterChange(type, value) {
         this.state.filters[type] = value || null;
+        this.state.pagination.currentPage = 1; // Reset to page 1 on filter
         this.load();
     }
 

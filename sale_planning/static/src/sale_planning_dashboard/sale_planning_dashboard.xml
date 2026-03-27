@@ -233,11 +233,12 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <t t-if="!state.order_suggestions.length">
+                    <t t-set="prows" t-value="paginatedSuggestions()"/>
+                    <t t-if="!prows.length">
                       <tr><td colspan="7" class="text-muted" t-out="this._t('No data')"/></tr>
                     </t>
                     <t t-else="">
-                      <t t-foreach="state.order_suggestions" t-as="r" t-key="r.stt">
+                      <t t-foreach="prows" t-as="r" t-key="r.stt">
                         <tr>
                           <td><t t-esc="r.stt"/></td>
                           <td class="fw-semibold"><t t-esc="r.sku"/></td>
@@ -260,6 +261,26 @@
                     </t>
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Pagination Footer -->
+              <div class="d-flex justify-content-between align-items-center mt-3 text-muted small border-top pt-2">
+                <div><t t-esc="state.pagination.currentPage"/> / <t t-esc="getTotalPages()"/> <t t-out="this._t('page')"/></div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-light border-0" t-on-click="() => this.changePage(state.pagination.currentPage - 1)" t-att-disabled="state.pagination.currentPage === 1">‹</button>
+                  <t t-foreach="getPageNumbers()" t-as="page" t-key="page_index">
+                    <button
+                      t-if="page !== '...'"
+                      class="btn btn-sm border-0"
+                      t-att-class="state.pagination.currentPage === page ? 'btn btn-primary fw-bold' : 'btn-light'"
+                      t-on-click="() => this.changePage(page)"
+                    >
+                      <t t-esc="page"/>
+                    </button>
+                    <span t-else="" class="px-2 text-muted">...</span>
+                  </t>
+                  <button class="btn btn-sm btn-light border-0" t-on-click="() => this.changePage(state.pagination.currentPage + 1)" t-att-disabled="state.pagination.currentPage === getTotalPages()">›</button>
+                </div>
               </div>
 
             </div>

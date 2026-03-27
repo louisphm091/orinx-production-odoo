@@ -34,6 +34,7 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
             ("date_start", ">=", datetime.combine(date_from, time.min)),
             ("date_start", "<=", datetime.combine(date_to, time.max)),
             ("state", "in", ["confirmed", "progress", "done", "to_close"]),
+            ("company_id", "=", self.env.company.id),
         ]
         mos = self.env["mrp.production"].sudo().search(domain)
 
@@ -67,7 +68,10 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
 
     @api.model
     def get_bottleneck(self):
-        workorders = self.env["mrp.workorder"].search([("state", "in", ["ready", "progress", "waiting"])])
+        workorders = self.env["mrp.workorder"].search([
+            ("state", "in", ["ready", "progress", "waiting"]),
+            ("production_id.company_id", "=", self.env.company.id)
+        ])
         load_by_center = {}
         for workorder in workorders:
             workcenter = workorder.workcenter_id
@@ -85,30 +89,34 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
     @api.model
     def get_delay_orders(self):
         mrp_production = self.env["mrp.production"]
-        today = fields.Date.context_today(self)
-
+        now = fields.Datetime.now()
+        
+        domain = [
+            ("state", "not in", ["done", "cancel"]),
+            ("company_id", "=", self.env.company.id)
+        ]
+        
+        # Use OR logic: (deadline < now) OR (deadline is false AND start < now)
         if "date_deadline" in mrp_production._fields:
-            deadline_field = mrp_production._fields["date_deadline"]
-            cutoff = today if deadline_field.type == "date" else datetime.combine(today, time.min)
-            count = mrp_production.search_count(
-                [
-                    ("date_deadline", "<", cutoff),
-                    ("state", "not in", ["done", "cancel"]),
-                ]
-            )
-            return {"count": count}
-
-        count = mrp_production.search_count(
-            [
-                ("date_start", "<", datetime.combine(today, time.min)),
-                ("state", "not in", ["done", "cancel"]),
+            domain += [
+                '|',
+                ("date_deadline", "<", now),
+                '&',
+                ("date_deadline", "=", False),
+                ("date_start", "<", now)
             ]
-        )
+        else:
+            domain += [("date_start", "<", now)]
+            
+        count = mrp_production.search_count(domain)
         return {"count": count}
 
     @api.model
     def get_lines_table(self):
-        workorders = self.env["mrp.workorder"].search([("state", "in", ["ready", "progress", "done", "waiting"])])
+        workorders = self.env["mrp.workorder"].search([
+            ("state", "in", ["ready", "progress", "done", "waiting"]),
+            ("production_id.company_id", "=", self.env.company.id)
+        ])
         rows = {}
 
         for workorder in workorders:
@@ -135,17 +143,18 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
             row["loadCap"] += 480.0 * efficiency
 
         result = []
-        for index, row in enumerate(rows.values(), start=1):
-            row["no"] = index
-            row["target"] = row["plan"]
-            row["rate"] = round((row["result"] / row["target"] * 100.0), 2) if row["target"] else 0.0
+        for index, r in enumerate(rows.values(), start=1):
+            r["no"] = index
+            r["target"] = r["plan"]
+            r["rate"] = round((r["result"] / r["target"] * 100.0), 2) if r["target"] else 0.0
 
-            if row["rate"] >= 100:
-                row["status"] = "green"
-            elif row["rate"] >= 80:
-                row["status"] = "yellow"
+            if r["rate"] >= 100:
+                r["status"] = "green"
+            elif r["rate"] >= 80:
+                r["status"] = "yellow"
             else:
-                row["status"] = "red"
+                r["status"] = "red"
+            result.append(r)
 
         return {"rows": result}
 
