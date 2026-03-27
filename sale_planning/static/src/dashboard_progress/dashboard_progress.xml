@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
   <t t-name="sale_planning.DashboardProgress" owl="1">
-    <div class="sp_progress o_action p-3">
+    <div class="sp_progress p-3">
 
       <!-- HEADER -->
       <div class="sp_header mb-3 d-flex justify-content-between align-items-center">
@@ -38,7 +38,7 @@
 
       <div class="sp_subheader mb-3 d-flex justify-content-between align-items-center">
         <div class="text-muted">
-          <t t-out="this._t('Executive Dashboard')"/> · <b><t t-out="this._t('Fashion Industry')"/></b> · <t t-out="this._t('By Time')"/>
+          <t t-out="this._t('Executive Dashboard')"/> · <t t-out="this._t('By Time')"/>
         </div>
       </div>
 

@@ -24,13 +24,24 @@ export class SalePlanningDashboard extends Component {
         this._revChart = null;
         this._invChart = null;
 
+        // Extract context and params carefully
+        const action = this.props.action || {};
+        const context = action.context || {};
+        const params = action.params || {};
+        
+        // Find forecast_id in multiple places
+        const defaultForecastId = context.default_forecast_id || params.forecast_id || context.forecast_id;
+        const defaultWarehouseId = context.default_warehouse_id || params.warehouse_id || context.warehouse_id;
+
+        // State management
         this.state = useState({
             loading: true,
             loading_first_time: true,
             creating: false,
             error: null,
             filters: {
-                warehouse_id: null,
+                warehouse_id: defaultWarehouseId || null,
+                forecast_id: defaultForecastId || null,
                 category_id: null,
                 time_range: "this_month",
             },
@@ -72,7 +83,7 @@ export class SalePlanningDashboard extends Component {
     // List of strings used in XML for Odoo's translation harvester
     static _i18n_strings = [
         _t("Supply / Purchase Plan"),
-        _t("Plan and track purchase/supply plans based on demand and production plans for the fashion industry"),
+        _t("Plan and track purchase/supply plans based on demand and production plans"),
         _t("SKU / SKU Group"),
         _t("Refresh"),
         _t("Category"),
@@ -114,39 +125,10 @@ export class SalePlanningDashboard extends Component {
         try {
             this.state.loading = true;
             this.state.error = null;
-
-            // Kiểm tra context nếu được chuyển từ trang Dự báo
-            const context = this.props.action.context || {};
-            if (context.from_forecast && context.initial_demand_data && this.state.loading_first_time !== false) {
-                const data = await this.orm.call(
-                    "sale.planning.dashboard", 
-                    "get_dashboard_data", 
-                    [], 
-                    { filters: this.state.filters || {}, context: context }
-                );
-                this.state.kpis = data.kpis;
-                this.state.main_chart = data.main_chart;
-                this.state.order_suggestions = data.order_suggestions;
-                this.state.warehouses = data.warehouses;
-                this.state.categories = data.categories;
-
-                // Ghi đè demand bằng data từ forecast
-                this.state.order_suggestions.forEach(s => {
-                    const forecasted = context.initial_demand_data[s.sku];
-                    if (forecasted !== undefined) {
-                        s.demand = forecasted;
-                        s.plan_buy = Math.max(0, s.demand - s.onhand);
-                        s.status = s.plan_buy > 0 ? _t("Out of Stock Risk") : _t("Stable");
-                    }
-                });
-
-                this._scheduleRenderAllCharts();
-                this.state.loading_first_time = false;
-                return;
-            }
-
+            
+            const model = "sale.planning.dashboard"; 
             const data = await this.orm.call(
-                "sale.planning.dashboard",
+                model,
                 "get_dashboard_data",
                 [],
                 { filters: this.state.filters || {} }

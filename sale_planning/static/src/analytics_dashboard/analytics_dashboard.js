@@ -54,7 +54,7 @@ class AnalyticsDashboard extends Component {
   // String list for i18n harvester
   static _i18n_strings = [
       _t("ANALYTICS & REPORTS"),
-      _t("Aggregate business performance, user behavior and compare plan vs actual for the fashion industry"),
+      _t("Aggregate business performance, user behavior and compare plan vs actual"),
       _t("Women's Fashion"),
       _t("Products / SKU"),
       _t("Time"),

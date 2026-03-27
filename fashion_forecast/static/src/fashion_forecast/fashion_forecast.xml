@@ -9,7 +9,7 @@
         <div class="ff_header_left">
           <div class="ff_title_block">
             <div class="ff_title" t-out="this.tr('DEMAND FORECAST')"/>
-            <div class="ff_subtitle" t-out="this.tr('Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry')"/>
+            <div class="ff_subtitle" t-out="this.tr('Forecast demand quantity by product, time and scenario to serve supply planning')"/>
           </div>
         </div>
 
@@ -40,18 +40,17 @@
           <div class="dropdown">
             <button class="btn ff_pill dropdown-toggle" data-bs-toggle="dropdown" type="button">
               <span class="ff_dot"/>
-              <t t-out='this.tr("Women&apos;s Fashion")'/>
+              <t t-out='this.tr("Products")'/>
             </button>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="#" t-out='this.tr("Women&apos;s Fashion")'/>
-              <a class="dropdown-item" href="#" t-out='this.tr("Men&apos;s Fashion")'/>
+              <a class="dropdown-item" href="#" t-out='this.tr("Products")'/>
             </div>
           </div>
 
           <div class="dropdown">
             <button class="btn ff_pill dropdown-toggle" data-bs-toggle="dropdown" type="button">
               <i class="fa fa-user-o me-1"/>
-              <t t-out="this.tr('SKU Group / SKU')"/>
+              <t t-out="this.tr('Product Group / SKU')"/>
             </button>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="#" t-out="this.tr('SKU Group')"/>
@@ -200,10 +199,12 @@
                 <!-- Table 1 -->
                 <div class="col-12 col-md-6">
                   <div class="card h-100 mb-3 p-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <h5 class="mb-0" t-out="this.tr('Forecast by SKU')"/>
-                      <span class="text-muted small" t-out="this.tr('Top')"/>
-                    </div>
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0" t-out="this.tr('Forecast by SKU')"/>
+                        <button class="btn btn-sm btn-outline-primary shadow-sm" t-on-click="goToSupplyPlanning">
+                           <i class="fa fa-briefcase me-1"/> Lập kế hoạch đặt hàng
+                        </button>
+                      </div>
 
                     <div class="table-responsive">
                       <table class="table table-sm align-middle mb-0">

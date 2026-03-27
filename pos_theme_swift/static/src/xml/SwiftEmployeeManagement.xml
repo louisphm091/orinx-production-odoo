@@ -426,6 +426,7 @@
                             <option value="month" t-out="this._t('By month')"/>
                         </select>
                         <label t-out="this._t('Salary Amount')"/><input type="text" t-att-value="formatMoney(state.createForm.salaryAmount)" t-on-input="onCreateSalaryInput"/>
+                        <label t-out="this._t('Password')"/><input type="password" t-model="state.createForm.password" placeholder="Mật khẩu đăng nhập"/>
                     </div>
                     <div class="sem-actionsRow">
                         <button class="sem-lightBtn" t-on-click="closeCreate" t-out="this._t('Cancel')"/>

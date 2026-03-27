@@ -59,7 +59,7 @@ export class SaleScheduleDashboard extends Component {
         _t("SALE SCHEDULING"),
         _t("SKU / SKU Group"),
         _t("Week"),
-        _t("Fashion Industry"),
+        _t("Sales Management"),
         _t("By SKU"),
         _t("By Campaign"),
         _t("By Time"),

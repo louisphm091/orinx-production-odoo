@@ -181,6 +181,7 @@ export class SwiftEmployeeManagement extends Component {
                 salaryAmount: 0,
                 advancedSetting: false,
                 overtimeEnabled: false,
+                password: "",
             },
             showAccessCodeModal: false,
             accessCodeData: null,
@@ -460,6 +461,7 @@ export class SwiftEmployeeManagement extends Component {
             salaryAmount: 0,
             advancedSetting: false,
             overtimeEnabled: false,
+            password: "",
         };
     }
 
@@ -499,6 +501,7 @@ export class SwiftEmployeeManagement extends Component {
             salaryAmount: this.parseCurrencyInput(profile.salaryAmount),
             advancedSetting: Boolean(profile.advancedSetting),
             overtimeEnabled: Boolean(profile.overtimeEnabled),
+            password: "",
         };
         this.state.showCreateModal = true;
         await Promise.all([this.loadFilterOptions(), this.loadBranches()]);
@@ -576,29 +579,15 @@ export class SwiftEmployeeManagement extends Component {
             const requiredFields = [
                 { key: "name", label: _t("Name is required") },
                 { key: "phone", label: _t("Phone Number is required") },
-                { key: "birthDate", label: _t("Birth Date is required") },
-                { key: "salaryAmount", label: _t("Salary Amount is required") },
             ];
             for (const field of requiredFields) {
                 const value = this.state.createForm[field.key];
-                const isEmpty = field.key === "salaryAmount"
-                    ? this.parseCurrencyInput(value) <= 0
-                    : !String(value || "").trim();
-                if (isEmpty) {
+                if (!String(value || "").trim()) {
                     this.notification.add(field.label, { type: "warning" });
                     return;
                 }
             }
             const selectedJobTitleId = String(this.state.createForm.jobTitle || "").trim();
-            if (!selectedJobTitleId) {
-                this.notification.add(
-                    this.state.filterOptions.jobTitles.length
-                        ? _t("Please select a position")
-                        : _t("No position available."),
-                    { type: "warning" }
-                );
-                return;
-            }
             const selectedJobTitle = this.state.filterOptions.jobTitles.find(
                 (jobTitle) => String(jobTitle.id) === selectedJobTitleId
             );

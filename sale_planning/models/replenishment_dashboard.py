@@ -20,22 +20,22 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         today = date.today()
 
         # --- Master Data for Filters ---
-        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        warehouses_objs = env["stock.warehouse"].sudo().search(
+            ['|', ('name', 'ilike', 'AN PHU THINH'), ('name', 'ilike', 'TRUNG TAM')]
+        )
+        allowed_wh_ids = warehouses_objs.ids
+        warehouses = [
+            {"id": w.id, "name": w.name.replace('KHO ', '').strip()}
+            for w in warehouses_objs
+        ]
+            
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         # --- Filter Processing ---
-        wh_id = filters.get("warehouse_id")
-        cat_id = filters.get("category_id")
+        wh_id = self._safe_int(filters.get("warehouse_id"))
+        cat_id = self._safe_int(filters.get("category_id"))
 
-        PosConfig = env["pos.config"].sudo()
-        configs = PosConfig.search([("active", "=", True)])
         selected_config = False
-        if filters.get("pos_config_id"):
-            selected_config = PosConfig.browse(int(filters["pos_config_id"])).exists()
-        if not selected_config:
-            selected_config = configs[:1]
-
-        store_options = [{"id": config.id, "name": config.name} for config in configs]
 
         # ---- Products (storable, active) ----
         Product = env["product.product"].sudo()
@@ -53,7 +53,7 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         all_products = Product.search(product_domain)
 
         if not all_products:
-            return self._empty_payload(selected_config=selected_config, store_options=store_options, warehouses=warehouses, categories=categories)
+            return self._empty_payload(store_options=[], warehouses=warehouses, categories=categories)
 
         product_ids = all_products.ids
 
@@ -70,16 +70,25 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         if wh:
             location = wh.view_location_id
             wh_name = wh.name
+        elif selected_config:
+            location = selected_config.picking_type_id.default_location_src_id if selected_config.picking_type_id else False
+            wh_name = selected_config.name
         else:
-            location = selected_config.picking_type_id.default_location_src_id if selected_config and selected_config.picking_type_id else False
-            wh_name = selected_config.name if selected_config else _("Main Warehouse")
+            # All allowed warehouses
+            view_locations = warehouses_objs.mapped('view_location_id').ids
+            if view_locations:
+                location = view_locations # This will be used in 'child_of' domain
+            wh_name = _("All Branches")
 
         quant_domain = [
             ("product_id", "in", product_ids),
             ("location_id.usage", "=", "internal"),
         ]
         if location:
-            quant_domain.append(("location_id", "child_of", location.id))
+            if isinstance(location, list):
+                quant_domain.append(("location_id", "child_of", location))
+            else:
+                quant_domain.append(("location_id", "child_of", location.id))
         quants = StockQuant.search(quant_domain)
         stock_map = {}
         for q in quants:
@@ -88,26 +97,55 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
         # ---- 30-day sales history ----
         SaleLine = env["sale.order.line"].sudo()
         thirty_days_ago = today - timedelta(days=30)
-        sale_lines = SaleLine.search([
+        # ---- Demand Forecast (Integrate from Forecast module) ----
+        forecast_id = self._safe_int(filters.get("forecast_id"))
+        forecast_map = {}
+        if forecast_id:
+            ForecastLine = env["demand.forecast.line"].sudo()
+            flines = ForecastLine.search([
+                ("forecast_id", "=", forecast_id),
+                ("product_id", "in", product_ids)
+            ])
+            for fl in flines:
+                forecast_map[fl.product_id.id] = forecast_map.get(fl.product_id.id, 0.0) + (fl.forecast_qty or 0.0)
+
+        # ---- Sale History (Past 30d) ----
+        thirty_days_ago = today - timedelta(days=30)
+        SaleLine = env["sale.order.line"].sudo()
+        
+        sale_history_domain = [
             ("order_id.state", "in", ["sale", "done"]),
             ("order_id.date_order", ">=", str(thirty_days_ago)),
             ("product_id", "in", product_ids),
-        ])
+        ]
+        if "warehouse_id" in env["sale.order"]._fields:
+            if wh:
+                sale_history_domain.append(("order_id.warehouse_id", "=", wh.id))
+            elif selected_config:
+                sale_history_domain.append(("order_id.warehouse_id", "=", selected_config.swift_warehouse_id.id))
+            else:
+                sale_history_domain.append(("order_id.warehouse_id", "in", allowed_wh_ids))
+        
+        sale_lines = SaleLine.search(sale_history_domain)
         demand_30d_map = {}
         for sl in sale_lines:
             pid = sl.product_id.id
             demand_30d_map[pid] = demand_30d_map.get(pid, 0.0) + sl.product_uom_qty
 
-        # ---- Thresholds ----
-        threshold_default = 10.0
+        # ---- Thresholds (Reordering Rules) ----
+        # Use Odoo standard stock.warehouse.orderpoint
         threshold_map = {}
-        active_alert_product_ids = set()
-        if "swift.low.stock.alert" in env:
-            Alert = env["swift.low.stock.alert"].sudo()
-            active_alerts = Alert.search([("state", "=", "active")])
-            for alert in active_alerts:
-                threshold_map[alert.product_id.id] = alert.threshold or threshold_default
-                active_alert_product_ids.add(alert.product_id.id)
+        orderpoints = env["stock.warehouse.orderpoint"].sudo().search([
+            ("product_id", "in", product_ids),
+            ("warehouse_id", "in", allowed_wh_ids),
+            ("active", "=", True),
+        ])
+        for op in orderpoints:
+            pid = op.product_id.id
+            # If multiple rules exist (for different locations), we use the one with the highest product_min_qty
+            threshold_map[pid] = max(threshold_map.get(pid, 0.0), op.product_min_qty)
+
+        threshold_default = 0.0 # Default to 0 if no rule is found
 
         # ---- Purchase orders ----
         PurchaseLine = env["purchase.order.line"].sudo()
@@ -137,17 +175,21 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             onhand = int(round(onhand_qty))
             threshold = threshold_map.get(pid, threshold_default)
             threshold_qty = int(round(threshold))
-            shortage = max(0.0, threshold - onhand_qty)
+            forecast_qty = forecast_map.get(pid, 0.0)
+            # Shortage = Threshold + Forecast - Onhand
+            # This follows the user logic: "bring all forecasted values here to create supply plan"
+            shortage_val = (threshold + forecast_qty) - onhand_qty
+            shortage = max(0.0, shortage_val)
             suggest_qty = int(round(shortage))
 
-            if pid not in active_alert_product_ids and onhand_qty > threshold:
+            if shortage <= 0 and not ordered_map.get(pid) and not pending_map.get(pid):
                 continue
 
             if ordered_map.get(pid):
                 state = "ordered"
             elif pending_map.get(pid):
                 state = "approved"
-            elif shortage > 0 or pid in active_alert_product_ids:
+            elif shortage > 0:
                 state = "proposed"
             else:
                 continue
@@ -201,8 +243,8 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
 
         return {
             "filters_echo": filters,
-            "store_options": store_options,
-            "selected_store": {"id": selected_config.id, "name": selected_config.name} if selected_config else False,
+            "store_options": [],
+            "selected_store": False,
             "kpis": {
                 "total_suggestions": len(rows),
                 "delta_vs_last_week": f"+{len([r for r in rows if r['state'] == 'proposed'])}",
@@ -292,11 +334,97 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             _logger.error("action_approve_replenishment error: %s", e)
             return {"ok": False, "message": str(e)}
 
-    def _empty_payload(self, selected_config=False, store_options=None, warehouses=None, categories=None):
+    @api.model
+    def action_batch_manufacturing(self, items, filters=None):
+        """
+        Create Manufacturing Orders (mrp.production) in bulk.
+        items: list of {'product_id': int, 'qty': float, 'warehouse_id': int}
+        """
+        env = self.env
+        try:
+            Production = env["mrp.production"].sudo()
+            Bom = env["mrp.bom"].sudo()
+            ProductObj = env["product.product"].sudo()
+            Warehouse = env["stock.warehouse"].sudo()
+
+            created_count = 0
+            errors = []
+            mo_ids = []
+
+            for item in items:
+                pid = self._safe_int(item.get("product_id"))
+                qty = float(item.get("qty") or 0)
+                wh_id = self._safe_int(item.get("warehouse_id"))
+
+                if not pid or qty <= 0:
+                    continue
+
+                Product = ProductObj.browse(pid)
+                if not Product.exists():
+                    errors.append(_("Product ID %s not found.") % pid)
+                    continue
+
+                # Find BOM
+                wh = Warehouse.browse(wh_id) if wh_id else Warehouse.search([], limit=1)
+                bom = Bom._bom_find(product=Product, warehouse_id=wh.id if wh else False)
+                if not bom:
+                    # Fallback to any bom for this product
+                    bom = Bom.search([
+                        '|',
+                        ("product_id", "=", Product.id),
+                        "&",
+                        ("product_tmpl_id", "=", Product.product_tmpl_id.id),
+                        ("product_id", "=", False)
+                    ], limit=1)
+
+                if not bom:
+                    errors.append(_("No BoM found for product %s") % Product.display_name)
+                    continue
+
+                # Picking type (Manufacturing)
+                picking_type = env["stock.picking.type"].sudo().search([
+                    ("code", "=", "mrp_operation"),
+                    ("warehouse_id", "=", wh.id)
+                ], limit=1)
+                if not picking_type:
+                    # Fallback
+                    picking_type = env["stock.picking.type"].sudo().search([("code", "=", "mrp_operation")], limit=1)
+
+                mo_vals = {
+                    "product_id": Product.id,
+                    "product_qty": qty,
+                    "product_uom_id": Product.uom_id.id,
+                    "bom_id": bom.id,
+                    "date_planned_start": fields.Datetime.now(),
+                    "user_id": env.user.id,
+                    "origin": _("Bulk Plan: Replenishment Dashboard"),
+                }
+                if picking_type:
+                    mo_vals["picking_type_id"] = picking_type.id
+                
+                mo = Production.create(mo_vals)
+                mo_ids.append(mo.id)
+                created_count += 1
+
+            message = _("Successfully created %s Manufacturing Orders.") % created_count
+            if errors:
+                message += " " + _("Skipped: %s") % "; ".join(errors[:5])
+
+            return {
+                "ok": True,
+                "message": message,
+                "mo_ids": mo_ids,
+                "created_count": created_count
+            }
+        except Exception as e:
+            _logger.error("action_batch_manufacturing error: %s", e)
+            return {"ok": False, "message": str(e)}
+
+    def _empty_payload(self, store_options=None, warehouses=None, categories=None):
         return {
             "filters_echo": {},
             "store_options": store_options or [],
-            "selected_store": {"id": selected_config.id, "name": selected_config.name} if selected_config else False,
+            "selected_store": False,
             "kpis": {
                 "total_suggestions": 0,
                 "delta_vs_last_week": "+0",
@@ -310,3 +438,9 @@ class SalePlanningReplenishmentDashboard(models.AbstractModel):
             "categories": categories or [],
             "last_update": fields.Datetime.now(),
         }
+
+    def _safe_int(self, value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return False

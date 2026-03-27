@@ -11,7 +11,7 @@
             <span class="sp_logo"><i class="fa fa-instagram"/></span>
             <t t-out="this._t('ANALYTICS &amp; REPORTS')"/>
           </div>
-          <div class="sp_subtitle" t-out="this._t('Aggregate business performance, user behavior and compare plan vs actual for the fashion industry')"/>
+          <div class="sp_subtitle" t-out="this._t('Aggregate business performance, user behavior and compare plan vs actual')"/>
         </div>
 
         <div class="d-flex gap-2 align-items-center flex-wrap sp_filters">
@@ -23,9 +23,9 @@
               </t>
           </select>
 
-          <!-- Warehouse Filter -->
+          <!-- Branch Filter -->
           <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
-              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <option value=""><t t-out="this._t('Branch')"/>: <t t-out="this._t('All')"/></option>
               <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
                   <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
               </t>

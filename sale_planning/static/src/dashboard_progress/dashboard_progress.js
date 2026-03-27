@@ -63,7 +63,6 @@ export class SalePlanningDashboardProgress extends Component {
       _t("SKU / SKU Group"),
       _t("Quarter"),
       _t("Executive Dashboard"),
-      _t("Fashion Industry"),
       _t("By Time"),
       _t("Week"),
       _t("Month"),

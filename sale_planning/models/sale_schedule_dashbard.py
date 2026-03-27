@@ -22,7 +22,7 @@ class SaleScheduleDashboard(models.AbstractModel):
         this_period_start = today - timedelta(days=29)
         previous_period_start = this_period_start - timedelta(days=30)
 
-        pos_configs, branch_options, selected_config, warehouse = self._get_branch_context(filters)
+        pos_configs, branch_options, selected_config, warehouse, allowed_warehouse_ids = self._get_branch_context(filters)
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         product_domain = [
@@ -44,8 +44,11 @@ class SaleScheduleDashboard(models.AbstractModel):
             ("state", "in", ["sale", "done"]),
             ("product_id", "in", product_ids),
         ]
-        if warehouse and "warehouse_id" in env["sale.order"]._fields:
-            sale_line_domain.append(("order_id.warehouse_id", "=", warehouse.id))
+        if "warehouse_id" in env["sale.order"]._fields:
+            if warehouse:
+                sale_line_domain.append(("order_id.warehouse_id", "=", warehouse.id))
+            else:
+                sale_line_domain.append(("order_id.warehouse_id", "in", allowed_warehouse_ids))
 
         SaleLine = env["sale.order.line"].sudo()
 
@@ -135,12 +138,15 @@ class SaleScheduleDashboard(models.AbstractModel):
     def action_open_sale_orders(self, **kwargs):
         filters = kwargs.get("filters") or {}
         selected_key = kwargs.get("selected_key")
-        _pos_configs, _branch_options, _selected_config, warehouse = self._get_branch_context(filters)
+        _pos_configs, _branch_options, _selected_config, warehouse, allowed_warehouse_ids = self._get_branch_context(filters)
         product = self._get_selected_product(selected_key)
 
         domain = [("state", "in", ["sale", "done"])]
-        if warehouse and "warehouse_id" in self.env["sale.order"]._fields:
-            domain.append(("warehouse_id", "=", warehouse.id))
+        if "warehouse_id" in self.env["sale.order"]._fields:
+            if warehouse:
+                domain.append(("warehouse_id", "=", warehouse.id))
+            else:
+                domain.append(("warehouse_id", "in", allowed_warehouse_ids))
         if product:
             domain.append(("order_line.product_id", "=", product.id))
 
@@ -170,14 +176,21 @@ class SaleScheduleDashboard(models.AbstractModel):
     @api.model
     def action_open_inventory(self, **kwargs):
         filters = kwargs.get("filters") or {}
-        _pos_configs, _branch_options, _selected_config, warehouse = self._get_branch_context(filters)
+        _pos_configs, _branch_options, _selected_config, warehouse, allowed_warehouse_ids = self._get_branch_context(filters)
         product = self._get_selected_product(kwargs.get("selected_key"))
 
         domain = [("location_id.usage", "=", "internal")]
         if product:
             domain.append(("product_id", "=", product.id))
-        if warehouse and warehouse.view_location_id:
-            domain.append(("location_id", "child_of", warehouse.view_location_id.id))
+        if warehouse:
+            if warehouse.view_location_id:
+                domain.append(("location_id", "child_of", warehouse.view_location_id.id))
+        else:
+            # Filter by all allowed warehouses
+            ws = self.env['stock.warehouse'].sudo().browse(allowed_warehouse_ids)
+            loc_ids = ws.mapped('view_location_id').ids
+            if loc_ids:
+                domain.append(("location_id", "child_of", loc_ids))
 
         return {
             "type": "ir.actions.act_window",
@@ -195,26 +208,32 @@ class SaleScheduleDashboard(models.AbstractModel):
                 ("active", "=", True),
                 ("company_id", "=", env.company.id),
                 ("swift_warehouse_id", "!=", False),
+                '|',
+                ("swift_warehouse_id.name", "ilike", "AN PHU THINH"),
+                ("swift_warehouse_id.name", "ilike", "TRUNG TAM")
             ]
         )
-        branch_options = [
-            {
+        branch_options = []
+        for config in pos_configs:
+            name = config.name.replace('KHO ', '').strip()
+            branch_options.append({
                 "id": config.id,
-                "name": config.name,
+                "name": name,
                 "warehouse_id": config.swift_warehouse_id.id,
-            }
-            for config in pos_configs
-        ]
+            })
 
         selected_config = False
         branch_id = self._safe_int(filters.get("warehouse_id"))
+        selected_config = False
         if branch_id:
             selected_config = pos_configs.filtered(lambda config: config.id == branch_id)[:1]
-        if not selected_config:
-            selected_config = pos_configs[:1]
 
         warehouse = selected_config.swift_warehouse_id if selected_config and selected_config.swift_warehouse_id else False
-        return pos_configs, branch_options, selected_config, warehouse
+        
+        # Determine allowed warehouse IDs
+        allowed_warehouse_ids = [config.swift_warehouse_id.id for config in pos_configs if config.swift_warehouse_id]
+        
+        return pos_configs, branch_options, selected_config, warehouse, allowed_warehouse_ids
 
     def _collect_product_metrics(self, products, current_lines, previous_lines, warehouse, today):
         env = self.env

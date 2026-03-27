@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
   <t t-name="sale_planning.Dashboard" owl="1">
-    <div class="sp_wrap o_action p-3">
+    <div class="sp_wrap p-3">
 
       <!-- TOP BAR -->
       <div class="sp_topbar d-flex justify-content-between align-items-center mb-2">
         <div>
           <div class="sp_title" t-out="this._t('Supply / Purchase Plan')"/>
-          <div class="sp_subtitle text-muted" t-out="this._t('Plan and track purchase/supply plans based on demand and production plans for the fashion industry')"/>
+          <div class="sp_subtitle text-muted" t-out="this._t('Plan and track purchase/supply plans based on demand and production plans')"/>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -28,9 +28,9 @@
             </t>
         </select>
 
-        <!-- Warehouse Filter -->
+        <!-- Branch Filter -->
         <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
-            <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+            <option value=""><t t-out="this._t('Branch')"/>: <t t-out="this._t('All')"/></option>
             <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
                 <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
             </t>

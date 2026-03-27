@@ -14,9 +14,6 @@
     </div>
     <div class="ff_header">
         <div class="ff_header_left">
-            <div class="ff_title_block">
-                <h4><t t-out="this.tr('Fashion Industry')"/></h4>
-            </div>
         </div>
         <div class="ff_header_right">
           <div class="ff_header_actions d-flex gap-2 align-items-center">

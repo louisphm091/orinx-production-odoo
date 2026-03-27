@@ -11,7 +11,7 @@
 
     /* Style for the app switcher (grid icon) */
     .o_navbar_apps_menu button {
-        color: #1a202c !important;
+        color: #000000 !important;
         background-color: transparent !important;
         &:hover {
             color: #008784 !important;
@@ -24,14 +24,18 @@
     .o_menu_sections .o-dropdown,
     .o_menu_sections .dropdown-toggle,
     .o_menu_sections .o_nav_entry,
-    .o_menu_systray .o_systray_item .btn {
-        color: #1a202c !important;
+    .o_menu_systray .o_systray_item .btn,
+    .o_menu_systray .o_systray_item i,
+    .o_menu_systray .o_systray_item .fa-comments,
+    .o_menu_systray .o_systray_item .fa-clock-o,
+    .oe_topbar_name {
+        color: #000000 !important;
         background-color: transparent !important;
-        font-weight: 500;
+        font-weight: 600;
         border: none !important;
         
         &:hover, &:focus, &.show, &.active {
-            background-color: #f1f5f9 !important; /* Very light gray instead of purple */
+            background-color: #f1f5f9 !important;
             color: #008784 !important;
         }
     }

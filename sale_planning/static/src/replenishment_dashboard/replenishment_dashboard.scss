@@ -116,18 +116,29 @@
   justify-content: center;
 }
 
+.sp_table tr {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  &:hover {
+    background: rgba(0,0,0,0.02);
+  }
+}
+
 .sp_row_active {
-  background: #eef2ff !important;
+  background: #f0f7ff !important;
+  border-left: 4px solid #0055ff !important;
 }
 
 .sp_badge {
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-weight: 700;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
 }
-.sp_badge_proposed { background: #e5e7eb; color: #374151; }
-.sp_badge_approved { background: #ffedd5; color: #9a3412; }
-.sp_badge_ordered { background: #d1fae5; color: #065f46; }
+.sp_badge_proposed { background: #f3f4f6; color: #4b5563; }
+.sp_badge_approved { background: #fff7ed; color: #c2410c; }
+.sp_badge_ordered { background: #ecfdf5; color: #047857; }
 
 .sp_side {
   position: sticky;
@@ -135,9 +146,10 @@
 }
 
 .sp_side_title {
-  font-weight: 900;
-  font-size: 20px;
-  line-height: 1.2;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.1;
+  color: #111827;
 }
 
 .sp_side_img {
@@ -153,9 +165,9 @@
   width: 72px;
   height: 72px;
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: 12px;
   display: block;
-  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .sp_side_img_placeholder {

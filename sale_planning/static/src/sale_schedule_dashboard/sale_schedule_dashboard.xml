@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
   <t t-name="sale_planning.SaleScheduleDashboard" owl="1">
-    <div class="ssd_wrap o_action p-3">
+    <div class="ssd_wrap p-3">
 
       <!-- TOP BAR -->
       <div class="ssd_top d-flex justify-content-between align-items-center mb-2">
@@ -37,7 +37,7 @@
       <div class="ssd_sub card p-3 mb-3">
         <div class="d-flex justify-content-between align-items-center">
           <div class="ssd_tabs">
-            <span class="fw-semibold" t-out="this._t('Fashion Industry')"/>
+            <span class="fw-semibold" t-out="this._t('Sales Management')"/>
             <span class="text-muted">· <t t-out="this._t('By SKU')"/> · <t t-out="this._t('By Campaign')"/> · <t t-out="this._t('By Time')"/></span>
           </div>
           <div class="d-flex gap-2">

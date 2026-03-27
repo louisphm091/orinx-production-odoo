@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
   <t t-name="sale_planning.ReplenishmentDashboard" owl="1">
-    <div class="sp_rep o_action p-3">
+    <div class="sp_rep p-3">
 
             <!-- HEADER -->
       <div class="sp_rep_header d-flex justify-content-between align-items-start mb-3">
@@ -12,13 +12,6 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
-          <label class="sp_pill sp_select_pill mb-0">
-            <select t-att-value="state.filters.pos_config_id || ''" t-on-change="updateStore">
-              <t t-foreach="state.storeOptions" t-as="store" t-key="store.id">
-                <option t-att-value="store.id"><t t-esc="store.name"/></option>
-              </t>
-            </select>
-          </label>
           <!-- Category Filter -->
           <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('category_id', ev.target.value)">
               <option value=""><t t-out="this._t('Category')"/>: <t t-out="this._t('All')"/></option>
@@ -27,9 +20,9 @@
               </t>
           </select>
 
-          <!-- Warehouse Filter -->
+          <!-- Branch Filter -->
           <select class="form-select sp_pill w-auto" t-on-change="(ev) => this.onFilterChange('warehouse_id', ev.target.value)">
-              <option value=""><t t-out="this._t('Warehouse')"/>: <t t-out="this._t('All')"/></option>
+              <option value=""><t t-out="this._t('Branch')"/>: <t t-out="this._t('All')"/></option>
               <t t-foreach="state.warehouses" t-as="wh" t-key="wh.id">
                   <option t-att-value="wh.id" t-att-selected="state.filters.warehouse_id == wh.id"><t t-esc="wh.name"/></option>
               </t>
@@ -42,9 +35,12 @@
       </div>
 
             <!-- TOP ACTIONS -->
-      <div class="d-flex justify-content-end gap-2 mb-3">
+      <div class="d-flex justify-content-end gap-2 mb-3 mt-1">
+        <button class="btn btn-light border p-2 px-3 sp_pill d-flex align-items-center gap-2 shadow-sm" type="button" t-on-click="batchCreateMO">
+           <i class="fa fa-briefcase text-success"></i>
+           <span class="fw-semibold" t-out="this._t('Order Planning')"/>
+        </button>
         <button class="btn sp_pill" type="button"><i class="fa fa-search me-1"/> <t t-out="this._t('Article Page')"/></button>
-        <button class="btn sp_pill" type="button"><i class="fa fa-cog me-1"/> <t t-out="this._t('Stock Threshold Settings')"/></button>
         <button class="btn sp_pill" type="button"><i class="fa fa-download me-1"/> <t t-out="this._t('Export CSV')"/></button>
       </div>
 
@@ -129,13 +125,15 @@
                 <table class="table table-sm align-middle mb-0 sp_table">
                   <thead class="text-muted small">
                     <tr>
-                      <th t-out="this._t('SKU / Product')"/>
-                      <th t-out="this._t('Category')"/>
-                      <th t-out="this._t('Warehouse')"/>
-                      <th class="text-end" t-out="this._t('Current Stock')"/>
-                      <th class="text-end" t-out="this._t('Threshold')"/>
-                      <th class="text-end" t-out="this._t('Sug. Rep. Qty')"/>
-                      <th class="text-end" t-out="this._t('Status')"/>
+                      <th>Mã hàng / Sản phẩm</th>
+                      <th>Danh mục</th>
+                      <th>Chi nhánh</th>
+                      <th class="text-end">Nhu cầu (30n)</th>
+                      <th class="text-end">Nhu cầu dự báo</th>
+                      <th class="text-end">Tồn kho hiện tại</th>
+                      <th class="text-end">Ngưỡng tồn kho</th>
+                      <th class="text-end">SL bổ sung gợi ý</th>
+                      <th class="text-end">Trạng thái</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -157,9 +155,11 @@
                           </td>
                           <td><t t-esc="r.category"/></td>
                           <td><t t-esc="r.warehouse"/></td>
+                          <td class="text-end"><t t-esc="r.demand_qty"/></td>
+                          <td class="text-end fw-bold text-primary"><t t-esc="r.forecast_qty"/></td>
                           <td class="text-end"><t t-esc="r.onhand"/></td>
                           <td class="text-end"><t t-esc="r.threshold"/></td>
-                          <td class="text-end"><t t-esc="r.suggest_qty"/></td>
+                          <td class="text-end fw-bold text-success"><t t-esc="r.suggest_qty"/></td>
                           <td class="text-end">
                             <span t-att-class="badgeClass(r.state)"><t t-esc="this._t(badgeText(r.state))"/></span>
                           </td>
@@ -173,17 +173,19 @@
               <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
                 <div><t t-esc="state.pagination.currentPage"/> / <t t-esc="getTotalPages()"/> <t t-out="this._t('page')"/></div>
                 <div class="d-flex gap-1">
-                  <button class="btn btn-sm btn-light" t-on-click="() => this.changePage(state.pagination.currentPage - 1)">‹</button>
-                  <t t-foreach="getPageNumbers()" t-as="page" t-key="page">
+                  <button class="btn btn-sm btn-light border-0" t-on-click="() => this.changePage(state.pagination.currentPage - 1)" t-att-disabled="state.pagination.currentPage === 1">‹</button>
+                  <t t-foreach="getPageNumbers()" t-as="page" t-key="page_index">
                     <button
-                      class="btn btn-sm"
-                      t-att-class="state.pagination.currentPage === page ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-light'"
+                      t-if="page !== '...'"
+                      class="btn btn-sm border-0"
+                      t-att-class="state.pagination.currentPage === page ? 'btn btn-primary fw-bold px-3' : 'btn-light'"
                       t-on-click="() => this.changePage(page)"
                     >
                       <t t-esc="page"/>
                     </button>
+                    <span t-else="" class="px-2 text-muted">...</span>
                   </t>
-                  <button class="btn btn-sm btn-light" t-on-click="() => this.changePage(state.pagination.currentPage + 1)">›</button>
+                  <button class="btn btn-sm btn-light border-0" t-on-click="() => this.changePage(state.pagination.currentPage + 1)" t-att-disabled="state.pagination.currentPage === getTotalPages()">›</button>
                 </div>
               </div>
             </div>

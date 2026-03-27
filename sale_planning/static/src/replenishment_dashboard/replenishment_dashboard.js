@@ -14,13 +14,14 @@ export class ReplenishmentDashboard extends Component {
     this.notification = useService("notification");
     this.action = useService("action");
 
+    const context = this.props.action?.context || {};
     // State management
     this.state = useState({
       loading: true,
       error: null,
       filters: {
-        pos_config_id: null,
-        warehouse_id: null,
+        warehouse_id: context.default_warehouse_id || null,
+        forecast_id: context.default_forecast_id || null,
         category_id: null,
         status: "all",
         search: "",
@@ -38,8 +39,6 @@ export class ReplenishmentDashboard extends Component {
         ordered: 0,
         ordered_hint: "",
       },
-      storeOptions: [],
-      selectedStore: null,
       rows: [],
       pagination: {
         currentPage: 1,
@@ -135,6 +134,46 @@ export class ReplenishmentDashboard extends Component {
     }
   }
 
+  async batchCreateMO() {
+    const proposedRows = this.state.rows.filter(r => r.state === 'proposed' && r.suggest_qty > 0);
+    if (proposedRows.length === 0) {
+      this.notification.add(this._t("No proposed items to plan."), { type: "info" });
+      return;
+    }
+
+    if (!window.confirm(this._t(`Create Manufacturing Orders for ${proposedRows.length} items?`))) {
+      return;
+    }
+
+    try {
+      this.state.loading = true;
+      const items = proposedRows.map(r => ({
+        product_id: r.product_id,
+        qty: r.suggest_qty,
+        warehouse_id: this.state.filters.warehouse_id
+      }));
+
+      const result = await this.orm.call(
+        "sale.planning.replenishment",
+        "action_batch_manufacturing",
+        [],
+        { items: items, filters: this.state.filters }
+      );
+
+      if (result && result.ok) {
+        this.notification.add(result.message, { type: "success" });
+        await this.load();
+      } else {
+        this.notification.add(result.message || this._t("Failed to create manufacturing orders."), { type: "danger" });
+      }
+    } catch (err) {
+      console.error(err);
+      this.notification.add(this._t("Error during batch planning."), { type: "danger" });
+    } finally {
+      this.state.loading = false;
+    }
+  }
+
   // strings for translation extraction
   static _i18n_strings = [
     _t("REPLENISHMENT MANAGEMENT"),
@@ -190,15 +229,8 @@ export class ReplenishmentDashboard extends Component {
         { filters: this.state.filters }
       );
       this.state.kpis = data.kpis || this.state.kpis;
-      this.state.storeOptions = data.store_options || [];
-      this.state.selectedStore = data.selected_store || null;
-      
       this.state.warehouses = data.warehouses || [];
       this.state.categories = data.categories || [];
-
-      if (this.state.selectedStore && !this.state.filters.pos_config_id) {
-        this.state.filters.pos_config_id = this.state.selectedStore.id;
-      }
       this.state.rows = data.rows || [];
       this.state.detail = data.detail || this.state.detail;
       const totalPages = this.getTotalPages();
@@ -236,13 +268,6 @@ export class ReplenishmentDashboard extends Component {
     this.state.pagination.currentPage = 1;
   }
 
-  async updateStore(ev) {
-    const value = ev.target.value ? parseInt(ev.target.value, 10) : null;
-    this.state.filters.pos_config_id = value;
-    this.state.filters.selected_key = null;
-    this.state.pagination.currentPage = 1;
-    await this.load();
-  }
 
   filteredRows() {
     const search = this.normalizeSearchValue(this.state.filters.search);
@@ -273,7 +298,32 @@ export class ReplenishmentDashboard extends Component {
   }
 
   getPageNumbers() {
-    return Array.from({ length: this.getTotalPages() }, (_, index) => index + 1);
+    const total = this.getTotalPages();
+    const current = this.state.pagination.currentPage;
+    const delta = 2; // Number of pages to show before and after current
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+            range.push(i);
+        }
+    }
+
+    for (let i of range) {
+        if (l) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1);
+            } else if (i - l !== 1) {
+                rangeWithDots.push('...');
+            }
+        }
+        rangeWithDots.push(i);
+        l = i;
+    }
+
+    return rangeWithDots;
   }
 
   changePage(page) {

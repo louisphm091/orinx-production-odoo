@@ -1777,11 +1777,13 @@ class PosDashboardSwift(models.AbstractModel):
         if job_title:
             profile_domain.append(('job_title', '=', job_title))
         if keyword:
-            profile_domain += ['|', '|', '|',
+            profile_domain += ['|', '|', '|', '|', '|',
                 ('user_id.name', 'ilike', keyword),
                 ('user_id.login', 'ilike', keyword),
                 ('employee_code', 'ilike', keyword),
                 ('attendance_code', 'ilike', keyword),
+                ('phone', 'ilike', keyword),
+                ('id_number', 'ilike', keyword),
             ]
         return profile_domain
 
@@ -2121,24 +2123,28 @@ class PosDashboardSwift(models.AbstractModel):
             job_title = self._normalize_job_title_value(vals.get('jobTitle'))
             if not phone:
                 return {'ok': False, 'message': _('Phone Number is required')}
-            if not birth_date:
-                return {'ok': False, 'message': _('Birth Date is required')}
-            if salary_amount <= 0:
-                return {'ok': False, 'message': _('Salary Amount is required')}
-            if not job_title:
-                return {'ok': False, 'message': _('Job Title is required')}
             if selected_user_id:
                 user = self.env['res.users'].sudo().browse(int(selected_user_id))
                 if not user.exists():
                     return {'ok': False, 'message': _('Employee not found')}
             else:
-                login = phone or f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
-                if self.env['res.users'].sudo().with_context(active_test=False).search_count([('login', '=', login)]):
+                # Use phone as login for mobile integration
+                login = phone
+                if not login:
                     login = f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
-
+                
+                # Check if this login already exists for a DIFFERENT user
+                existing_user = self.env['res.users'].sudo().with_context(active_test=False).search([('login', '=', login)], limit=1)
+                if existing_user:
+                    # If it's a generated login, just keep appending. If it's a phone, it's an error.
+                    if login == phone:
+                        return {'ok': False, 'message': _('Số điện thoại này đã được sử dụng làm tài khoản đăng nhập cho nhân viên khác.')}
+                    login = f"swift_employee_{fields.Datetime.now().strftime('%Y%m%d%H%M%S%f')}"
+                
                 user_vals = {
                     'name': name,
                     'login': login,
+                    'password': vals.get('password') or '123456', # Default password if none provided
                     'active': True,
                     'share': False,
                 }
@@ -2152,8 +2158,14 @@ class PosDashboardSwift(models.AbstractModel):
                         user = self.env['res.users'].sudo().create(user_vals)
 
             user = self._ensure_employee_internal_user(user)
+            user_write_vals = {}
             if name:
-                user.sudo().write({'name': name})
+                user_write_vals['name'] = name
+            if vals.get('password'):
+                user_write_vals['password'] = vals.get('password')
+            
+            if user_write_vals:
+                user.sudo().write(user_write_vals)
             self._write_partner_phone(user.partner_id, phone)
 
             profile = self._ensure_employee_profile(user)
@@ -2200,41 +2212,68 @@ class PosDashboardSwift(models.AbstractModel):
             return {'ok': False, 'message': _('Name is required')}
         if not phone:
             return {'ok': False, 'message': _('Phone Number is required')}
-        if not birth_date:
-            return {'ok': False, 'message': _('Birth Date is required')}
-        if salary_amount <= 0:
-            return {'ok': False, 'message': _('Salary Amount is required')}
+            
         try:
             user_vals = {}
             if vals.get('name'):
                 user_vals['name'] = vals.get('name')
-            if user_vals:
-                user.sudo().write(user_vals)
-
-            phone = (vals.get('phone') or '').strip()
+            if vals.get('password'):
+                 user_vals['password'] = vals.get('password')
+            
+            # Forcefully resolve any login conflicts by renaming old/duplicate accounts
             if phone:
-                self._write_partner_phone(user.partner_id, phone)
+                duplicates = self.env['res.users'].sudo().with_context(active_test=False).search([
+                    ('login', '=', phone), ('id', '!=', user.id)
+                ])
+                for dup in duplicates:
+                    dup_login_old = dup.login
+                    new_dup_login = f"DUP_{dup.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+                    _logger.warning("Freeing up login %s by renaming user %s to %s", dup_login_old, dup.id, new_dup_login)
+                    dup.write({'login': new_dup_login, 'active': False})
+                
+                # Now set this user's login definitely to their phone number
+                user_vals['login'] = phone
 
-            profile.sudo().write({
-                'phone': phone,
-                'id_number': vals.get('idNumber') or profile.id_number or '',
-                'birth_date': birth_date,
-                'gender': vals.get('gender') or profile.gender or False,
-                'work_branch': vals.get('workBranch') or profile.work_branch or _('Chi nhánh trung tâm'),
-                'pay_branch': vals.get('payBranch') or profile.pay_branch or _('Chi nhánh trung tâm'),
-                'department': vals.get('department') or profile.department or '',
-                'job_title': job_title or profile.job_title or '',
-                'salary_type': vals.get('salaryType') or profile.salary_type,
-                'salary_amount': salary_amount,
-                'advanced_setting': bool(vals.get('advancedSetting')) if 'advancedSetting' in vals else profile.advanced_setting,
-                'overtime_enabled': bool(vals.get('overtimeEnabled')) if 'overtimeEnabled' in vals else profile.overtime_enabled,
-            })
-            self._swift_sync_hr_employee(user, profile)
+            # Perform User write in its own block
+            if user_vals:
+                with self.env.cr.savepoint():
+                    user.sudo().write(user_vals)
+
+            # Perform Phone write
+            if phone:
+                with self.env.cr.savepoint():
+                    self._write_partner_phone(user.partner_id, phone)
+
+            # Perform Profile write
+            with self.env.cr.savepoint():
+                profile_vals = {
+                    'phone': phone,
+                    'id_number': vals.get('idNumber') or profile.id_number or '',
+                    'birth_date': birth_date,
+                    'gender': vals.get('gender') or profile.gender or False,
+                    'work_branch': vals.get('workBranch') or profile.work_branch or _('Chi nhánh trung tâm'),
+                    'pay_branch': vals.get('payBranch') or profile.pay_branch or _('Chi nhánh trung tâm'),
+                    'department': vals.get('department') or profile.department or '',
+                    'job_title': job_title or profile.job_title or '',
+                    'salary_type': vals.get('salaryType') or profile.salary_type,
+                    'salary_amount': salary_amount,
+                    'advanced_setting': bool(vals.get('advancedSetting')) if 'advancedSetting' in vals else profile.advanced_setting,
+                    'overtime_enabled': bool(vals.get('overtimeEnabled')) if 'overtimeEnabled' in vals else profile.overtime_enabled,
+                }
+                profile.sudo().write(profile_vals)
+
+            # Perform HR sync (most likely to fail but shouldn't rollback user/profile)
+            try:
+                with self.env.cr.savepoint():
+                    self._swift_sync_hr_employee(user, profile)
+            except Exception as e:
+                _logger.warning("HR sync failed but continuing: %s", e)
+
             return {'ok': True}
         except Exception as e:
             self.env.cr.rollback()
-            _logger.exception("update_employee_record failed: %s", e)
-            return {'ok': False, 'message': _('Cannot update employee')}
+            _logger.exception("update_employee_record critical failure: %s", e)
+            return {'ok': False, 'message': _('Cannot update employee: %s') % str(e)}
 
     @api.model
     def update_employee_salary_setup(self, user_id, vals):

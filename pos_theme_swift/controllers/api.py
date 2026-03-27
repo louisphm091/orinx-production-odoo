@@ -9,10 +9,13 @@ from datetime import datetime
 import pytz
 import odoo
 import odoo.modules.registry
+import logging
 from odoo import fields, http, _
 from odoo.exceptions import AccessDenied, UserError
 from odoo.http import request
 from werkzeug.utils import secure_filename
+
+_logger = logging.getLogger(__name__)
 
 class SwiftZaloApiController(http.Controller):
 
@@ -503,13 +506,13 @@ class SwiftZaloApiController(http.Controller):
             except Exception:
                 pass
 
-        login = payload.get("username") or payload.get("login")
+        username = payload.get("username")
         password = payload.get("password")
         
         if not db:
             return self._error(_("Database name is required. Please provide 'db' in request body or ensure server configuration is correct."))
         
-        if not login or not password:
+        if not username or not password:
             return self._error(_("Username and password are required"))
 
         try:
@@ -526,7 +529,32 @@ class SwiftZaloApiController(http.Controller):
                 if 'swift.employee.profile' not in env.registry:
                     return self._error(_("Model 'swift.employee.profile' not found in database '%s'. Please ensure the 'pos_theme_swift' module is installed and upgraded.") % db, status=500)
 
-                request.session.authenticate(env, {"login": login, "password": password, "type": "password"})
+                # Allow login with phone number as a fallback (checking both partner and employee profile)
+                # handle both 0xxx and +84xxx formats
+                alt_phone = username.replace('0', '+84', 1) if username.startswith('0') else username.replace('+84', '0', 1)
+                target_user = env['res.users'].sudo().with_context(active_test=True).search([
+                    '|', ('login', '=', username),
+                    '|', ('partner_id.phone', 'ilike', username),
+                    '|', ('partner_id.phone', 'ilike', alt_phone),
+                    '|', ('id', 'in', env['swift.employee.profile'].sudo().search([('phone', 'ilike', username)]).mapped('user_id').ids),
+                    ('id', 'in', env['swift.employee.profile'].sudo().search([('phone', 'ilike', alt_phone)]).mapped('user_id').ids)
+                ], limit=1)
+                login_id = target_user.login if target_user else username
+                _logger.info("Login attempt for %s -> mapped to login_id %s (target_user_id: %s)", username, login_id, target_user.id if target_user else None)
+
+                try:
+                    request.session.authenticate(env, {"login": login_id, "password": password, "type": "password"})
+                except AccessDenied:
+                    # Fallback to original username if mapped login failed
+                    if login_id != username:
+                        try:
+                            request.session.authenticate(env, {"login": username, "password": password, "type": "password"})
+                        except AccessDenied:
+                            return self._error(_("Wrong login/password"), status=401)
+                    else:
+                        return self._error(_("Wrong login/password"), status=401)
+                except Exception as e:
+                    return self._error(str(e), status=401)
                 request.session.db = db
                 request._save_session(env)
 

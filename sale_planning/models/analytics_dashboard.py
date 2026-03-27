@@ -19,17 +19,25 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
         last_month_start = first_day_month - relativedelta(months=1)
 
         # --- Master Data for Filters ---
-        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        warehouses_objs = env["stock.warehouse"].sudo().search(
+            ['|', ('name', 'ilike', 'AN PHU THINH'), ('name', 'ilike', 'TRUNG TAM')]
+        )
+        allowed_wh_ids = warehouses_objs.ids
+        warehouses = [
+            {"id": w.id, "name": w.name.replace('KHO ', '').strip()}
+            for w in warehouses_objs
+        ]
+            
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         # --- Filter Processing ---
-        cat_id = filters.get("category_id")
-        wh_id = filters.get("warehouse_id")
+        cat_id = self._safe_int(filters.get("category_id"))
+        wh_id = self._safe_int(filters.get("warehouse_id"))
         
         # Product Domain
         product_domain = [('active', '=', True), ('type', '=', 'consu')]
         if cat_id:
-            product_domain.append(('categ_id', 'child_of', int(cat_id)))
+            product_domain.append(('categ_id', 'child_of', cat_id))
             
         all_products = env['product.product'].sudo().search(product_domain)
         product_ids = all_products.ids
@@ -37,7 +45,9 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
         # Order Domain Base
         order_domain = [('state', 'in', ['sale', 'done'])]
         if wh_id:
-            order_domain.append(('warehouse_id', '=', int(wh_id)))
+            order_domain.append(('warehouse_id', '=', wh_id))
+        else:
+            order_domain.append(('warehouse_id', 'in', allowed_wh_ids))
 
         SaleOrder = env['sale.order'].sudo()
         SaleLine = env['sale.order.line'].sudo()
@@ -103,25 +113,25 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
         data_table_rows = []
         # Group by product
         if order_lines:
-            grouped_data = env['sale.order.line'].read_group(
+            grouped_data = env['sale.order.line']._read_group(
                 [('id', 'in', order_lines.ids)],
-                ['product_id', 'product_uom_qty', 'price_subtotal', 'discount:avg'],
                 ['product_id'],
+                ['product_uom_qty:sum', 'price_subtotal:sum', 'discount:avg'],
                 limit=10,
-                orderby='product_uom_qty desc'
+                order='product_uom_qty:sum desc'
             )
             for i, item in enumerate(grouped_data):
-                if not item['product_id']: continue
-                product = env['product.product'].browse(item['product_id'][0])
+                product = item[0]
+                if not product: continue
                 data_table_rows.append({
                     "key": f"p{product.id}",
                     "name": product.display_name,
                     "category": product.categ_id.name or _("Other"),
-                    "pv": int(item['product_uom_qty']),
+                    "pv": int(item[1]),
                     "uu": 0,
-                    "revenue": f"{round(item['price_subtotal'] / 1000000, 1)} M",
-                    "full_price": f"{100 - round(item.get('discount', 0), 1)}%",
-                    "sale": round(item.get('discount', 0), 1)
+                    "revenue": f"{round(item[2] / 1000000, 1)} M",
+                    "full_price": f"{100 - round(item[3] or 0, 1)}%",
+                    "sale": round(item[3] or 0, 1)
                 })
 
         return {
@@ -135,3 +145,9 @@ class SalePlanningAnalyticsDashboard(models.AbstractModel):
             "warehouses": warehouses,
             "categories": categories,
         }
+
+    def _safe_int(self, value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return False

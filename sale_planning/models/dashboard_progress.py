@@ -23,11 +23,19 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
         pos_configs = env["pos.config"].sudo().search([
             ("active", "=", True),
             ("company_id", "=", env.company.id),
+            ("swift_warehouse_id", "!=", False),
+            '|',
+            ("swift_warehouse_id.name", "ilike", "AN PHU THINH"),
+            ("swift_warehouse_id.name", "ilike", "TRUNG TAM")
         ])
-        warehouses_data = [
-            {"id": config.id, "name": config.name, "warehouse_id": config.swift_warehouse_id.id if config.swift_warehouse_id else False}
-            for config in pos_configs
-        ]
+        warehouses_data = []
+        for config in pos_configs:
+            name = config.name.replace('KHO ', '').strip()
+            warehouses_data.append({
+                "id": config.id, 
+                "name": name, 
+                "warehouse_id": config.swift_warehouse_id.id
+            })
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         # --- Filter Processing ---
@@ -36,6 +44,9 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
 
         selected_config = pos_configs.filtered(lambda c: c.id == branch_id)[:1] if branch_id else False
         target_warehouse_id = selected_config.swift_warehouse_id.id if selected_config and selected_config.swift_warehouse_id else False
+        
+        # Determine allowed warehouse IDs
+        allowed_warehouse_ids = [config.swift_warehouse_id.id for config in pos_configs if config.swift_warehouse_id]
 
         # ---- Top products to track ----
         Product = env['product.product'].sudo()
@@ -53,18 +64,21 @@ class SalePlanningDashboardProgressService(models.AbstractModel):
             ('state', 'in', ['sale', 'done']),
             ('product_id', 'in', product_ids),
         ]
-        if target_warehouse_id and 'warehouse_id' in env['sale.order']._fields:
-            line_domain.append(('order_id.warehouse_id', '=', target_warehouse_id))
+        if 'warehouse_id' in env['sale.order']._fields:
+            if target_warehouse_id:
+                line_domain.append(('order_id.warehouse_id', '=', target_warehouse_id))
+            else:
+                line_domain.append(('order_id.warehouse_id', 'in', allowed_warehouse_ids))
 
-        top_lines = SaleLine.read_group(
+        top_lines = SaleLine._read_group(
             line_domain + [('order_id.date_order', '>=', str(today - timedelta(days=60)))],
-            ['product_id', 'product_uom_qty'],
             ['product_id'],
+            ['product_uom_qty:sum'],
             limit=10,
-            orderby='product_uom_qty desc'
+            order='product_uom_qty:sum desc'
         )
 
-        final_product_pids = [l['product_id'][0] for l in top_lines if l['product_id']]
+        final_product_pids = [l[0].id for l in top_lines if l[0]]
         products = Product.browse(final_product_pids)
 
         # planned vs actual (planned = last month, actual = this month)

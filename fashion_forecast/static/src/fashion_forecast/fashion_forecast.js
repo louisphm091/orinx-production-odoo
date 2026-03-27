@@ -8,14 +8,12 @@ import { _t } from "@web/core/l10n/translation";
 
 const FASHION_FORECAST_TRANSLATION_TERMS = [
     _t("DEMAND FORECAST"),
-    _t("Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry"),
+    _t("Forecast demand quantity by product, time and scenario to serve supply planning"),
     _t("Month"),
     _t("This Month"),
     _t("Next Month"),
     _t("Refresh Forecast"),
-    _t("Women's Fashion"),
-    _t("Men's Fashion"),
-    _t("SKU Group / SKU"),
+    _t("Product Group / SKU"),
     _t("SKU Group"),
     _t("SKU"),
     _t("Week"),
@@ -55,14 +53,12 @@ const VI_VN_FASHION_FORECAST_TRANSLATIONS = {
     "DEMAND FORECAST": "DỰ BÁO NHU CẦU",
     "Demand Forecast": "Dự báo nhu cầu",
     "Revenue Forecast": "Dự báo doanh thu",
-    "Forecast demand quantity by product, time and scenario to serve supply planning for the fashion industry": "Dự báo số lượng nhu cầu theo sản phẩm, thời gian và kịch bản để phục vụ kế hoạch cung ứng ngành thời trang",
+    "Forecast demand quantity by product, time and scenario to serve supply planning": "Dự báo số lượng nhu cầu theo sản phẩm, thời gian và kịch bản để phục vụ kế hoạch cung ứng",
     "Month": "Tháng",
     "This Month": "Tháng này",
     "Next Month": "Tháng sau",
     "Refresh Forecast": "Làm mới dự báo",
-    "Women's Fashion": "Thời trang nữ",
-    "Men's Fashion": "Thời trang nam",
-    "SKU Group / SKU": "Nhóm SKU / SKU",
+    "Product Group / SKU": "Nhóm sản phẩm / SKU",
     "SKU Group": "Nhóm SKU",
     "SKU": "Mã hàng",
     "Week": "Tuần",
@@ -241,6 +237,10 @@ export class FashionForecastDashboard extends Component {
             this.state.forecast_leak_rows = data.forecast_leak_rows || [];
             this.state.top_rows = this.state.forecast_rows;
 
+            if (data.forecast_id) {
+                this.state.filters.forecast_id = data.forecast_id;
+            }
+
             if (data.adjustment_percent !== undefined && data.adjustment_percent !== null) {
                 this.state.adjustment_percent = data.adjustment_percent;
             }
@@ -254,6 +254,17 @@ export class FashionForecastDashboard extends Component {
         } finally {
             this.state.loading = false;
         }
+    }
+
+    async goToSupplyPlanning(ev) {
+        if (ev) ev.preventDefault();
+        
+        this.action.doAction("sale_planning.action_sale_planning_dashboard", {
+            additionalContext: {
+                default_forecast_id: this.state.filters.forecast_id,
+                default_warehouse_id: this.state.filters.warehouse_id,
+            }
+        });
     }
 
     formatNumber(value) {

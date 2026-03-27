@@ -16,7 +16,6 @@ import { _t } from "@web/core/l10n/translation";
 
 const DEMAND_FORECAST_TRANSLATION_TERMS = [
     _t("REVENUE FORECAST"),
-    _t("Fashion Industry"),
     _t("Refresh Forecast"),
     _t("Advanced Settings"),
     _t("Loading data..."),
@@ -66,7 +65,6 @@ const VI_VN_DEMAND_FORECAST_TRANSLATIONS = {
     "REVENUE FORECAST": "DỰ BÁO DOANH THU",
     "Revenue Forecast": "Dự báo doanh thu",
     "Demand Forecast": "Dự báo nhu cầu",
-    "Fashion Industry": "Ngành thời trang",
     "Refresh Forecast": "Làm mới dự báo",
     "Advanced Settings": "Cài Đặt Nâng Cao",
     "Loading data...": "Đang tải dữ liệu...",

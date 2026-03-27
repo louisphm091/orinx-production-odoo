@@ -174,6 +174,7 @@ class DemandForecastDashboard(models.AbstractModel):
             inventory_forecast = {}
 
         return {
+            "forecast_id": forecast.id if forecast else None,
             "kpis": kpis,
             "series": series,
             "forecast_rows": forecast_rows,

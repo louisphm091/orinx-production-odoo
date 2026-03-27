@@ -38,36 +38,104 @@ class SalePlanningDashboard(models.AbstractModel):
             end_date = today
 
         # ---- Master Data for Filters ----
-        warehouses = env["stock.warehouse"].sudo().search_read([], ["id", "name"])
+        warehouses_objs = env["stock.warehouse"].sudo().search(
+            ['|', ('name', 'ilike', 'AN PHU THINH'), ('name', 'ilike', 'TRUNG TAM')]
+        )
+        allowed_wh_ids = warehouses_objs.ids
+        warehouses = [
+            {"id": w.id, "name": w.name.replace('KHO ', '').strip()}
+            for w in warehouses_objs
+        ]
+        
         categories = env["product.category"].sudo().search_read([], ["id", "name"])
 
         # ---- Filter Processing ----
-        Warehouse = env["stock.warehouse"].sudo()
-        wh = None
-        if filters.get("warehouse_id"):
-            wh = Warehouse.browse(int(filters["warehouse_id"])).exists()
-        if not wh:
-            wh = Warehouse.search([("company_id", "=", env.company.id)], limit=1)
+        wh_id = self._safe_int(filters.get("warehouse_id"))
+        wh = env["stock.warehouse"].sudo().browse(wh_id) if wh_id else False
 
         # ---- Products (storable, active) ----
         Product = env["product.product"].sudo()
-        domain = [
-            ("active", "=", True),
-            ("type", "=", "consu"),
-            ("is_storable", "=", True),
-        ]
-        if filters.get("category_id"):
-            domain.append(("categ_id", "child_of", int(filters["category_id"])))
-        if filters.get("product_id"):
-            domain.append(("id", "=", int(filters["product_id"])))
+        
+        # ---- Forecast Demand Handling ----
+        forecast_id = self._safe_int(filters.get("forecast_id"))
+        forecast_map = {}
+        all_products = Product.browse([])
 
-        all_products = Product.search(domain, limit=200)
+        if not forecast_id:
+            # Fallback: Find latest forecast record
+            f_domain = []
+            if wh:
+                f_domain.append(("warehouse_id", "=", wh.id))
+            LatestForecast = env["demand.forecast"].sudo().search(f_domain, limit=1, order="date_from desc, id desc")
+            if LatestForecast:
+                forecast_id = LatestForecast.id
+
+        if forecast_id:
+            Forecast = env["demand.forecast"].sudo().browse(int(forecast_id))
+            if Forecast.exists():
+                flines = Forecast.line_ids
+                # Sum up forecast quantities per product
+                for fl in flines:
+                    pid = fl.product_id.id
+                    forecast_map[pid] = forecast_map.get(pid, 0.0) + (fl.forecast_qty or 0.0)
+                
+                # Fetch products directly from forecast lines
+                all_products = flines.mapped("product_id").filtered(lambda p: p.active)
+        
+        if not all_products:
+            # Fallback: Traditional storable products + historical demand logic
+            domain = [("active", "=", True)]
+            if "is_storable" in Product._fields:
+                domain.append("|")
+                domain.append(("is_storable", "=", True))
+                domain.append(("type", "=", "product"))
+            else:
+                domain.append(("type", "=", "product"))
+                
+            if filters.get("category_id"):
+                domain.append(("categ_id", "child_of", int(filters["category_id"])))
+            
+            all_products = Product.search(domain, limit=200)
+            
+            # Populate forecast_map with historical average demand (as a baseline)
+            # Fetch it now since it's used as fallback
+            thirty_days_ago = today - timedelta(days=30)
+            SaleLine = env["sale.order.line"].sudo()
+            sale_domain = [
+                ("order_id.state", "in", ["sale", "done"]),
+                ("order_id.date_order", ">=", str(thirty_days_ago)),
+                ("product_id", "in", all_products.ids),
+            ]
+            if wh:
+                sale_domain.append(("order_id.warehouse_id", "=", wh.id))
+            
+            s_lines = SaleLine.search(sale_domain)
+            d_hist_map = {}
+            for sl in s_lines:
+                pid = sl.product_id.id
+                d_hist_map[pid] = d_hist_map.get(pid, 0.0) + sl.product_uom_qty
+
+            for p in all_products:
+                if p.id in d_hist_map:
+                    forecast_map[p.id] = d_hist_map[p.id]
 
         if not all_products:
             return {
-                "kpis": {}, "main_chart": {}, "rev_by_category": [], "rev_spark": {},
-                "inventory_forecast": None, "order_suggestions": [],
-                "warehouses": warehouses, "categories": categories,
+                "kpis": {
+                    "total_supply_need": 0,
+                    "purchase_plan_qty": 0,
+                    "risk_sku_count": 0,
+                    "waiting_orders": 0,
+                    "growth_percent": 0,
+                    "last_update": fields.Datetime.to_string(fields.Datetime.now()),
+                },
+                "main_chart": {}, 
+                "rev_by_category": [], 
+                "rev_spark": {},
+                "inventory_forecast": None, 
+                "order_suggestions": [],
+                "warehouses": warehouses, 
+                "categories": categories,
             }
 
         # ---- Real stock quantities ----
@@ -79,6 +147,11 @@ class SalePlanningDashboard(models.AbstractModel):
         ]
         if wh:
             quant_domain.append(("location_id", "child_of", wh.view_location_id.id))
+        else:
+            # All allowed warehouses
+            view_locations = warehouses_objs.mapped('view_location_id').ids
+            if view_locations:
+                quant_domain.append(("location_id", "child_of", view_locations))
         
         quants = StockQuant.search(quant_domain)
         stock_map = {}
@@ -93,6 +166,12 @@ class SalePlanningDashboard(models.AbstractModel):
             ("order_id.date_order", "<=", str(end_date)),
             ("product_id", "in", product_ids),
         ]
+        if "warehouse_id" in env["sale.order"]._fields:
+            if wh:
+                sale_domain.append(("order_id.warehouse_id", "=", wh.id))
+            else:
+                sale_domain.append(("order_id.warehouse_id", "in", allowed_wh_ids))
+        
         sale_lines = SaleLine.search(sale_domain)
         demand_map = {}
         for sl in sale_lines:
@@ -124,46 +203,56 @@ class SalePlanningDashboard(models.AbstractModel):
         demand_total = 0
         purchase_plan_total = 0
         risk_sku = 0
+        # ---- Dashboard Stats ----
         sku_rows = []
+        demand_total = 0.0
+        purchase_plan_total = 0.0
+        risk_sku = 0
 
-        products_with_demand = sorted(
-            [(p, demand_map.get(p.id, 0)) for p in all_products],
-            key=lambda x: x[1], reverse=True
-        )[:15]
-
-        if all(d == 0 for _, d in products_with_demand):
-            products_with_demand = [
-                (p, stock_map.get(p.id, 0) * 1.5) for p in all_products[:15]
-            ]
-
-        for p, demand in products_with_demand:
-            demand = int(demand) if demand else 0
-            onhand = int(stock_map.get(p.id, 0))
-            plan_buy = int(purchase_map.get(p.id, 0))
-            shortage = max(0, demand - (onhand + plan_buy))
-
+        # Build data rows
+        for p in all_products:
+            onhand_qty = stock_map.get(p.id, 0.0)
+            forecast_qty = forecast_map.get(p.id, 0.0)
+            # Threshold from reordering rules
+            threshold = 0.0
+            orderpoint = env["stock.warehouse.orderpoint"].sudo().search([
+                ("product_id", "=", p.id),
+                ("warehouse_id", "in", allowed_wh_ids),
+                ("active", "=", True)
+            ], limit=1)
+            if orderpoint:
+                threshold = orderpoint.product_min_qty
+            
+            # Simple demand = Forecast
+            demand = forecast_qty
+            # Shortage calculation
+            shortage = max(0.0, (threshold + demand) - onhand_qty)
+            
+            # If we select a forecast, show everything in it even if 0 shortage
+            # If not using forecast, skip empty/boring rows
+            if not forecast_id and demand <= 0 and shortage <= 0 and onhand_qty <= 0:
+                continue
+            
             demand_total += demand
-            purchase_plan_total += plan_buy
-            if shortage > 0 and demand > 0:
-                risk_sku += 1
+            purchase_plan_total += shortage # Suggested purchase
 
             sku_rows.append({
-                "key": f"sku_{p.id}",
-                "sku_name": p.display_name,
-                "category": p.categ_id.display_name if p.categ_id else _("Uncategorized"),
-                "demand": demand,
-                "onhand": onhand,
-                "plan_buy": plan_buy,
-                "risk": shortage > 0 and demand > 0,
+                "key": f"p_{p.id}",
+                "stt": len(sku_rows) + 1,
+                "sku": p.display_name,
+                "category": p.categ_id.name if p.categ_id else _("Uncategorized"),
+                "demand": int(round(demand)),
+                "onhand": int(round(onhand_qty)),
+                "plan_buy": int(round(shortage)),
+                "status": _("Out of Stock Risk") if (onhand_qty < threshold or shortage > 0) else _("Stable"),
             })
 
-        # KPI construction simplified, growth vs last month always compared same span
         kpis = {
             "total_supply_need": demand_total,
             "purchase_plan_qty": purchase_plan_total,
-            "risk_sku_count": risk_sku,
-            "waiting_orders": waiting_orders,
-            "growth_percent": 12, # Static for now or recalculate
+            "risk_sku_count": len([r for r in sku_rows if r["plan_buy"] > 0]),
+            "waiting_orders": len(PurchaseOrder.search([("state", "in", ["draft", "sent"])])),
+            "growth_percent": 0,
             "last_update": fields.Datetime.to_string(fields.Datetime.now()),
         }
 
@@ -187,17 +276,7 @@ class SalePlanningDashboard(models.AbstractModel):
                 "color": palette[i % len(palette)],
             })
 
-        order_suggestions = []
-        for i, r in enumerate(sku_rows[:8], start=1):
-            order_suggestions.append({
-                "stt": i,
-                "sku": r["sku_name"],
-                "category": r["category"],
-                "demand": r["demand"],
-                "onhand": r["onhand"],
-                "plan_buy": r["plan_buy"],
-                "status": _("Out of Stock Risk") if r["risk"] else _("Stable"),
-            })
+        order_suggestions = sku_rows
 
         return {
             "kpis": kpis,
@@ -213,6 +292,12 @@ class SalePlanningDashboard(models.AbstractModel):
             "warehouses": warehouses,
             "categories": categories,
         }
+
+    def _safe_int(self, value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return False
 
     @api.model
     def create_supply_plan(self, **kwargs):
