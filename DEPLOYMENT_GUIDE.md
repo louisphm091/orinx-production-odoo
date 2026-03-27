@@ -23,7 +23,7 @@ sudo apt install python3-pip python3-dev python3-venv \
 
 # Clone Odoo 19
 mkdir ~/orinx && cd ~/orinx
-git clone https://github.com/odoo/odoo.git --depth 1 --branch 18.0 odoo # Note: Use branch 18.0 or 19.0 when available
+git clone https://github.com/odoo/odoo.git --depth 1 --branch 19.0 odoo # Note: Use branch 19.0
 ```
 
 ## 3. Clone Custom Modules
