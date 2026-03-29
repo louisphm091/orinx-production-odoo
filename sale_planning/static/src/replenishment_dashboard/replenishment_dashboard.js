@@ -58,6 +58,7 @@ export class ReplenishmentDashboard extends Component {
         reason: "",
         state: "",
       },
+      editing_row: null,
     });
 
     this.load();
@@ -338,6 +339,77 @@ export class ReplenishmentDashboard extends Component {
     }
     this.state.filters.selected_key = key;
     await this.load();
+  }
+
+  onCellClick(ev, rowKey, field) {
+    if (ev) {
+      ev.stopPropagation();
+    }
+    if (!['forecast_qty', 'demand_qty'].includes(field)) return;
+    this.state.editing_row = { key: rowKey, field };
+  }
+
+  onCellBlur(ev, row) {
+    if (ev) {
+      ev.stopPropagation();
+    }
+    const editingField = this.state.editing_row?.field;
+    if (!editingField) {
+      this.state.editing_row = null;
+      return;
+    }
+    const newVal = parseFloat(ev.target.value);
+    if (!isNaN(newVal) && newVal !== row[editingField]) {
+        this.saveCellValue(row, newVal);
+    }
+    this.state.editing_row = null;
+  }
+
+  onCellKeyDown(ev, row) {
+    if (ev) {
+      ev.stopPropagation();
+    }
+    const editingField = this.state.editing_row?.field;
+    if (!editingField) {
+      this.state.editing_row = null;
+      return;
+    }
+    if (ev.key === "Enter") {
+        const newVal = parseFloat(ev.target.value);
+        if (!isNaN(newVal) && newVal !== row[editingField]) {
+            this.saveCellValue(row, newVal);
+        }
+        this.state.editing_row = null;
+    } else if (ev.key === "Escape") {
+        this.state.editing_row = null;
+    }
+  }
+
+  async saveCellValue(row, newValue) {
+    try {
+        const result = await this.orm.call(
+            "demand.forecast.dashboard",
+            "save_forecast_line",
+            [],
+            {
+                product_id: row.product_id,
+                qty: newValue,
+                filters: {
+                    forecast_id: this.state.filters.forecast_id,
+                    warehouse_id: this.state.filters.warehouse_id,
+                }
+            }
+        );
+        if (result && result.ok) {
+            this.notification.add(this._t("Saved forecast adjustment."), { type: "success" });
+            this.load();
+        } else {
+            this.notification.add(result.message || this._t("Failed to save."), { type: "danger" });
+        }
+    } catch (e) {
+        console.error(e);
+        this.notification.add(this._t("Error saving forecast."), { type: "danger" });
+    }
   }
 
   badgeText(state) {

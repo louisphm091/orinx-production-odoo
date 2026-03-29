@@ -11,6 +11,41 @@ class FashionForecastDashboard(models.AbstractModel):
     _name = "fashion.forecast.dashboard"
     _description = "Fashion Forecast Dashboard Service"
 
+    def _resolve_warehouse_id(self, filters=None):
+        filters = filters or {}
+        wh_id = filters.get("warehouse_id")
+        if wh_id:
+            return int(wh_id)
+        user = self.env.user.with_company(self.env.company.id)
+        if hasattr(user, "_get_default_warehouse_id"):
+            warehouse = user._get_default_warehouse_id()
+            if warehouse:
+                return warehouse.id
+        warehouse = self.env["stock.warehouse"].sudo().search(
+            [("company_id", "=", self.env.company.id)],
+            limit=1,
+        )
+        return warehouse.id or False
+
+    def _seed_forecast_lines_from_dynamic_data(self, forecast, filters=None):
+        filters = dict(filters or {})
+        filters["forecast_id"] = False
+        dynamic_data = self._get_dynamic_historical_forecast(filters)
+        existing_product_ids = set(forecast.line_ids.mapped("product_id").ids)
+        line_vals = []
+        for row in dynamic_data.get("forecast_rows", []):
+            product_id = row.get("product_id")
+            if not product_id or int(product_id) in existing_product_ids:
+                continue
+            line_vals.append({
+                "forecast_id": forecast.id,
+                "product_id": int(product_id),
+                "forecast_qty": float(row.get("demand") or 0.0),
+                "actual_qty": float(row.get("actual") or 0.0),
+            })
+        if line_vals:
+            self.env["fashion.forecast.line"].sudo().create(line_vals)
+
     @api.model
     def get_dashboard_data(self, **kwargs):
         filters = kwargs.get("filters") or {}
@@ -40,6 +75,8 @@ class FashionForecastDashboard(models.AbstractModel):
         if not forecast:
             return self._get_dynamic_historical_forecast(filters)
 
+        if forecast.state == "draft":
+            self._seed_forecast_lines_from_dynamic_data(forecast, filters)
         lines = Line.search([("forecast_id", "=", forecast.id)])
 
         total_forecast = sum(lines.mapped("forecast_qty")) or 0.0
@@ -123,6 +160,7 @@ class FashionForecastDashboard(models.AbstractModel):
             })
 
         return {
+            "forecast_id": forecast.id,
             "kpis": kpis,
             "series": series,
             "forecast_rows": forecast_rows,
@@ -227,6 +265,7 @@ class FashionForecastDashboard(models.AbstractModel):
         weights = [0.12, 0.15, 0.17, 0.18, 0.20, 0.18]
         
         return {
+            "forecast_id": False,
             "kpis": {
                 "sku_forecast": int(round(f_total)),
                 "delta_percent": "0%",
@@ -256,3 +295,67 @@ class FashionForecastDashboard(models.AbstractModel):
             "forecast_leak_rows": [],
             "adjustment_percent": 0,
         }
+
+    @api.model
+    def save_forecast_line(self, product_id, qty, filters=None):
+        """Save manual forecast quantity for a product on fashion forecast."""
+        env = self.env
+        Forecast = env["fashion.forecast"].sudo()
+        Line = env["fashion.forecast.line"].sudo()
+        Product = env["product.product"].sudo().browse(int(product_id))
+
+        if not Product.exists():
+            return {"ok": False, "message": "Product not found."}
+
+        filters = filters or {}
+        forecast_id = filters.get("forecast_id")
+        wh_id = self._resolve_warehouse_id(filters)
+        forecast = False
+
+        if forecast_id:
+            forecast = Forecast.browse(int(forecast_id)).exists()
+
+        if not forecast:
+            domain = [("company_id", "=", env.company.id)]
+            if wh_id:
+                domain.append(("warehouse_id", "=", wh_id))
+            forecast = Forecast.search(domain, limit=1, order="date_from desc, id desc")
+
+        if not forecast:
+            today = date.today()
+            date_from = today.replace(day=1)
+            date_to = (date_from + relativedelta(months=1)) - timedelta(days=1)
+            vals = {
+                "name": f"Dự báo thời trang {date_from.strftime('%m/%Y')}",
+                "date_from": date_from,
+                "date_to": date_to,
+                "company_id": env.company.id,
+                "warehouse_id": wh_id,
+            }
+            forecast = Forecast.create(vals)
+
+        self._seed_forecast_lines_from_dynamic_data(forecast, filters)
+
+        line = Line.search(
+            [
+                ("forecast_id", "=", forecast.id),
+                ("product_id", "=", Product.id),
+            ],
+            limit=1,
+        )
+
+        values = {"forecast_qty": float(qty)}
+        if line:
+            line.write(values)
+        else:
+            Line.create(
+                {
+                    "forecast_id": forecast.id,
+                    "product_id": Product.id,
+                    "forecast_qty": float(qty),
+                    "date_from": forecast.date_from,
+                    "date_to": forecast.date_to,
+                }
+            )
+
+        return {"ok": True, "message": "Saved.", "forecast_id": forecast.id}

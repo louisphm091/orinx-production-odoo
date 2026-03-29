@@ -243,7 +243,15 @@
                           <td><t t-esc="r.stt"/></td>
                           <td class="fw-semibold"><t t-esc="r.sku"/></td>
                           <td class="text-muted"><t t-esc="r.category"/></td>
-                          <td class="text-end"><t t-esc="formatNumber(r.demand)"/></td>
+                          <td class="text-end" t-on-click="(ev) => this.onCellClick(r.key, 'demand')">
+                            <div t-if="state.editing_row?.key === r.key" class="sp_cell_input_wrap">
+                                <input type="number" class="form-control form-control-sm sp_cell_input" t-att-value="r.demand" t-on-blur="(ev) => this.onCellBlur(ev, r)" t-on-keydown="(ev) => this.onCellKeyDown(ev, r)" t-att-autofocus="true"/>
+                            </div>
+                            <div t-else="" class="ff_cell_value fw-bold text-primary">
+                              <t t-esc="formatNumber(r.demand)"/>
+                              <i class="fa fa-pencil ms-1 text-muted small"/>
+                            </div>
+                          </td>
                           <td class="text-end"><t t-esc="formatNumber(r.onhand)"/></td>
                           <td class="text-end"><t t-esc="formatNumber(r.plan_buy)"/></td>
                           <td>

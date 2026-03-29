@@ -785,6 +785,18 @@ class SwiftZaloApiController(http.Controller):
         qty_map, location = self._swift_stock_qty_map(product.ids, branch_config=branch_config)
         return self._ok(self._swift_product_payload(product, qty_map=qty_map, location=location))
 
+    @http.route("/api/swift/v1/products/by-barcode", type="http", auth="user", methods=["GET"], csrf=False)
+    def get_product_by_barcode_query(self, **kwargs):
+        barcode = (
+            request.httprequest.args.get("barcode")
+            or request.httprequest.args.get("barCode")
+            or request.httprequest.args.get("sku")
+            or ""
+        ).strip()
+        if not barcode:
+            return self._error(_("Barcode is required"))
+        return self.get_product_by_barcode(barcode, **kwargs)
+
     @http.route("/api/swift/v1/products/export-stock-report", type="http", auth="user", methods=["POST"], csrf=False)
     def export_stock_report(self, **kwargs):
         payload = self._json_body()

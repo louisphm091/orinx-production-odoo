@@ -8,11 +8,24 @@ class FashionForecast(models.Model):
     _description = "Fashion Forecast Dashboard"
     _order = "date_from desc, id desc"
 
+    @api.model
+    def _default_warehouse_id(self):
+        user = self.env.user.with_company(self.env.company.id)
+        if hasattr(user, "_get_default_warehouse_id"):
+            warehouse = user._get_default_warehouse_id()
+            if warehouse:
+                return warehouse.id
+        warehouse = self.env["stock.warehouse"].search(
+            [("company_id", "=", self.env.company.id)],
+            limit=1,
+        )
+        return warehouse.id
+
     name = fields.Char(required = True, default = lambda self: _("New Forecast"))
     company_id = fields.Many2one("res.company", required = True, default = lambda self: self.env.company)
     currency_id = fields.Many2one(related = "company_id.currency_id", store = False, readonly = True)
 
-    warehouse_id = fields.Many2one("stock.warehouse", required = True)
+    warehouse_id = fields.Many2one("stock.warehouse", required = True, default = _default_warehouse_id)
     date_from = fields.Date(required = True, default = fields.Date.context_today)
     date_to = fields.Date(required = True, default = fields.Date.context_today)
 

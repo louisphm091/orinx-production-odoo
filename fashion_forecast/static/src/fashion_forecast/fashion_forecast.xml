@@ -169,7 +169,15 @@
                                 <tr>
                                 <td class="fw-semibold"><t t-esc="row.name"/></td>
                                 <td class="text-end"><t t-esc="row.category"/></td>
-                                <td class="text-end"><t t-esc="formatNumber(row.demand)"/></td>
+                                <td class="text-end" t-on-click="(ev) => this.onCellClick(ev, row.key, 'demand')">
+                                    <div t-if="state.editing_row?.key === row.key" class="ff_cell_input_wrap">
+                                        <input type="number" class="form-control form-control-sm ff_cell_input" t-att-value="row.demand" t-on-click.stop="() => {}" t-on-blur="(ev) => this.onCellBlur(ev, row)" t-on-keydown="(ev) => this.onCellKeyDown(ev, row)" t-att-autofocus="true"/>
+                                    </div>
+                                    <div t-else="" class="ff_cell_value fw-bold text-primary">
+                                        <t t-esc="formatNumber(row.demand)"/>
+                                        <i class="fa fa-pencil ms-1 text-muted small"/>
+                                    </div>
+                                </td>
                                 <td class="text-end text-muted"><t t-esc="formatNumber(row.minimum)"/></td>
                                 <td class="text-end">
                                     <span class="badge bg-light text-dark">
@@ -228,7 +236,15 @@
                               <tr>
                                 <td class="fw-semibold"><t t-esc="row.name"/></td>
                                 <td class="text-end"><t t-esc="row.category"/></td>
-                                <td class="text-end"><t t-esc="formatNumber(row.demand)"/></td>
+                                <td class="text-end" t-on-click="(ev) => this.onCellClick(ev, row.key, 'demand')">
+                                  <div t-if="state.editing_row?.key === row.key" class="ff_cell_input_wrap">
+                                      <input type="number" class="form-control form-control-sm ff_cell_input" t-att-value="row.demand" t-on-click.stop="() => {}" t-on-blur="(ev) => this.onCellBlur(ev, row)" t-on-keydown="(ev) => this.onCellKeyDown(ev, row)" t-att-autofocus="true"/>
+                                  </div>
+                                  <div t-else="" class="ff_cell_value fw-bold text-primary">
+                                    <t t-esc="formatNumber(row.demand)"/>
+                                    <i class="fa fa-pencil ms-1 text-muted small"/>
+                                  </div>
+                                </td>
                                 <td class="text-end text-muted"><t t-esc="formatNumber(row.minimum)"/></td>
                                 <td class="text-end">
                                   <span class="badge bg-light text-dark">

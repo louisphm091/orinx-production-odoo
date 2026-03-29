@@ -8,6 +8,12 @@
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         </record>
 
+        <record id="demand_forecast_line_multi_company" model="ir.rule">
+            <field name="name">Demand Forecast Line Multi-Company</field>
+            <field name="model_id" ref="model_demand_forecast_line"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
         <!-- Record Rule for Fashion Forecast -->
         <record id="fashion_forecast_multi_company" model="ir.rule">
             <field name="name">Fashion Forecast Multi-Company</field>

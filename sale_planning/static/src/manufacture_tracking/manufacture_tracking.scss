@@ -1,7 +1,9 @@
 .mt_wrap {
   padding: 16px 20px;
   background: #f8fafc;
-  min-height: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #334155;
 }

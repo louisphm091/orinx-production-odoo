@@ -10,7 +10,7 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
     @api.model
     def get_kpis(self):
         # Auto-seed if empty for demo
-        if not self.env["mrp.production"].sudo().search_count([]):
+        if not self.env["mrp.workorder"].sudo().search_count([]):
             self.seed_mock_data()
         
         today = fields.Date.context_today(self)
@@ -113,7 +113,7 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
 
     @api.model
     def get_lines_table(self):
-        workorders = self.env["mrp.workorder"].search([
+        workorders = self.env["mrp.workorder"].sudo().search([
             ("state", "in", ["ready", "progress", "done", "waiting"]),
             ("production_id.company_id", "=", self.env.company.id)
         ])
@@ -141,6 +141,42 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
 
             efficiency = workcenter.time_efficiency or 1.0
             row["loadCap"] += 480.0 * efficiency
+
+        if not rows:
+            productions = self.env["mrp.production"].sudo().search([
+                ("state", "in", ["confirmed", "progress", "done", "to_close"]),
+                ("company_id", "=", self.env.company.id),
+            ])
+
+            for production in productions:
+                workcenter = (
+                    production.workorder_ids[:1].workcenter_id
+                    or production.bom_id.operation_ids[:1].workcenter_id
+                )
+                line_key = workcenter.id or production.id
+                row = rows.setdefault(
+                    line_key,
+                    {
+                        "line": workcenter.display_name or production.name,
+                        "product": production.product_id.display_name,
+                        "plan": 0.0,
+                        "target": 0.0,
+                        "result": 0.0,
+                        "delay": 0.0,
+                        "loadUsed": 0.0,
+                        "loadCap": 0.0,
+                    },
+                )
+
+                row["plan"] += production.product_qty or 0.0
+                if production.state in ("done", "to_close"):
+                    row["result"] += production.product_qty or 0.0
+                elif "qty_producing" in production._fields:
+                    row["result"] += production.qty_producing or 0.0
+
+                if workcenter:
+                    row["loadUsed"] += sum(production.workorder_ids.mapped("duration_expected"))
+                    row["loadCap"] += 480.0 * (workcenter.time_efficiency or 1.0)
 
         result = []
         for index, r in enumerate(rows.values(), start=1):
@@ -186,7 +222,17 @@ class SalePlanningManufactureTrackingService(models.AbstractModel):
         # 2. Workcenter
         wc = WC.search([], limit=1)
         if not wc:
-            wc = WC.create({'name': 'Chuyền may A1', 'time_efficiency': 0.95})
+            wc = WC.create({'name': 'Chuyền may A1', 'time_efficiency': 0.95, 'capacity': 1, 'time_start': 0, 'time_stop': 0})
+            
+        # 3. Ensure BOM has operations
+        if not bom.operation_ids:
+            self.env['mrp.routing.workcenter'].sudo().create({
+                'name': 'May hoàn thiện',
+                'bom_id': bom.id,
+                'workcenter_id': wc.id,
+                'time_cycle': 10,
+                'sequence': 10,
+            })
             
         today = fields.Date.today()
         

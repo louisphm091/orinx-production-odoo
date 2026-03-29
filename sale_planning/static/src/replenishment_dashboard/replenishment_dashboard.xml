@@ -129,7 +129,7 @@
                       <th>Danh mục</th>
                       <th>Chi nhánh</th>
                       <th class="text-end">Nhu cầu (30n)</th>
-                      <th class="text-end">Nhu cầu dự báo</th>
+                      <th class="text-end" t-out="this._t('Demand')"/>
                       <th class="text-end">Tồn kho hiện tại</th>
                       <th class="text-end">Ngưỡng tồn kho</th>
                       <th class="text-end">SL bổ sung gợi ý</th>
@@ -155,8 +155,24 @@
                           </td>
                           <td><t t-esc="r.category"/></td>
                           <td><t t-esc="r.warehouse"/></td>
-                          <td class="text-end"><t t-esc="r.demand_qty"/></td>
-                          <td class="text-end fw-bold text-primary"><t t-esc="r.forecast_qty"/></td>
+                          <td class="text-end" t-on-click="(ev) => this.onCellClick(ev, r.key, 'demand_qty')">
+                            <div t-if="state.editing_row?.key === r.key and state.editing_row?.field === 'demand_qty'" class="sp_cell_input_wrap">
+                                <input type="number" class="form-control form-control-sm sp_cell_input" t-att-value="r.demand_qty" t-on-click.stop="() => {}" t-on-blur="(ev) => this.onCellBlur(ev, r)" t-on-keydown="(ev) => this.onCellKeyDown(ev, r)" t-att-autofocus="true"/>
+                            </div>
+                            <div t-else="" class="ff_cell_value fw-bold text-primary">
+                              <t t-esc="r.demand_qty"/>
+                              <i class="fa fa-pencil ms-1 text-muted small"/>
+                            </div>
+                          </td>
+                          <td class="text-end" t-on-click="(ev) => this.onCellClick(ev, r.key, 'forecast_qty')">
+                            <div t-if="state.editing_row?.key === r.key and state.editing_row?.field === 'forecast_qty'" class="sp_cell_input_wrap">
+                                <input type="number" class="form-control form-control-sm sp_cell_input" t-att-value="r.forecast_qty" t-on-click.stop="() => {}" t-on-blur="(ev) => this.onCellBlur(ev, r)" t-on-keydown="(ev) => this.onCellKeyDown(ev, r)" t-att-autofocus="true"/>
+                            </div>
+                            <div t-else="" class="ff_cell_value fw-bold text-primary">
+                              <t t-esc="r.forecast_qty"/>
+                              <i class="fa fa-pencil ms-1 text-muted small"/>
+                            </div>
+                          </td>
                           <td class="text-end"><t t-esc="r.onhand"/></td>
                           <td class="text-end"><t t-esc="r.threshold"/></td>
                           <td class="text-end fw-bold text-success"><t t-esc="r.suggest_qty"/></td>

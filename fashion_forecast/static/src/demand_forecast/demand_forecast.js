@@ -167,6 +167,8 @@ export class DemandForecastDashboard extends Component {
             adjustment_percent: 0,
             rev_spark: null,
             inventory_forecast: null,
+            editing_row: null,
+            saving_row_key: null,
         });
 
         onWillStart(async () => {
@@ -179,7 +181,7 @@ export class DemandForecastDashboard extends Component {
 
         this.onPlanProduction = this.onPlanProduction.bind(this);
         onPatched(() => {
-            if (this.state.loading) return;
+            if (this.state.loading || this.state.editing_row) return;
             afterPaint(() => this.renderAllCharts());
         });
 
@@ -316,9 +318,26 @@ export class DemandForecastDashboard extends Component {
         });
     }
 
-    async load() {
+    updateRowDemand(rowKey, newValue) {
+        const normalized = Number(newValue);
+        for (const row of this.state.forecast_rows || []) {
+            if (row.key === rowKey) {
+                row.demand = normalized;
+            }
+        }
+        for (const row of this.state.top_rows || []) {
+            if (row.key === rowKey) {
+                row.demand = normalized;
+            }
+        }
+    }
+
+    async load(options = {}) {
+        const { silent = false } = options;
         try {
-            this.state.loading = true;
+            if (!silent) {
+                this.state.loading = true;
+            }
             this.state.error = null;
 
             const data = await this.orm.call(
@@ -334,6 +353,9 @@ export class DemandForecastDashboard extends Component {
             console.log("DASHBOARD DATA DEBUG: forecast_rows", this.state.forecast_rows);
             this.state.forecast_leak_rows = data.forecast_leak_rows || [];
             this.state.top_rows = this.state.forecast_rows;
+            if (data.forecast_id) {
+                this.state.filters.forecast_id = data.forecast_id;
+            }
 
             this.state.adjustment_percent =
                 data.adjustment_percent !== undefined && data.adjustment_percent !== null
@@ -349,7 +371,9 @@ export class DemandForecastDashboard extends Component {
             this.state.error = this.tr("Cannot load Forecast dashboard data.");
             this.notification.add(this.state.error, { type: "danger" });
         } finally {
-            this.state.loading = false;
+            if (!silent) {
+                this.state.loading = false;
+            }
         }
     }
 
@@ -387,6 +411,83 @@ export class DemandForecastDashboard extends Component {
         } else {
             // Fallback: doAction normally
             this.action.doAction(result);
+        }
+    }
+
+    onCellClick(ev, rowKey, field) {
+        if (ev) {
+            ev.stopPropagation();
+        }
+        if (field !== 'demand') return;
+        this.state.editing_row = { key: rowKey };
+    }
+
+    onCellBlur(ev, row) {
+        if (ev) {
+            ev.stopPropagation();
+        }
+        this.commitCellEdit(row, ev.target.value);
+    }
+
+    onCellKeyDown(ev, row) {
+        if (ev) {
+            ev.stopPropagation();
+        }
+        if (ev.key === "Enter") {
+            ev.preventDefault();
+            this.commitCellEdit(row, ev.target.value);
+        } else if (ev.key === "Escape") {
+            this.state.editing_row = null;
+        }
+    }
+
+    commitCellEdit(row, rawValue) {
+        const rowKey = row.key;
+        if (this.state.saving_row_key === rowKey) {
+            this.state.editing_row = null;
+            return;
+        }
+        const newVal = parseFloat(rawValue);
+        this.state.editing_row = null;
+        if (isNaN(newVal) || newVal === row.demand) {
+            return;
+        }
+        this.saveCellValue(row, newVal);
+    }
+
+    async saveCellValue(row, newValue) {
+        const rowKey = row.key;
+        try {
+            this.state.saving_row_key = rowKey;
+            const pId = Array.isArray(row.product_id) ? row.product_id[0] : row.product_id;
+            const result = await this.orm.call(
+                "demand.forecast.dashboard",
+                "save_forecast_line",
+                [],
+                {
+                    product_id: pId,
+                    qty: newValue,
+                    filters: {
+                        forecast_id: this.state.filters.forecast_id,
+                        warehouse_id: this.state.filters.warehouse_id,
+                    }
+                }
+            );
+            if (result && result.ok) {
+                if (result.forecast_id) {
+                    this.state.filters.forecast_id = result.forecast_id;
+                }
+                this.updateRowDemand(rowKey, newValue);
+                this.notification.add(this.tr("Saved forecast adjustment."), { type: "success" });
+                await this.load({ silent: true });
+            } else {
+                this.notification.add(result.message || this.tr("Failed to save."), { type: "danger" });
+            }
+        } catch (e) {
+            console.error(e);
+            this.notification.add(this.tr("Error saving forecast."), { type: "danger" });
+        } finally {
+            this.state.saving_row_key = null;
         }
     }
 }

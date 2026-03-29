@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_demand_forecast_user,demand.forecast user,model_demand_forecast,base.group_user,1,1,1,1
+access_demand_forecast_line_user,demand.forecast.line user,model_demand_forecast_line,base.group_user,1,1,1,1
 access_fashion_forecast_user,fashion.forecast user,model_fashion_forecast,base.group_user,1,1,1,1
 access_fashion_forecast_line_user,fashion.forecast.line user,model_fashion_forecast_line,base.group_user,1,1,1,1
 access_fashion_forecast_dashboard_user,fashion.forecast.dashboard user,model_fashion_forecast_dashboard,base.group_user,1,0,0,0

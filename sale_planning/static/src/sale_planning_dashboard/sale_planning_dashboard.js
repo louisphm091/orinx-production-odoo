@@ -69,6 +69,7 @@ export class SalePlanningDashboard extends Component {
                 currentPage: 1,
                 pageSize: 10,
             },
+            editing_row: null,
         });
 
         onWillStart(async () => {
@@ -465,6 +466,60 @@ export class SalePlanningDashboard extends Component {
     fmtMoney(v) {
         const n = Number(v || 0);
         return n.toLocaleString("vi-VN");
+    }
+
+    onCellClick(rowKey, field) {
+        if (field !== 'demand') return;
+        this.state.editing_row = { key: rowKey };
+    }
+
+    onCellBlur(ev, row) {
+        const newVal = parseFloat(ev.target.value);
+        if (!isNaN(newVal) && newVal !== row.demand) {
+            this.saveCellValue(row, newVal);
+        }
+        this.state.editing_row = null;
+    }
+
+    onCellKeyDown(ev, row) {
+        if (ev.key === "Enter") {
+            const newVal = parseFloat(ev.target.value);
+            if (!isNaN(newVal) && newVal !== row.demand) {
+                this.saveCellValue(row, newVal);
+            }
+            this.state.editing_row = null;
+        } else if (ev.key === "Escape") {
+            this.state.editing_row = null;
+        }
+    }
+
+    async saveCellValue(row, newValue) {
+        try {
+            // key is "p_ID"
+            const pId = row.key.split('_')[1];
+            const result = await this.orm.call(
+                "demand.forecast.dashboard",
+                "save_forecast_line",
+                [],
+                {
+                    product_id: pId,
+                    qty: newValue,
+                    filters: {
+                        forecast_id: this.state.filters.forecast_id,
+                        warehouse_id: this.state.filters.warehouse_id,
+                    }
+                }
+            );
+            if (result && result.ok) {
+                this.notification.add(_t("Saved forecast adjustment."), { type: "success" });
+                this.load();
+            } else {
+                this.notification.add(result.message || _t("Failed to save."), { type: "danger" });
+            }
+        } catch (e) {
+            console.error(e);
+            this.notification.add(_t("Error saving forecast."), { type: "danger" });
+        }
     }
 }
 
